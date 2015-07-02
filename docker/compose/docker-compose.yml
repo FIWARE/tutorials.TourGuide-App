@@ -1,0 +1,26 @@
+mongodbdata:
+    image: bitergia/mongodb-org:2.6
+    volumes:
+        - /var/lib/mongo
+    restart: no
+    entrypoint: ["/bin/echo","Data-only container for mongodb"]
+
+mongodb:
+    image: bitergia/mongodb-org:2.6
+    volumes_from:
+        - mongodbdata
+    expose:
+        - "27017"
+orion:
+    image: bitergia/orion:0.22.0
+    links:
+        - mongodb
+    expose:
+        - "10026"
+
+devguide:
+    image: bitergia/fiware-devguide-app
+    links:
+        - orion
+    volumes:
+        - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
