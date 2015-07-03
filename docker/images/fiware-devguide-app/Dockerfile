@@ -66,8 +66,8 @@ RUN cd fiware-devguide-app && \
     if [ "${GIT_REV_CHANCHAN}" != "master" ]; then git checkout ${GIT_REV_CHANCHAN}; fi
 
 # server
-# RUN cd ${CC_APP_SERVER_PATH} && \
-#     npm install --loglevel warn
+RUN cd ${CC_APP_SERVER_PATH} && \
+    npm install --loglevel warn
 
 # client
 # RUN cd ${CC_APP_CLIENT_PATH} && \
