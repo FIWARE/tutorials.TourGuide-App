@@ -45,15 +45,11 @@ exports.do_get = function (options, callback, res) {
 
 exports.do_post = function (options, data, callback, res, use_https) {
 
-    console.log("In DO POST");
-
-    console.log(options);
-
     try {
         var protocol = http;
         if (use_https) {protocol = https};
         var post_req = protocol.request(options, function(response) {
-            console.log("DOING POST");
+            // console.log("DOING POST");
 
             response.setEncoding('utf8');
 
@@ -65,12 +61,12 @@ exports.do_post = function (options, data, callback, res, use_https) {
             });
 
             response.on("end", function (err) {
-                console.log(buffer);
+                // console.log(buffer);
                 callback(res, buffer, response.headers);
             });
         });
 
-        console.log("POST Request created");
+        // console.log("POST Request created");
 
         post_req.on('error', function(e) {
             // TODO: handle error.
