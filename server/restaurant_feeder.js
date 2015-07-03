@@ -6,13 +6,50 @@ var feed_url = "http://opendata.euskadi.eus";
 var feed_path = "/contenidos/ds_recursos_turisticos";
 feed_path += "/restaurantes_sidrerias_bodegas/opendata/restaurantes.json";
 var cache_file = "restaurants.json";
-var orion_host = "orion";
-var orion_port = "10026";
+// var api_rest_host = "localhost";
+// var api_rest_port = 3000; // Dev with Express
+var api_rest_host = "compose_devguide_1";
+var api_rest_port = 80;
+var restaurants_added = 0;
 
 var feed_orion_restaurants = function(jdata) {
+    return_post = function(res, buffer, headers) {
+        restaurants_added++;
+        // console.log(buffer);
+    };
+
+    // jdata = jdata.slice(0,1); // debug with 1 itemfkg
+
     console.log("Feeding restaurants info in orion.");
+    console.log("Total tried: " + jdata.length);
     Object.keys(jdata).forEach(function(element, key, _array) {
-        console.log(jdata[key].documentName);
+        // Call orion to append the entity
+        var rname = jdata[key].documentName;
+        console.log("Adding restaurant " + rname)
+        var api_rest_path = "/api/orion/contexts/";
+        var org_name = "devguide";
+        var context = rname;
+        var temp = "NA";
+        api_rest_path += org_name+'/'+context+'/'+temp;
+
+        // POST to create a new entity
+        var post_data = {} // Pending include all restaurant attributes
+        post_data = JSON.stringify(post_data);
+
+        var headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Content-Length': post_data.length
+        };
+
+        var options = {
+                host: api_rest_host,
+                port: api_rest_port,
+                path: api_rest_path,
+                method: 'POST',
+                headers: headers
+            };
+        utils.do_post(options, post_data, return_post);
     });
 };
 
