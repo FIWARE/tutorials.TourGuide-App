@@ -18,22 +18,50 @@ var feed_orion_restaurants = function(jdata) {
         // console.log(buffer);
     };
 
-    // jdata = jdata.slice(0,1); // debug with 1 itemfkg
+    // jdata = jdata.slice(0,1); // debug with 1 item
 
     console.log("Feeding restaurants info in orion.");
     console.log("Total tried: " + jdata.length);
     Object.keys(jdata).forEach(function(element, key, _array) {
         // Call orion to append the entity
         var rname = jdata[key].documentName;
+        // Time to add first attribute to orion as first approach
+        var attributes = [];
+        Object.keys(jdata[key]).forEach(function(element) {
+        // Object.keys(jdata[key]).slice(0,2).forEach(function(element) {
+            console.log(jdata[key][element]);
+            var val = jdata[key][element];
+            // Orion does not support empty values in APPEND
+            if (val === '') {
+                val = " ";
+            }
+            var attr = {"name":element,
+                        "type":"NA",
+                        "value":val};
+            attributes.push(attr)
+        });
+        console.log(attributes);
         console.log("Adding restaurant " + rname)
-        var api_rest_path = "/api/orion/contexts/";
+        var api_rest_path = "/api/orion/entities/";
         var org_name = "devguide";
-        var context = rname;
-        var temp = "NA";
-        api_rest_path += org_name+'/'+context+'/'+temp;
+        var context_id = rname;
+        var temperature_id = "NA";
+        api_rest_path += org_name;
+
+        // Time to build the Context Element in Orion language
+        var post_data = {
+            "contextElements": [
+                    {
+                        "type": "restaurant1",
+                        "isPattern": "false",
+                        "id": context_id,
+                        "attributes": attributes
+                    }
+            ],
+            "updateAction": "APPEND"
+        };
 
         // POST to create a new entity
-        var post_data = {} // Pending include all restaurant attributes
         post_data = JSON.stringify(post_data);
 
         var headers = {
