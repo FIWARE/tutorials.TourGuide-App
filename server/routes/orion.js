@@ -83,7 +83,7 @@ exports.subscribe_context = function(req, res) {
   headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Content-Length': post_data.length
+      'Content-Length': Buffer.byteLength(post_data)
   };
 
   var options = {
@@ -136,7 +136,7 @@ exports.update_context_temperature = function(req, res) {
   headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Content-Length': post_data.length
+      'Content-Length': Buffer.byteLength(post_data)
   };
 
   var options = {
@@ -176,7 +176,7 @@ exports.get_sensors = function(req, res) {
   headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Content-Length': post_data.length,
+      'Content-Length': Buffer.byteLength(post_data),
       'X-Auth-Token': auth_token
   };
 
@@ -203,7 +203,7 @@ exports.update_entities = function(req, res) {
   headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Content-Length': post_data.length
+      'Content-Length': Buffer.byteLength(post_data)
   };
 
   var options = {

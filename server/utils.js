@@ -5,8 +5,11 @@
 http = require('http');
 https = require('https');
 
-exports.do_get = function (options, callback, res) {
-    var request = http.get(options, function (response) {
+exports.do_get = function (options, callback, res, use_https) {
+    var protocol = http;
+    if (use_https) {protocol = https};
+
+    var request = protocol.get(options, function (response) {
         // data is streamed in chunks from the server
         // so we have to handle the "data" event
         var buffer = "", data;
@@ -19,7 +22,7 @@ exports.do_get = function (options, callback, res) {
             var msg = "";
             try {
                 data = JSON.parse(buffer);
-                console.log(data);
+                // console.log(data);
             } catch (err) {
                 console.log("Can't decode JSON response.");
                 console.log(err);
@@ -48,6 +51,7 @@ exports.do_post = function (options, data, callback, res, use_https) {
     try {
         var protocol = http;
         if (use_https) {protocol = https};
+
         var post_req = protocol.request(options, function(response) {
             // console.log("DOING POST");
 
@@ -76,7 +80,6 @@ exports.do_post = function (options, data, callback, res, use_https) {
 
         // post the data
         post_req.write(data);
-
         post_req.end();
 
     } catch (error) {
