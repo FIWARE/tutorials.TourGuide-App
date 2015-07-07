@@ -38,7 +38,13 @@ function get_address(restaurant) {
 
 var get_geocode_api_next = function(pos, data) {
     var total = restaurants_data.length;
-    cache_geo[get_address(restaurants_data[pos])] = data;
+    try {
+        var geocode_json = JSON.parse(data);
+        cache_geo[get_address(restaurants_data[pos])] = geocode_json;
+    } catch (e) {
+        cache_geo[get_address(restaurants_data[pos])] = data;
+    }
+    
     if (pos < total-1) {
         console.log("API call " + pos + "/" + (total-1));
         setTimeout(function() {get_geocode_api(++pos);}, geo_wait_time_ms);
@@ -46,7 +52,6 @@ var get_geocode_api_next = function(pos, data) {
         // Once all read, write to cache file and feed data to orion
         fs.writeFileSync(cache_file_geo, JSON.stringify(cache_geo));
         console.log("TOTAL API CALLS: " + api_count);
-        throw("");
         feed_orion_restaurants();
     }
 }
@@ -61,10 +66,7 @@ var get_geocode_api = function(pos) {
         return
     }
 
-    api_count++;
-    get_geocode_api_next (pos, "TEST");
-    return;
-
+    var api_key = process.argv[2];
     var url_path = "/maps/api/geocode/json?";
     url_path += "region=es&"; // All our restaurants are from Spain
     url_path += "address="+encodeURIComponent(address);
@@ -80,6 +82,7 @@ var get_geocode_api = function(pos) {
         headers: headers
     };
     var https = true;
+    api_count++;
     utils.do_get(options, get_geocode_api_next, pos, https);
 };
 
