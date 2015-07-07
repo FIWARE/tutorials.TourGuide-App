@@ -21,7 +21,7 @@ So for this purpose, we have already a simple file that launches:
    * Orion Context Broker as a service
    * Devguide app
 
-The file `` can be downloaded from [here](https://github.com/Bitergia/fiware-devguide-app/blob/master/docker/compose/docker-compose.yml).
+The file `docker-compose.yml` can be downloaded from [here](https://github.com/Bitergia/fiware-devguide-app/blob/master/docker/compose/docker-compose.yml).
 
 Once you get it, you just have to:
 
