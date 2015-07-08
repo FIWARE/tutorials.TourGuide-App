@@ -44,7 +44,7 @@ var get_geocode_api_next = function(pos, data) {
     } catch (e) {
         cache_geo[get_address(restaurants_data[pos])] = data;
     }
-    
+
     if (pos < total-1) {
         console.log("API call " + pos + "/" + (total-1));
         setTimeout(function() {get_geocode_api(++pos);}, geo_wait_time_ms);
@@ -92,11 +92,13 @@ function get_geocode (address) {
     if (cache_geo[address] === undefined) {
         console.log("Can't read geocodes");
     } else {
-        if (cache_geo[address].results !== undefined) {
+        if (cache_geo[address].results !== undefined &&
+            Array.isArray(cache_geo[address].results) &&
+            cache_geo[address].results[0] != undefined) {
             geocode_raw = cache_geo[address].results[0].geometry.location;
             geocode = geocode_raw.lat+", "+geocode_raw.lng;
         } else {
-            console.log("Can't read geocode " + cache_geo[address]);
+            console.log("Bad geocode data: " + cache_geo[address]);
         }
     }
 
@@ -134,7 +136,7 @@ var feed_orion_restaurants = function() {
         console.log(buffer);
     };
 
-    restaurants_data = restaurants_data.slice(0,2); // debug with few items
+    // restaurants_data = restaurants_data.slice(0,5); // debug with few items
 
     console.log("Feeding restaurants info in orion.");
     console.log("Total tried: " + restaurants_data.length);
@@ -154,8 +156,8 @@ var feed_orion_restaurants = function() {
                                "value": "WGS84"
                              }];
         attributes.push(geo_attr);
-        // Object.keys(restaurants_data[key]).forEach(function(element) {
-        Object.keys(restaurants_data[pos]).slice(0,2).forEach(function(element) {
+        Object.keys(restaurants_data[pos]).forEach(function(element) {
+        // Object.keys(restaurants_data[pos]).slice(0,2).forEach(function(element) {
             var val = restaurants_data[pos][element];
             // Orion does not support empty values in APPEND
             if (val === '') {
