@@ -150,23 +150,23 @@ exports.update_context_temperature = function(req, res) {
   utils.do_post(options, post_data, return_post, res);
 };
 
-// Find the sensors for a organization and a type
-exports.get_sensors = function(req, res) {
+// Find the restaurants given a name
+exports.get_restaurants = function(req, res) {
   return_post = function(res, buffer, headers) {
       res.send(buffer);
   };
 
-  var org_id = req.params.org_id;
-  var sensor_type = req.params.sensor_type;
-  var orion_url = "orion.lab.fi-ware.org";
-  var auth_token = req.headers['x-auth-token'];
+  var name = req.params.name;
+  var orion_url = "orion";
+  var orion_port = 10026;
+  var orion_res_limit = 1000; // Max orion items to avoid pagination
 
   post_data = {
         "entities": [
          {
-             "type": sensor_type,
+             "type": "restaurant",
              "isPattern": "true",
-             "id": "urn:smartsantander:testbed:*"
+             "id": ".*"+name+".*"
          }]
     };
 
@@ -176,14 +176,13 @@ exports.get_sensors = function(req, res) {
   headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Content-Length': Buffer.byteLength(post_data),
-      'X-Auth-Token': auth_token
+      'Content-Length': Buffer.byteLength(post_data)
   };
 
   var options = {
       host: orion_url,
-      port: 1026,
-      path: '/NGSI10/queryContext',
+      port: orion_port,
+      path: '/NGSI10/queryContext?limit='+orion_res_limit,
       method: 'POST',
       headers: headers
   };
