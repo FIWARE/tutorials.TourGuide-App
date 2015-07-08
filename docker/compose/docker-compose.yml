@@ -1,18 +1,18 @@
 mongodbdata:
-    image: bitergia/mongodb-org:2.6
+    image: bitergia/mongodb:2.6
     volumes:
         - /var/lib/mongo
     restart: no
     entrypoint: ["/bin/echo","Data-only container for mongodb"]
 
 mongodb:
-    image: bitergia/mongodb-org:2.6
+    image: bitergia/mongodb:2.6
     volumes_from:
         - mongodbdata
     expose:
         - "27017"
 orion:
-    image: bitergia/orion:0.22.0
+    image: bitergia/fiware-orion:0.22.0
     links:
         - mongodb
     expose:
