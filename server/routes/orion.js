@@ -170,6 +170,10 @@ exports.get_restaurants = function(req, res) {
          }]
     };
 
+  if (name === undefined) {
+      // Get all restaurants
+      post_data.entities[0].id=".*";
+  }
 
   post_data = JSON.stringify(post_data);
 
