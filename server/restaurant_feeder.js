@@ -129,6 +129,11 @@ function read_geo_data_feed_orion() {
     }
 }
 
+function fixedEncodeURIComponent (str) {
+  return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+    return '%' + c.charCodeAt(0).toString(16);
+  });
+}
 
 var feed_orion_restaurants = function() {
     return_post = function(res, buffer, headers) {
@@ -165,7 +170,7 @@ var feed_orion_restaurants = function() {
             }
             var attr = {"name":element,
                         "type":"NA",
-                        "value":val};
+                        "value":fixedEncodeURIComponent(val)};
             attributes.push(attr)
         });
         console.log("Adding restaurant " + rname)
@@ -182,7 +187,7 @@ var feed_orion_restaurants = function() {
                     {
                         "type": "restaurant",
                         "isPattern": "false",
-                        "id": context_id,
+                        "id": fixedEncodeURIComponent(context_id),
                         "attributes": attributes
                     }
             ],
