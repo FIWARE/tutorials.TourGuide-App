@@ -2,7 +2,7 @@
 
 [FIWARE Developers Guide App](https://github.com/Bitergia/fiware-devguide-app) is the sample application used in the [FIWARE Developers Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
 
-This image is intended to work together with [Orion](https://registry.hub.docker.com/u/bitergia/fiware-orion/) and [Cygnus](https://registry.hub.docker.com/u/bitergia/cygnus/) for data persistance. 
+This image is intended to work together with [Orion](https://registry.hub.docker.com/u/bitergia/fiware-orion/). 
 
 ## Image contents
 
@@ -21,7 +21,7 @@ So for this purpose, we have already a simple file that launches:
    * Orion Context Broker as a service
    * Devguide app
 
-The file `docker-compose.yml` can be downloaded from [here](https://github.com/Bitergia/fiware-devguide-app/blob/master/docker/compose/docker-compose.yml).
+The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Bitergia/fiware-devguide-app/master/docker/compose/docker-compose.yml).
 
 Once you get it, you just have to:
 
@@ -36,7 +36,7 @@ And all the services will be up. End to end testing can be done using the REST i
  
 ## What if I don't want to use docker-compose?
 
-No problem, the only thing is that you will have to deploy an orion container yourself and configure its ip as orion name inside the devguide container. 
+No problem, the only thing is that you will have to deploy an Orion container yourself and configure its IP as Orion name inside the devguide container. 
 
 ## About SSH
 
@@ -69,7 +69,7 @@ You can also use the [get-container-ip](https://github.com/Bitergia/docker/tree/
 ### Using/generate your own SSH key
 
 Information on how to do that can be found [here](https://github.com/Bitergia/docker/tree/master/baseimages/ubuntu#about-ssh).
-**Note** that the information below is regarding the `bitergia/ubuntu-trusty` baseimage. If you have already pulled or made a `bitergia/authzforce` image based in the `bitergia/ubuntu-trusty` image before applying the keys change, you will need to re-build both images again.
+**Note** that the information below is regarding the `bitergia/ubuntu-trusty` baseimage. If you have already pulled or made a `bitergia/fiware-devguide-app` image based in the `bitergia/ubuntu-trusty` image before applying the keys change, you will need to re-build both images again.
 
 ## User feedback
 
