@@ -6,7 +6,8 @@
   "dependencies": {
       "express": "3.x",
       "oauth": "~0.9.12",
-      "node-mysql": "0.4.x"
+      "node-mysql": "0.4.x",
+      "async": "1.3.0"
   },
   "repository": {
     "type": "git",

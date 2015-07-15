@@ -14,6 +14,7 @@
 
 var utils = require('./utils');
 var fs = require('fs');
+var async = require('async');
 
 var feed_host = "opendata.euskadi.eus";
 var feed_url = "http://"+feed_host;
@@ -26,6 +27,7 @@ var cache_geo = {};
 // var api_rest_port = 3000; // Dev with Express
 var api_rest_host = "compose_devguide_1";
 var api_rest_port = 80;
+var api_rest_simtasks = 5 // number of simultaneous calls to API REST
 var restaurants_added = 0;
 var geo_wait_time_ms = 1000; // Wait ms between calls to Google API
 var restaurants_data; // All data for the restaurants
@@ -141,47 +143,25 @@ function fixedEncodeURIComponent (str) {
 var feed_orion_restaurants = function() {
     return_post = function(res, buffer, headers) {
         restaurants_added++;
-        console.log(buffer);
+        // console.log(buffer);
+        console.log(restaurants_added+"/"+restaurants_data.length);
     };
 
     // restaurants_data = restaurants_data.slice(0,5); // debug with few items
 
     console.log("Feeding restaurants info in orion.");
     console.log("Total tried: " + restaurants_data.length);
-    Object.keys(restaurants_data).forEach(function(element, pos, _array) {
-        // Call orion to append the entity
-        var rname = restaurants_data[pos].documentName;
-        // Time to add first attribute to orion as first approach
-        var attributes = [];
-        var address = get_address(restaurants_data[pos]);
-        var geocode = get_geocode(address);
-        console.log(geocode);
-        // Orion location attribute: http://bit.ly/1CmagJz
-        geo_attr = {"name":"location","type":"coords","value":geocode};
-        geo_attr.metadatas = [{
-                               "name": "location",
-                               "type": "string",
-                               "value": "WGS84"
-                             }];
-        attributes.push(geo_attr);
-        Object.keys(restaurants_data[pos]).forEach(function(element) {
-        // Object.keys(restaurants_data[pos]).slice(0,2).forEach(function(element) {
-            var val = restaurants_data[pos][element];
-            // Orion does not support empty values in APPEND
-            if (val === '') {
-                val = " ";
-            }
-            var attr = {"name":element,
-                        "type":"NA",
-                        "value":fixedEncodeURIComponent(val)};
-            attributes.push(attr)
-        });
-        console.log("Adding restaurant " + rname)
-        console.log(attributes);
-        var api_rest_path = "/api/orion/entities/";
-        var org_name = "devguide";
+
+    var api_rest_path = "/api/orion/entities/";
+    var org_name = "devguide";
+    var temperature_id = "NA";
+
+    // Limit the number of calls to be done in parallel to orion
+    var q = async.queue(function (task, callback) {
+        var rname = task.rname;
+        var attributes = task.attributes;
+        // console.log(attributes);
         var context_id = rname;
-        var temperature_id = "NA";
         api_rest_path += org_name;
 
         // Time to build the Context Element in Orion language
@@ -213,7 +193,43 @@ var feed_orion_restaurants = function() {
                 method: 'POST',
                 headers: headers
             };
-        utils.do_post(options, post_data, return_post);
+        utils.do_post(options, post_data, callback);
+    }, api_rest_simtasks);
+
+
+    q.drain = function() {
+        console.log("Total restaurants added: " + restaurants_added);
+    }
+
+    Object.keys(restaurants_data).forEach(function(element, pos, _array) {
+        // Call orion to append the entity
+        var rname = restaurants_data[pos].documentName;
+        // Time to add first attribute to orion as first approach
+        var attributes = [];
+        var address = get_address(restaurants_data[pos]);
+        var geocode = get_geocode(address);
+        // console.log(geocode);
+        // Orion location attribute: http://bit.ly/1CmagJz
+        geo_attr = {"name":"location","type":"coords","value":geocode};
+        geo_attr.metadatas = [{
+                               "name": "location",
+                               "type": "string",
+                               "value": "WGS84"
+                             }];
+        attributes.push(geo_attr);
+        Object.keys(restaurants_data[pos]).forEach(function(element) {
+        // Object.keys(restaurants_data[pos]).slice(0,2).forEach(function(element) {
+            var val = restaurants_data[pos][element];
+            // Orion does not support empty values in APPEND
+            if (val === '') {
+                val = " ";
+            }
+            var attr = {"name":element,
+                        "type":"NA",
+                        "value":fixedEncodeURIComponent(val)};
+            attributes.push(attr)
+        });
+        q.push({"rname":rname, "attributes":attributes}, return_post);
     });
 };
 
