@@ -15,7 +15,8 @@
 var utils = require('./utils');
 var fs = require('fs');
 
-var feed_url = "http://opendata.euskadi.eus";
+var feed_host = "opendata.euskadi.eus";
+var feed_url = "http://"+feed_host;
 var feed_path = "/contenidos/ds_recursos_turisticos";
 feed_path += "/restaurantes_sidrerias_bodegas/opendata/restaurantes.json";
 var cache_file = "restaurants.json";
@@ -85,6 +86,8 @@ var get_geocode_api = function(pos) {
     api_count++;
     utils.do_get(options, get_geocode_api_next, pos, https);
 };
+
+
 
 function get_geocode (address) {
     var geocode;
@@ -214,30 +217,41 @@ var feed_orion_restaurants = function() {
     });
 };
 
-console.log("Geeting restaurants info ...");
+// Load restaurant data in Orion
+var load_restaurant_data = function() {
+    var process_get = function(res, data) {
+        fs.writeFileSync(cache_file, data);
+        restaurants_data = JSON.parse(data);
+        read_geo_data_feed_orion();
+    };
 
-try {
-    var data = fs.readFileSync(cache_file);
-    console.log("Using cache file " + cache_file);
-    restaurants_data = JSON.parse(data);
-    read_geo_data_feed_orion();
-} catch (e) {
-    if (e.code === 'ENOENT') {
-        console.log("Downloading data ... be patient");
-        var exec = require('child_process').exec, child;
+    try {
+        var data = fs.readFileSync(cache_file);
+        console.log("Using cache file " + cache_file);
+        restaurants_data = JSON.parse(data);
+        read_geo_data_feed_orion();
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            console.log("Downloading data ... be patient");
 
-        cmd = "curl " + feed_url + feed_path + " -o " + cache_file;
+            var headers = {
+                    'Accept': 'application/json',
+            };
 
-        child = exec(cmd,
-          function (error, stdout, stderr) {
-            if (error !== null) {
-              console.log('exec error: ' + error);
-              return;
-            }
-            restaurants_data = JSON.parse(fs.readFileSync(cache_file));
-            read_geo_data_feed_orion();
-        });
-    } else {
-        throw e;
+            var options = {
+                host: feed_host,
+                path: feed_path,
+                method: 'GET',
+                headers: headers
+            };
+            utils.do_get(options, process_get);
+
+        } else {
+            throw e;
+        }
     }
-}
+};
+
+console.log("Loading restaurants info ...");
+
+load_restaurant_data();
