@@ -150,48 +150,62 @@ exports.update_context_temperature = function(req, res) {
   utils.do_post(options, post_data, return_post, res);
 };
 
-// Find the restaurants given a name
-exports.get_restaurants = function(req, res) {
-  return_post = function(res, buffer, headers) {
-      res.send(buffer);
-  };
-
-  var name = req.params.name;
-  var orion_url = "orion";
-  var orion_port = 10026;
-  var orion_res_limit = 1000; // Max orion items to avoid pagination
-
-  post_data = {
-        "entities": [
-         {
-             "type": "restaurant",
-             "isPattern": "true",
-             "id": ".*"+name+".*"
-         }]
+function get_orion_items(type, restaurant_name_regexp, res) {
+    return_post = function(res, buffer, headers) {
+        res.send(buffer);
     };
 
-  if (name === undefined) {
-      // Get all restaurants
-      post_data.entities[0].id=".*";
-  }
+    var name = restaurant_name_regexp;
+    var orion_url = "orion";
+    var orion_port = 10026;
+    var orion_res_limit = 1000; // Max orion items to avoid pagination
 
-  post_data = JSON.stringify(post_data);
+    post_data = {
+          "entities": [
+           {
+               "type": type,
+               "isPattern": "true",
+               "id": ".*"+name+".*"
+           }]
+    };
 
-  headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Content-Length': Buffer.byteLength(post_data)
-  };
+    if (name === undefined) {
+        // Get all restaurants
+        post_data.entities[0].id=".*";
+    }
 
-  var options = {
-      host: orion_url,
-      port: orion_port,
-      path: '/NGSI10/queryContext?limit='+orion_res_limit,
-      method: 'POST',
-      headers: headers
-  };
+    post_data = JSON.stringify(post_data);
 
-  utils.do_post(options, post_data, return_post, res);
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(post_data)
+    };
+
+    var options = {
+        host: orion_url,
+        port: orion_port,
+        path: '/NGSI10/queryContext?limit='+orion_res_limit,
+        method: 'POST',
+        headers: headers
+    };
+
+    utils.do_post(options, post_data, return_post, res);
+}
+
+// Find the restaurants given a name
+exports.get_restaurants = function(req, res) {
+    get_orion_items("restaurant", req.params.name, res);
+};
+
+// Find the reviews given a restaurant name regexp
+exports.get_reviews = function(req, res) {
+    get_orion_items("review", req.params.name, res);
+};
+
+// Find the reservations given a restaurant name regexp
+exports.get_reservations = function(req, res) {
+    get_orion_items("reservation", req.params.name, res);
 };
 
 // Update entities in orion
