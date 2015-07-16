@@ -45,7 +45,6 @@ var feed_orion_reservations = function() {
         var rname = task.rname;
         console.log("Adding reservation to " + rname);
         var attributes = task.attributes;
-        attributes = [];
         api_rest_path += org_name;
 
         // Time to build the Context Element in Orion language
@@ -93,7 +92,7 @@ var feed_orion_reservations = function() {
         var attributes = [];
         var attr = {"name":"bookingTime",
                     "type":"datetime",
-                    "value":Date()};
+                    "value":new Date().toJSON()};
         attributes.push(attr)
         attr = {"name":"reservationFor",
                 "type":"Restaurant",
