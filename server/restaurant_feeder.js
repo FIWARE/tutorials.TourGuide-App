@@ -150,7 +150,7 @@ var feed_orion_restaurants = function() {
     // restaurants_data = restaurants_data.slice(0,5); // debug with few items
 
     console.log("Feeding restaurants info in orion.");
-    console.log("Total tried: " + restaurants_data.length);
+    console.log("Number of restaurants: " + restaurants_data.length);
 
     var api_rest_path = "/api/orion/entities/";
     var org_name = "devguide";
