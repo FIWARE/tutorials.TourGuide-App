@@ -47,6 +47,7 @@ var feed_orion_reviews = function() {
         var rname = task.rname;
         var attributes = task.attributes;
         api_rest_path += org_name;
+        console.log(rname);
 
         // Time to build the Context Element in Orion language
         var post_data = {
@@ -89,7 +90,6 @@ var feed_orion_reviews = function() {
         // Call orion to append the entity
         var rname = restaurants_data[pos].contextElement.id;
         rname += "-"+shortid.generate();
-        console.log(rname);
         // Time to add first attribute to orion as first approach
         var attributes = [];
         var attr = {"name":"ratingValue",
