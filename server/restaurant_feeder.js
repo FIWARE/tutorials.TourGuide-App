@@ -135,7 +135,7 @@ function read_geo_data_feed_orion() {
 }
 
 function fixedEncodeURIComponent (str) {
-  return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+  return str.replace(/[<>"'=;()]/g, function(c) {
     return '%' + c.charCodeAt(0).toString(16);
   });
 }
