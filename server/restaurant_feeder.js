@@ -135,9 +135,11 @@ function read_geo_data_feed_orion() {
 }
 
 function fixedEncodeURIComponent (str) {
-  return str.replace(/[<>"'=;()]/g, function(c) {
-    return '%' + c.charCodeAt(0).toString(16);
-  });
+    return str.replace(/[<>"'=;()\n]/g, function(c) {
+	var hex;
+	hex = c.charCodeAt( 0 ).toString( 16 );
+	return '%' + ((hex.length==2) ? hex : '0' + hex );
+    });
 }
 
 var feed_orion_restaurants = function() {
