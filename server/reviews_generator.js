@@ -22,10 +22,19 @@ var shortid = require('shortid'); // unique ids generator
 
 var api_rest_host = "compose_devguide_1";
 var api_rest_port = 80;
-var api_rest_simtasks = 5 // number of simultaneous calls to API REST
+var api_rest_simtasks = 2 // number of simultaneous calls to API REST
 var reviews_added = 0;
 var restaurants_data; // All data for the restaurants to be reviewed
 
+function fixedEncodeURIComponent (str) {
+    str=str.replace(/["]/g,'\\"');
+    str=str.replace(/\n/g,'\\n');
+    return str.replace(/[<>"'=;()\n\\]/g, function(c) {
+	var hex;
+	hex = c.charCodeAt( 0 ).toString( 16 );
+	return '%' + ((hex.length==2) ? hex : '0' + hex );
+    });
+}
 
 var feed_orion_reviews = function() {
     return_post = function(res, buffer, headers) {
@@ -46,7 +55,6 @@ var feed_orion_reviews = function() {
     var q = async.queue(function (task, callback) {
         var rname = task.rname;
         var attributes = task.attributes;
-        api_rest_path += org_name;
         console.log(rname);
 
         // Time to build the Context Element in Orion language
@@ -55,7 +63,7 @@ var feed_orion_reviews = function() {
                     {
                         "type": "review",
                         "isPattern": "false",
-                        "id": rname,
+                        "id": fixedEncodeURIComponent(rname),
                         "attributes": attributes
                     }
             ],
@@ -74,7 +82,7 @@ var feed_orion_reviews = function() {
         var options = {
                 host: api_rest_host,
                 port: api_rest_port,
-                path: api_rest_path,
+                path: api_rest_path+org_name,
                 method: 'POST',
                 headers: headers
             };
