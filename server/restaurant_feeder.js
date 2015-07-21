@@ -135,7 +135,9 @@ function read_geo_data_feed_orion() {
 }
 
 function fixedEncodeURIComponent (str) {
-    return str.replace(/[<>"'=;()\n]/g, function(c) {
+    str=str.replace(/["]/g,'\\"');
+    str=str.replace(/\n/g,'\\n');
+    return str.replace(/[<>"'=;()\n\\]/g, function(c) {
 	var hex;
 	hex = c.charCodeAt( 0 ).toString( 16 );
 	return '%' + ((hex.length==2) ? hex : '0' + hex );
