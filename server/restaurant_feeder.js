@@ -166,7 +166,6 @@ var feed_orion_restaurants = function() {
         var attributes = task.attributes;
         // console.log(attributes);
         var context_id = rname;
-        api_rest_path += org_name;
 
         // Time to build the Context Element in Orion language
         var post_data = {
@@ -193,7 +192,7 @@ var feed_orion_restaurants = function() {
         var options = {
                 host: api_rest_host,
                 port: api_rest_port,
-                path: api_rest_path,
+                path: api_rest_path+org_name,
                 method: 'POST',
                 headers: headers
             };
