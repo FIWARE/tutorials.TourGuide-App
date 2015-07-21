@@ -150,7 +150,7 @@ exports.update_context_temperature = function(req, res) {
   utils.do_post(options, post_data, return_post, res);
 };
 
-function get_orion_items(type, restaurant_name_regexp, res) {
+function get_orion_items(type, restaurant_name_regexp, req, res) {
     return_post = function(res, buffer, headers) {
         res.send(unescape(buffer));
     };
@@ -168,6 +168,29 @@ function get_orion_items(type, restaurant_name_regexp, res) {
                "id": ".*"+name+".*"
            }]
     };
+
+    // In geoqueries we get: lat=<lat>&long=<long>&radius=<radius>
+
+    if (req.query.lat !== undefined && req.query.long !== undefined &&
+        req.query.radius !== undefined) {
+
+        console.log("GEO query")
+
+        post_data ["restriction"] = {
+            "scopes": [
+               {
+                 "type" : "FIWARE::Location",
+                 "value" : {
+                   "circle": {
+                     "centerLatitude": req.query.lat,
+                     "centerLongitude": req.query.long,
+                     "radius": req.query.radius
+                   }
+                 }
+               }
+           ]
+        }
+    }
 
     if (name === undefined) {
         // Get all restaurants
@@ -195,17 +218,17 @@ function get_orion_items(type, restaurant_name_regexp, res) {
 
 // Find the restaurants given a name
 exports.get_restaurants = function(req, res) {
-    get_orion_items("restaurant", req.params.name, res);
+    get_orion_items("restaurant", req.params.name, req, res);
 };
 
 // Find the reviews given a restaurant name regexp
 exports.get_reviews = function(req, res) {
-    get_orion_items("review", req.params.name, res);
+    get_orion_items("review", req.params.name, req, res);
 };
 
 // Find the reservations given a restaurant name regexp
 exports.get_reservations = function(req, res) {
-    get_orion_items("reservation", req.params.name, res);
+    get_orion_items("reservation", req.params.name, req, res);
 };
 
 // Update entities in orion
