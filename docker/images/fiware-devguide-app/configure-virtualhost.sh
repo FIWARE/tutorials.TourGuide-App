@@ -54,6 +54,7 @@ case "${DIST_TYPE}" in
 
     # reload service
     service apache2 restart
+    service apache2 stop
     ;;
     "redhat")
     VHOST_HTTP="/etc/httpd/conf.d/vhost-devguide-app.conf"
@@ -61,6 +62,7 @@ case "${DIST_TYPE}" in
     APACHE_LOG_DIR=/var/log/httpd
     _setup_vhost_http
     service httpd restart
+    service httpd stop
     ;;
     *)
     exit 1
