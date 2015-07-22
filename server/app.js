@@ -21,13 +21,13 @@ app.configure(function () {
     app.use(express.static(__dirname + '/public'));
 });
 
-// chanchan app
-app.use("/chanchan", express.static(__dirname + '/chanchan'));
+// devguide app
+app.use("/client", express.static(__dirname + '/client'));
 
 // main page
 //app.get('/', site.index);
 app.get('/', function(req, res) {
-    res.redirect('/chanchan');
+    res.redirect('/client');
 });
 app.get('/login',auth.login);
 app.get('/logout',auth.logout);
