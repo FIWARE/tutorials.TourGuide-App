@@ -152,6 +152,7 @@ exports.update_context_temperature = function(req, res) {
 
 function get_orion_items(type, restaurant_name_regexp, req, res) {
     return_post = function(res, buffer, headers) {
+        res.setHeader('Content-Type', 'application/json');
         res.send(unescape(buffer));
     };
 
