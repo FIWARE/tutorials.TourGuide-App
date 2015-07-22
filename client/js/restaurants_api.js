@@ -1,8 +1,6 @@
 //global vars
 var map; //map instance
-proxyurl='proxy/'; //proxy url. Needed due to cross-domain reference
-proxyurl='proxy.php?url=';
-
+proxyurl='';
 //initialization
 window.onload = function(){
 map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
