@@ -6,7 +6,7 @@ mongodbdata:
     entrypoint: ["/bin/echo","Data-only container for mongodb"]
 
 mongodb:
-    image: bitergia/fiware-devguide-restaurant-data:20150721
+    image: bitergia/mongodb:2.6
     volumes_from:
         - mongodbdata
     expose:
