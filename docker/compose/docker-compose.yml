@@ -18,9 +18,26 @@ orion:
     expose:
         - "10026"
 
+authzforce:
+    image: bitergia/authzforce:4.2.0
+    expose:
+        - "8080"
+
+idm:
+    image: bitergia/idm-keyrock:4.3.0
+    links:
+        - authzforce
+    volumes:
+        - /config
+    expose:
+        - "5000"
+
 devguide:
     image: bitergia/fiware-devguide-app
     links:
         - orion
+        - idm
     # volumes:
     #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
+    volumes_from:
+        - idm
