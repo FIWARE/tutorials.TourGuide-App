@@ -79,3 +79,7 @@ RUN cd ${CC_APP_SERVER_PATH} && \
 USER root
 # Configuring Apache
 RUN ${SCRIPTS_DIR}/configure-virtualhost.sh
+
+ADD docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod 755 /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
