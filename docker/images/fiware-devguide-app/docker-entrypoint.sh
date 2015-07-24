@@ -10,6 +10,9 @@ fi
 
 IDM_CONFIG="/config/idm2chanchan.json" 
 CC_SERVER_PATH="fiware-devguide-app/server"
+DOCROOT="${CC_APP_SERVER_PATH}/public"
+VHOST_HTTP="/etc/apache2/sites-available/devguide-app.conf"
+APACHE_LOG_DIR=/var/log/apache2
 
 function check_host_port () {
 
@@ -67,12 +70,40 @@ function configure_params () {
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g"
+    sed -i ${VHOST_HTTP} \
+        -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g"
+}
+
+function _setup_vhost_http () {
+    # create http virtualhost
+    cat <<EOF > ${VHOST_HTTP}
+<VirtualHost *:80>
+    ServerName IDM_HOSTNAME 
+
+    # DocumentRoot [root to your app/public]
+    DocumentRoot ${DOCROOT}
+
+    ErrorLog ${APACHE_LOG_DIR}/devguide-app-error.log
+    CustomLog ${APACHE_LOG_DIR}/devguide-app-access.log combined
+
+    # to avoid errors when using self-signed certificates
+    SetEnv NODE_TLS_REJECT_UNAUTHORIZED 0
+
+    # Directory [root to your app./public]
+    <Directory ${DOCROOT}>
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
 }
 
 # Call checks
 echo ${IDM_HOSTNAME} ${IDM_PORT}
 check_host_port ${IDM_HOSTNAME} ${IDM_PORT} 
+_setup_vhost_http
 configure_params
+# enable new virtualhosts
+a2ensite devguide-app
 
 # Start container back
 
