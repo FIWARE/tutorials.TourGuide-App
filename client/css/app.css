@@ -1,12 +1,10 @@
  
  #map{
-  	height: 450px;
+  	height: 600px;
   	width: 100%;
   	margin-top: 30px;
 }
-#rest_info{
-	
-}
+
 
 #logged_div{
 	position: fixed;
@@ -27,6 +25,26 @@
 	margin-top: 10%;
 }
 
+#pop_window{
+	position:fixed;
+	top:50px;
+	height: 500px;
+	background-color: rgba(194, 189, 181, 0.8);
+	margin-left: 20%;
+	margin-right: 20%;
+	width: 60%;
+	padding-right: 15px;
+	padding-left: 15px;
+	z-index: 2000;
+}
+
+#pop_content{
+	overflow-y:auto;
+	max-height: 400px; 
+}
+.hidden{
+	display: none;
+}
 #roles_div{
 	margin-top: 30px;
 	margin-bottom:10px;
@@ -52,4 +70,27 @@
 .review_label{
 	font-weight: bold;
 	font-size: 1.15em;
+}
+.reservation_time_label{
+	font-weight: bold;
+	font-size: 1.15em;
+}
+.under_name_reservation_label{
+	font-weight: bold;
+	font-size: 1.15em;
+}
+#top_pop{
+
+}
+#top_pop>button.close_pop{
+	float: right;
+}
+
+.markPopUp a{
+	cursor:pointer;
+}
+
+#pop_title{
+	font-size: 1.5em;
+	font-weight: bold;
 }
