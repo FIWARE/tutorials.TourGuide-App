@@ -2,49 +2,48 @@
  * ChanChan auth
  */
 
-var OAuth2 = require('oauth').OAuth2;
+var OAuth2 = require('./oauth2').OAuth2;
 var config = require('./config');
 
-var oauth = new OAuth2(
-    config.client_id,
-    config.client_secret,
-    config.idm_url,
-    '/oauth2/authorize',
-    '/oauth2/token'
-);
+// Config data from config.js file
+var client_id = config.client_id;
+var client_secret = config.client_secret;
+var idmURL = config.idm_url;
+var response_type = config.response_type;
+var callbackURL = config.callback_url;
+
+var oauth = new OAuth2(client_id,
+                    client_secret,
+                    idmURL,
+                    '/oauth2/authorize',
+                    '/oauth2/token',
+                    callbackURL);
 
 // This is the callback url for the application.  The IdM will
 // redirect the user here after a successful authentication
 exports.login = function(req, res) {
-    oauth.getOAuthAccessToken(
-	req.query.code,
-	{"grant_type": "authorization_code",
-	 "redirect_uri": config.callback_url},
-	function(e, token, refresh, results) {
-	    console.log('token: ', token);
-	    console.log('refresh: ', refresh);
-	    console.log('results: ', results);
-	    // store the access token on the session
-	    if (results !== undefined) {
-	        req.session.access_token = results.access_token;
-	    }
-	    res.redirect('/');
-	});
+    // Using the access code goes again to the IDM to obtain the access_token
+    oauth.getOAuthAccessToken(req.query.code, function (e, results){
+
+        // Stores the access_token in a session cookie
+        req.session.access_token = results.access_token;
+
+        res.redirect('/');
+
+    });
 };
 
 
 // Redirect the user to the IdM for authentication
 exports.auth = function(req, res) {
-    var redirect_path = oauth.getAuthorizeUrl(
-	{response_type: "code"});
-    console.log("redirect_path: ", redirect_path);
-    res.redirect(redirect_path);
+    var path = oauth.getAuthorizeUrl(response_type);
+    res.redirect(path);
 };
 
 
 // Logout from the application
 exports.logout = function(req, res) {
-    req.session.access_token = null;
+    req.session.access_token = undefined;
     res.redirect('/');
 };
 

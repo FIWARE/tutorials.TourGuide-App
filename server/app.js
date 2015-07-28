@@ -25,14 +25,15 @@ app.configure(function () {
 app.use("/client", express.static(__dirname + '/client'));
 
 // main page
-//app.get('/', site.index);
-app.get('/', function(req, res) {
-    res.redirect('/client');
-});
+app.get('/', site.index);
+//app.get('/', function(req, res) {
+//    res.redirect('/client');
+//});
 app.get('/login',auth.login);
-app.get('/logout',auth.logout);
 app.get('/auth',auth.auth);
-
+app.get('/get_user_data',auth.get_user_data);
+app.get('/get_username',auth.get_username);
+app.get('/logout',auth.logout);
 
 // api rest: /api/
 //
