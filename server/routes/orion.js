@@ -206,10 +206,13 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
         'Content-Length': Buffer.byteLength(post_data)
     };
 
+    var orion_path = '/NGSI10/queryContext?limit='+orion_res_limit;
+    var pep_extra_path = 'type='+type;  // For auth purposes
+
     var options = {
         host: orion_url,
         port: orion_port,
-        path: '/NGSI10/queryContext?limit='+orion_res_limit,
+        path: orion_path + '&' + pep_extra_path,
         method: 'POST',
         headers: headers
     };
