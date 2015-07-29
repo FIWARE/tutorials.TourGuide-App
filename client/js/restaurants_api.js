@@ -64,7 +64,7 @@ function showRestaurants(restaurants)
 		mark={id: restaurant['id']};
 
 		//get only desired attributes
-		for(j=0, len= attributes.length; j< len; j++)
+		for(j=0, lim= attributes.length; j< lim; j++)
 		{
 			if ("address" == attributes[j]['name'])
 			{
@@ -117,7 +117,7 @@ function showRestaurants(restaurants)
 	group = new L.featureGroup(markers);
 
 	//set the view
- 	map.fitBounds(group.getBounds().pad(0.5));
+ 	//map.fitBounds(group.getBounds().pad(0.5));
 	
 }
 
@@ -180,7 +180,7 @@ function showReviews(reviewsResponse)
 	reviewsHtml='<div class="reviewList">\n';
 	for (j=0, lim=reviewsResponse['contextResponses'].length; j < lim; j++)
 	{
-		review= reviewsResponse['contextResponses'][0]['contextElement'];
+		review= reviewsResponse['contextResponses'][j]['contextElement'];
 		for (i=0, len= review['attributes'].length; i<len;i++)
 		{
 			if("reviewBody" == review['attributes'][i]['name'])
@@ -263,7 +263,7 @@ function showReservations(reservationsResponse)
 	reservationsHtml='<div class="reservationList">\n';
 	for (j=0, lim=reservationsResponse['contextResponses'].length; j < lim; j++)
 	{
-		reservation= reservationsResponse['contextResponses'][0]['contextElement'];
+		reservation= reservationsResponse['contextResponses'][j]['contextElement'];
 		for (i=0, len= reservation['attributes'].length; i<len;i++)
 		{
 			if("bookingTime" == reservation['attributes'][i]['name'])
