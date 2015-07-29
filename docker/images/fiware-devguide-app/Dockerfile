@@ -53,6 +53,10 @@ RUN git clone https://github.com/Bitergia/fiware-devguide-app.git fiware-devguid
 RUN cd ${CC_APP_SERVER_PATH} && \
     npm install --loglevel warn
 
+# Add the IdM provision
+
+COPY keystone_provision.py ${DEPLOY_USER_DIR}/keystone_provision.py
+
 USER root
 
 ADD docker-entrypoint.sh /docker-entrypoint.sh

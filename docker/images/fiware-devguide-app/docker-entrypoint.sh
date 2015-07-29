@@ -128,8 +128,11 @@ function _setup_vhost_http () {
 EOF
 }
 
+# Move the provision file to /config to make it available for IdM
+
+mv /home/bitergia/keystone_provision.py /config/keystone_provision.py
+
 # Call checks
-echo ${IDM_HOSTNAME} ${IDM_PORT}
 check_host_port ${IDM_HOSTNAME} ${IDM_PORT} 
 _setup_vhost_http
 check_file ${CONFIG_FILE}

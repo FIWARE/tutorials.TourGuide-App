@@ -31,6 +31,8 @@ idm:
         - /config
     expose:
         - "5000"
+    environment:
+        - APP_NAME="FIWARE devGuide"
 
 devguide:
     image: bitergia/fiware-devguide-app
