@@ -175,7 +175,7 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     if (req.query.lat !== undefined && req.query.long !== undefined &&
         req.query.radius !== undefined) {
 
-        console.log("GEO query")
+        console.log("GEO query");
 
         post_data ["restriction"] = {
             "scopes": [
@@ -203,7 +203,8 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Content-Length': Buffer.byteLength(post_data)
+        'Content-Length': Buffer.byteLength(post_data),
+        'X-Auth-Token':req.query.token
     };
 
     var orion_path = '/NGSI10/queryContext?limit='+orion_res_limit;
