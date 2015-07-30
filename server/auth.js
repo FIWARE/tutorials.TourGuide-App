@@ -13,11 +13,11 @@ var response_type = config.response_type;
 var callbackURL = config.callback_url;
 
 var oauth = new OAuth2(client_id,
-                    client_secret,
-                    idmURL,
-                    '/oauth2/authorize',
-                    '/oauth2/token',
-                    callbackURL);
+                        client_secret,
+                        idmURL,
+                        '/oauth2/authorize',
+                        '/oauth2/token',
+                        callbackURL);
 
 // This is the callback url for the application.  The IdM will
 // redirect the user here after a successful authentication
@@ -25,11 +25,16 @@ exports.login = function(req, res) {
     // Using the access code goes again to the IDM to obtain the access_token
     oauth.getOAuthAccessToken(req.query.code, function (e, results){
 
-        // Stores the access_token in a session cookie
-        req.session.access_token = results.access_token;
+        if (results === undefined) {
+            res.status(404);
+            res.send("Auth token not received in results.");
+            console.log("Auth token not received in results.")
+        } else {
+            // Stores the access_token in a session cookie
+            req.session.access_token = results.access_token;
 
-        res.redirect('/');
-
+            res.redirect('/');
+        }
     });
 };
 
@@ -50,22 +55,20 @@ exports.logout = function(req, res) {
 exports.get_user_data = function(req, res) {
     var url = config.idm_url + '/user/';
     var user = null;
-    oauth.get(url,
-	      req.session.access_token,
-	      function(e, response) {
-		  user = JSON.parse(response);
-	      }
-	     );
+    oauth.get(url, req.session.access_token,
+        function(e, responAse) {
+            user = JSON.parse(response);
+        }
+    );
 };
 
 exports.get_username = function(req, res, callback) {
     var url = config.idm_url + '/user/';
     var user = null;
-    oauth.get(url,
-	      req.session.access_token,
-	      function(e, response) {
-		  user = JSON.parse(response);
-		  callback(user.displayName);
-	      }
-	     );
+    oauth.get(url, req.session.access_token,
+        function(e, response) {
+            user = JSON.parse(response);
+            callback(user.displayName);
+        }
+    );
 }

@@ -5,7 +5,7 @@ exports.index = function(req, res){
     if (!req.session.access_token) {
         // user is not authenticated
         res.send('<a href="/auth">Log in with your FI-WARE Account</a>');
-        } else {
+    } else {
         // user is already authenticated
         auth.get_username(req, res, function(user){
             console.log("user:", user);

@@ -76,7 +76,7 @@ app.get('*', function(req, res, next) {
 
 app.use(function(err, req, res, next) {
     if (err.status !== 404) {
-	    return next();
+        return next();
     }
 
     res.status(404);
