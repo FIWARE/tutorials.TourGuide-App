@@ -1,16 +1,18 @@
 mongodbdata:
-    image: bitergia/fiware-devguide-restaurant-data:20150721
+    image: bitergia/fiware-devguide-restaurant-data:20150728
     volumes:
-        - /var/lib/mongo
+        - /data/db
     restart: no
-    entrypoint: ["/bin/echo","Data-only container for mongodb"]
+    command: /bin/echo "Data-only container for mongodb."
 
 mongodb:
-    image: bitergia/mongodb:2.6
+    image: mongo:2.6
     volumes_from:
         - mongodbdata
     expose:
         - "27017"
+    command: --smallfiles
+
 orion:
     image: bitergia/fiware-orion:0.22.0
     links:
