@@ -99,10 +99,10 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                          role=owner_role.id,
                          project=org_b.id)
 
-    # Create chanchan APP and give provider role to the pepProxy
+    # Create Devguide APP and give provider role to the pepProxy
     # TODO: modify the url + callback when the app is ready
     devguide_app = keystone.oauth2.consumers.create(
-        name='FIWARE devGuide',
+        name='FIWAREdevGuide',
         redirect_uris=['http://compose_devguide_1/login'],
         description='Fiware devGuide Test Application',
         scopes=['all_info'],
