@@ -119,9 +119,9 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
         application=devguide_app.id,
         organization=pep_user.default_project_id)
 
-    # Create a role 'Orion' for the application
-    role_orion = keystone.fiware_roles.roles.create(
-        name='Orion Operations',
+    # Create a role 'manager' for the application
+    role_manager = keystone.fiware_roles.roles.create(
+        name='manager Operations',
         is_internal=False,
         application=devguide_app.id)
 
@@ -131,10 +131,10 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
         p for p in keystone.fiware_roles.permissions.list()
         if p.name == settings.INTERNAL_PERMISSIONS[4])
     keystone.fiware_roles.permissions.add_to_role(
-        role=role_orion,
+        role=role_manager,
         permission=internal_permission_owned)
 
-    # Make user 0 owner of the organization A and give Orion role
+    # Make user 0 owner of the organization A and give manager role
     user0 = users[0]
     
     keystone.roles.grant(user=user0.id,
@@ -142,182 +142,42 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                          project=org_a.id)
 
     keystone.fiware_roles.roles.add_to_user(
-        role=role_orion.id,
+        role=role_manager.id,
         user=user0.id,
         application=devguide_app.id,
         organization=user0.default_project_id)
 
-    # Make user 1 owner of the organization B and give Orion role
+    # Make user 1 owner of the organization B and give manager role
     user1 = users[1]
 
     keystone.roles.grant(user=user1.id,
                          role=owner_role.id,
                          project=org_b.id)
 
-    keystone.fiware_roles.roles.add_to_user(
-        role=role_orion.id,
-        user=user1.id,
-        application=devguide_app.id,
-        organization=user1.default_project_id)
+    # keystone.fiware_roles.roles.add_to_user(
+    #     role=role_manager.id,
+    #     user=user1.id,
+    #     application=devguide_app.id,
+    #     organization=user1.default_project_id)
 
-    # Adding permissions for Orion
+    # Adding permissions for manager
 
     perm0 = keystone.fiware_roles.permissions.create(
-                name='updateContext', 
+                name='reservations', 
                 application=devguide_app, 
                 action= 'POST', 
-                resource= 'v1/updateContext',
+                resource= '/NGSI10/queryContext?limit=1000&entity_type=reservations',
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm0)
+                    role_manager, perm0)
 
     perm1 = keystone.fiware_roles.permissions.create(
-                name='queryContext', 
+                name='reviews', 
                 application=devguide_app, 
                 action= 'POST', 
-                resource= 'v1/queryContext',
+                resource= '/NGSI10/queryContext?limit=1000&entity_type=reviews',
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm1)
-
-    perm2 = keystone.fiware_roles.permissions.create(
-                name='subscribeContext', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/subscribeContext',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm2)
-
-    perm3 = keystone.fiware_roles.permissions.create(
-                name='updateContextSubscription', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/updateContextSubscription',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm3)
-
-    perm4 = keystone.fiware_roles.permissions.create(
-                name='unsubscribeContext', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/unsubscribeContext',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm4)
-
-    perm5 = keystone.fiware_roles.permissions.create(
-                name='registry/registerContext', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/registry/registerContext',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm5)
-
-    perm6 = keystone.fiware_roles.permissions.create(
-                name='registry/discoverContextAvailability', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/registry/discoverContextAvailability',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm6)
-
-    perm7 = keystone.fiware_roles.permissions.create(
-                name='/registry/subscribeContextAvailability', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1//registry/subscribeContextAvailability',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm7)
-
-    perm8 = keystone.fiware_roles.permissions.create(
-                name='registry/updateContextAvailabilitySubscription', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/registry/updateContextAvailabilitySubscription',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm8)
-
-    perm9 = keystone.fiware_roles.permissions.create(
-                name='registry/unsubscribeContextAvailability', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/registry/unsubscribeContextAvailability',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm9)
-
-    perm10 = keystone.fiware_roles.permissions.create(
-                name='registry/contextAvailabilitySubscriptions', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/registry/contextAvailabilitySubscriptions',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm10)
-
-    perm11 = keystone.fiware_roles.permissions.create(
-                name='contextTypes', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/contextTypes',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm11)
-
-    perm12 = keystone.fiware_roles.permissions.create(
-                name='contextSubscriptions', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/contextSubscriptions',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm12)
-
-    perm13 = keystone.fiware_roles.permissions.create(
-                name='contextEntities', 
-                application=devguide_app, 
-                action= 'POST', 
-                resource= 'v1/contextEntities',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm13)
-
-    perm14 = keystone.fiware_roles.permissions.create(
-                name='contextEntities(GET)', 
-                application=devguide_app, 
-                action= 'GET', 
-                resource= 'v1/contextEntities',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm14)
-
-    perm15 = keystone.fiware_roles.permissions.create(
-                name='contextSubscriptions', 
-                application=devguide_app, 
-                action= 'GET', 
-                resource= 'v1/contextSubscriptions',
-                is_internal=False)
-
-    keystone.fiware_roles.permissions.add_to_role(
-                    role_orion, perm15)
+                    role_manager, perm1)
