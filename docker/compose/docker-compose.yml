@@ -36,12 +36,22 @@ idm:
     environment:
         - APP_NAME=FIWAREdevGuide
 
+pepwilma:
+    image: bitergia/pep-wilma:4.3.0
+    links:
+        - orion
+        - idm
+        - authzforce
+    volumes_from:
+        - idm
+
 devguide:
     image: bitergia/fiware-devguide-app
     links:
         - orion
         - idm
+        - pepwilma
     # volumes:
-    #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
+    #  - ~/devel/fiware-devguide-app:/home/bitergia/fiware-devguide-app
     volumes_from:
         - idm

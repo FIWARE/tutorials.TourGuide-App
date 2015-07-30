@@ -3,7 +3,7 @@
  */
 
 var utils = require('../utils');
-var orion_url = "orion"; // To be changed to PEP for auth
+var orion_url = "pepwilma"; // To be changed to PEP for auth
 
 
 
@@ -22,7 +22,7 @@ exports.contexts = function(req, res) {
 
     var options = {
         host: orion_url,
-        port: 10026,
+        port: 1026,
         path: '/NGSI10/contextEntityTypes/'+contextType,
         method: 'GET',
         headers: {
@@ -88,7 +88,7 @@ exports.subscribe_context = function(req, res) {
 
   var options = {
       host: orion_url,
-      port: 10026,
+      port: 1026,
       path: '/NGSI10/subscribeContext',
       method: 'POST',
       headers: headers
@@ -141,7 +141,7 @@ exports.update_context_temperature = function(req, res) {
 
   var options = {
       host: orion_url,
-      port: 10026,
+      port: 1026,
       path: '/NGSI10/updateContext',
       method: 'POST',
       headers: headers
@@ -157,8 +157,8 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     };
 
     var name = restaurant_name_regexp;
-    var orion_url = "orion";
-    var orion_port = 10026;
+    var orion_url = "pepwilma";
+    var orion_port = 1026;
     var orion_res_limit = 1000; // Max orion items to avoid pagination
 
     post_data = {
@@ -208,7 +208,7 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     };
 
     var orion_path = '/NGSI10/queryContext?limit='+orion_res_limit;
-    var pep_extra_path = 'type='+type;  // For auth purposes
+    var pep_extra_path = 'entity_type='+type;  // For auth purposes
 
     var options = {
         host: orion_url,
@@ -253,7 +253,7 @@ exports.update_entities = function(req, res) {
 
   var options = {
       host: orion_url,
-      port: 10026,
+      port: 1026,
       path: '/NGSI10/updateContext',
       method: 'POST',
       headers: headers
