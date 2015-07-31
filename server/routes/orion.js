@@ -6,6 +6,7 @@ var utils = require('../utils');
 var config = require('../config');
 var orion_url = config.orion_hostname; // To be changed to PEP for auth
 var orion_port = config.orion_port;
+var orion_pep_enabled = config.orion_pep_enabled;
 
 // Return the list of available entities in Orion
 exports.contexts = function(req, res) {
@@ -211,7 +212,7 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     var options = {
         host: orion_url,
         port: orion_port,
-        path: orion_path + '&' + pep_extra_path,
+        path: orion_path + ((orion_pep_enabled) ? '&' + pep_extra_path : '' ),
         method: 'POST',
         headers: headers
     };

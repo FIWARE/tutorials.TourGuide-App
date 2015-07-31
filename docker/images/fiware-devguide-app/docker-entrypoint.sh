@@ -7,6 +7,7 @@
 
 [ -z "${ORION_HOSTNAME}" ] && echo "ORION_HOSTNAME is undefined.  Using default value of 'orion'" && export ORION_HOSTNAME=orion
 [ -z "${ORION_PORT}" ] && echo "ORION_PORT is undefined.  Using default value of '1026'" && export ORION_PORT=1026
+[ -z "${ORION_PEP_ENABLED}" ] && echo "ORION_PEP_ENABLED is undefined.  Using default value of 'false'" && export ORION_PEP_ENABLED=false
 
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
@@ -14,6 +15,20 @@ fi
 if [[ ${ORION_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export ORION_PORT=${BASH_REMATCH[1]}
 fi
+
+case "${ORION_PEP_ENABLED}" in
+    "true")
+        echo "Orion PEP Proxy authentication has been ENABLED".
+        ;;
+    "false")
+        echo "Orion PEP Proxy authentication has been DISABLED".
+        ;;
+    *)
+        echo "Unknown value defined for 'ORION_PEP_ENABLED' variable: '${ORION_PEP_ENABLED}'"
+        echo "Allowed values are: true, false (false is the default)."
+        exit 1
+        ;;
+esac
 
 CC_SERVER_PATH="/home/bitergia/fiware-devguide-app/server"
 DOCROOT="${CC_APP_SERVER_PATH}/public"
@@ -108,7 +123,8 @@ function _configure_params () {
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
         -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
-        -e "s|ORION_PORT|${ORION_PORT}|g"
+        -e "s|ORION_PORT|${ORION_PORT}|g" \
+        -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g"
     sed -i ${VHOST_HTTP} \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g"
 }

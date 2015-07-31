@@ -23,5 +23,6 @@ config.response_type = 'code';
 // Orion
 config.orion_port = 'ORION_PORT'
 config.orion_hostname = 'ORION_HOSTNAME'
+config.orion_pep_enabled = ORION_PEP_ENABLED
 
 module.exports = config;

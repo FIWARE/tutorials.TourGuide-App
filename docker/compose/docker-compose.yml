@@ -44,6 +44,11 @@ pepwilma:
         - authzforce
     volumes_from:
         - idm
+    expose:
+        - "1026"
+    environment:
+        - APP_HOSTNAME=orion
+        - APP_PORT=10026
 
 devguide:
     image: bitergia/fiware-devguide-app
@@ -51,6 +56,10 @@ devguide:
         - orion
         - idm
         - pepwilma
+    environment:
+        - ORION_HOSTNAME=pepwilma
+        - ORION_PORT=1026
+        - ORION_PEP_ENABLED=true
     # volumes:
     #  - ~/devel/fiware-devguide-app:/home/bitergia/fiware-devguide-app
     volumes_from:
