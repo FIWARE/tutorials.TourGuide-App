@@ -20,4 +20,8 @@ config.callback_url = 'http://compose_devguide_1/login'
 
 config.response_type = 'code';
 
+// Orion
+config.orion_port = 'ORION_PORT'
+config.orion_hostname = 'ORION_HOSTNAME'
+
 module.exports = config;

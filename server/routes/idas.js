@@ -3,14 +3,15 @@
  */
 
 var utils = require('../utils');
-var mysql      = require('../node_modules/node-mysql/node_modules/mysql');
+var config = require('../config');
+var mysql = require('../node_modules/node-mysql/node_modules/mysql');
 var idas_url = "idas";
 var scripts_home = "/home/bitergia/scripts/idas-scripts";
 var idas_params = " --idas-host idas --idas-port 8080 ";
-var orion_params = " --context-broker-url http://orion:10026 ";
 var api_params = " --api-key test ";
 var service_name = "bitergiaidas";
 var service_params = " --service "+service_name+" --service-path / ";
+var orion_params = " --context-broker-url http://"+config.orion_hostname+":"+config.orion_port;
 
 
 exports.get_history = function(req, res) {

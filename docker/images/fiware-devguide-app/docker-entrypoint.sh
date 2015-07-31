@@ -5,8 +5,14 @@
 [ -z "${CONFIG_FILE}" ] && echo "CONFIG_FILE is undefined.  Using default value of '/config/idm2chanchan.json'" && export CONFIG_FILE=/config/idm2chanchan.json
 [ -z "${DEFAULT_MAX_TRIES}" ] && echo "DEFAULT_MAX_TRIES is undefined.  Using default value of '30'" && export DEFAULT_MAX_TRIES=30
 
+[ -z "${ORION_HOSTNAME}" ] && echo "ORION_HOSTNAME is undefined.  Using default value of 'orion'" && export ORION_HOSTNAME=orion
+[ -z "${ORION_PORT}" ] && echo "ORION_PORT is undefined.  Using default value of '1026'" && export ORION_PORT=1026
+
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
+fi
+if [[ ${ORION_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
+    export ORION_PORT=${BASH_REMATCH[1]}
 fi
 
 CC_SERVER_PATH="/home/bitergia/fiware-devguide-app/server"
@@ -100,7 +106,9 @@ function _configure_params () {
     sed -i ${CC_SERVER_PATH}/config.js \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
-        -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g"
+        -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
+        -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
+        -e "s|ORION_PORT|${ORION_PORT}|g"
     sed -i ${VHOST_HTTP} \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g"
 }
@@ -109,7 +117,7 @@ function _setup_vhost_http () {
     # create http virtualhost
     cat <<EOF > ${VHOST_HTTP}
 <VirtualHost *:80>
-    ServerName IDM_HOSTNAME 
+    ServerName IDM_HOSTNAME
 
     # DocumentRoot [root to your app/public]
     DocumentRoot ${DOCROOT}
@@ -133,7 +141,8 @@ EOF
 mv /home/bitergia/keystone_provision.py /config/keystone_provision.py
 
 # Call checks
-check_host_port ${IDM_HOSTNAME} ${IDM_PORT} 
+check_host_port ${IDM_HOSTNAME} ${IDM_PORT}
+check_host_port ${ORION_HOSTNAME} ${ORION_PORT}
 _setup_vhost_http
 check_file ${CONFIG_FILE}
 _configure_params
