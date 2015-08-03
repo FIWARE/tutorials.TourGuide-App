@@ -61,7 +61,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     owner_role = keystone.roles.find(name='owner')
 
-    # Create 4 users
+    # Create 10 users
     users = []
     for i in range(10):
         username = 'user'
@@ -125,14 +125,11 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
         is_internal=False,
         application=devguide_app.id)
 
-    # Give it the permission to get and assign only the owned roles
- 
-    internal_permission_owned = next(
-        p for p in keystone.fiware_roles.permissions.list()
-        if p.name == settings.INTERNAL_PERMISSIONS[4])
-    keystone.fiware_roles.permissions.add_to_role(
-        role=role_manager,
-        permission=internal_permission_owned)
+    # Create a role 'restaurant_viewer' for the application
+    restaurant_viewer = keystone.fiware_roles.roles.create(
+        name='Restaurant Viewer',
+        is_internal=False,
+        application=devguide_app.id)
 
     # Make user 0 owner of the organization A and give manager role
     user0 = users[0]
@@ -141,12 +138,6 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                          role=owner_role.id,
                          project=org_a.id)
 
-    keystone.fiware_roles.roles.add_to_user(
-        role=role_manager.id,
-        user=user0.id,
-        application=devguide_app.id,
-        organization=user0.default_project_id)
-
     # Make user 1 owner of the organization B and give manager role
     user1 = users[1]
 
@@ -154,19 +145,29 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                          role=owner_role.id,
                          project=org_b.id)
 
-    # keystone.fiware_roles.roles.add_to_user(
-    #     role=role_manager.id,
-    #     user=user1.id,
-    #     application=devguide_app.id,
-    #     organization=user1.default_project_id)
+    # Make all users Restaurant viewers
+    for user in users:
+        keystone.fiware_roles.roles.add_to_user(
+            role=restaurant_viewer.id,
+            user=user.id,
+            application=devguide_app.id,
+            organization=user.default_project_id)
 
-    # Adding permissions for manager
+    # Make user0 Role Manager
+
+    keystone.fiware_roles.roles.add_to_user(
+        role=role_manager.id,
+        user=user0.id,
+        application=devguide_app.id,
+        organization=user0.default_project_id)
+
+    # Adding permissions for manager and restaurants
 
     perm0 = keystone.fiware_roles.permissions.create(
                 name='reservations', 
                 application=devguide_app, 
                 action= 'POST', 
-                resource= '/NGSI10/queryContext?limit=1000&entity_type=reservations',
+                resource= 'NGSI10/queryContext?limit=1000&entity_type=reservation',
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
@@ -176,8 +177,21 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                 name='reviews', 
                 application=devguide_app, 
                 action= 'POST', 
-                resource= '/NGSI10/queryContext?limit=1000&entity_type=reviews',
+                resource= 'NGSI10/queryContext?limit=1000&entity_type=review',
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
                     role_manager, perm1)
+
+    perm2 = keystone.fiware_roles.permissions.create(
+                name='restaurants', 
+                application=devguide_app, 
+                action= 'POST', 
+                resource= 'NGSI10/queryContext?limit=1000&entity_type=restaurant',
+                is_internal=False)
+
+    keystone.fiware_roles.permissions.add_to_role(
+                    role_manager, perm2)
+
+    keystone.fiware_roles.permissions.add_to_role(
+                    restaurant_viewer, perm2)
