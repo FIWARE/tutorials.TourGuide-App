@@ -19,7 +19,7 @@ orion:
         - mongodb
     expose:
         - "1026"
-    command: -fg
+    command: -dbhost mongodb
 
 authzforce:
     image: bitergia/authzforce:4.2.0
