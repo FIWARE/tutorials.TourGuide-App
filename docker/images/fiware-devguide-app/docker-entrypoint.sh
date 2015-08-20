@@ -65,9 +65,13 @@ function check_host_port () {
             echo "OK."
             _is_open=1
         else
-            echo "Failed."
             sleep 1
             _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
         fi
     done
 
@@ -96,9 +100,13 @@ function check_file () {
             echo "OK."
             _is_available=1
         else
-            echo "Failed."
             sleep 1
             _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
         fi
     done
 
