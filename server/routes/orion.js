@@ -203,7 +203,7 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Content-Length': Buffer.byteLength(post_data),
-        'X-Auth-Token':req.query.token
+        'X-Auth-Token':req.session.access_token
     };
 
     var orion_path = '/NGSI10/queryContext?limit='+orion_res_limit;
