@@ -52,12 +52,13 @@ exports.logout = function(req, res) {
     res.redirect('/');
 };
 
-exports.get_user_data = function(req, res) {
+exports.get_user_data = function(req, res, callback) {
     var url = config.idm_url + '/user/';
     var user = null;
     oauth.get(url, req.session.access_token,
-        function(e, responAse) {
+        function(e, response) {
             user = JSON.parse(response);
+            callback(user);
         }
     );
 };
