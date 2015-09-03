@@ -2,12 +2,7 @@
 var express = require('express'),
     auth =    require('./auth'),
     site =    require('./site'),
-    orion_pep =  require('./routes/orion_pep'),
-    orion =    require('./routes/orion'),
-    ckan =    require('./routes/ckan'),
-    filabs =    require('./routes/filabs'),
-    idas =    require('./routes/idas'),
-    idm =    require('./routes/idm');
+    orion =    require('./routes/orion');
 
 var app = express();
 
@@ -29,6 +24,8 @@ app.get('/', site.index);
 //app.get('/', function(req, res) {
 //    res.redirect('/client');
 //});
+
+// Auth support
 app.get('/login',auth.login);
 app.get('/auth',auth.auth);
 app.get('/get_user_data',auth.get_user_data);
@@ -37,34 +34,14 @@ app.get('/logout',auth.logout);
 
 // api rest: /api/
 //
-// orion_pep
-app.post('/api/orion-pep/contexts/:org_id/:context_id/:temperature_id',orion_pep.update_context_temperature);
-app.post('/api/orion-pep/entities/:org_id',orion_pep.update_entities);
 // orion
-app.get('/api/orion/contexts',orion.contexts);
 app.get('/api/orion/restaurants',orion.get_restaurants);
 app.get('/api/orion/restaurants/:name',orion.get_restaurants);
 app.get('/api/orion/reviews',orion.get_reviews);
 app.get('/api/orion/reviews/:name',orion.get_reviews);
 app.get('/api/orion/reservations',orion.get_reservations);
 app.get('/api/orion/reservations/:name',orion.get_reservations);
-// app.post('/api/orion/contexts/:org_id/:context_id',orion.subscribe_context);
-app.post('/api/orion/contexts/:org_id/:context_id/:temperature_id',orion.update_context_temperature);
 app.post('/api/orion/entities/:org_id',orion.update_entities); 
-// filabs
-app.get('/api/filabs/auth/:auth_data',filabs.auth);
-// ckan
-app.get('/api/ckan/datasets',ckan.datasets);
-app.get('/api/ckan/organizations',ckan.organizations);
-app.get('/api/ckan/organization/:org_id',ckan.organization);
-app.get('/api/ckan/resource/:resource_id',ckan.resource);
-// idas
-app.post('/api/idas/devices/:device_id/temperature/:temperature',idas.update_temperature);
-app.get('/api/idas/devices',idas.list_devices);
-app.get('/api/idas/history',idas.get_history);
-// idm
-app.get('/api/idm/auth/:auth_data',idm.auth);
-app.get('/api/idm/auth_pep/:auth_data',idm.auth_pep);
 
 // end api rest
 
