@@ -12,17 +12,17 @@ config.idm_url = 'https://IDM_HOSTNAME';
 config.client_id = 'CLIENT_ID';
 
 // Client Secret for the application
-config.client_secret = 'CLIENT_SECRET'
+config.client_secret = 'CLIENT_SECRET';
 
 // Callback URL for the application
 // TODO: make callback URL configurable as the others
-config.callback_url = 'http://compose_devguide_1/login'
+config.callback_url = 'http://compose_devguide_1/login';
 
 config.response_type = 'code';
 
 // Orion
-config.orion_port = 'ORION_PORT'
-config.orion_hostname = 'ORION_HOSTNAME'
-config.orion_pep_enabled = ORION_PEP_ENABLED
+config.orion_port = 'ORION_PORT';
+config.orion_hostname = 'ORION_HOSTNAME';
+config.orion_pep_enabled = ORION_PEP_ENABLED;
 
 module.exports = config;
