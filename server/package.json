@@ -1,17 +1,17 @@
 {
-  "name": "fiware-chanchan",
+  "name": "fiware-devguide-app",
   "version": "0.1.0",
-  "description": "Sample application showing how to publish in CKAN using Orion Context Broker",
+  "description": "FIWARE Developers Guide Application",
   "author": "Bitergia",
   "dependencies": {
       "express": "3.x",
-      "oauth": "~0.9.12",
       "node-mysql": "0.4.x",
       "async": "1.3.0",
-      "shortid": "2.2.2"
+      "shortid": "2.2.2",
+      "querystring": "0.2.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Bitergia/fiware-chanchan"
+    "url": "https://github.com/Bitergia/fiware-devguide-app"
   }
 }
