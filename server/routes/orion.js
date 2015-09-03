@@ -8,7 +8,8 @@ var orion_url = config.orion_hostname; // To be changed to PEP for auth
 var orion_port = config.orion_port;
 var orion_pep_enabled = config.orion_pep_enabled;
 
-function get_orion_items(type, restaurant_name_regexp, req, res) {
+/* Get entities from orion */
+function get_orion_entities(type, restaurant_name_regexp, req, res) {
     return_post = function(res, buffer, headers) {
         res.setHeader('Content-Type', 'application/json');
         res.send(unescape(buffer));
@@ -77,22 +78,7 @@ function get_orion_items(type, restaurant_name_regexp, req, res) {
     utils.do_post(options, post_data, return_post, res);
 }
 
-// Find the restaurants given a name
-exports.get_restaurants = function(req, res) {
-    get_orion_items("restaurant", req.params.name, req, res);
-};
-
-// Find the reviews given a restaurant name regexp
-exports.get_reviews = function(req, res) {
-    get_orion_items("review", req.params.name, req, res);
-};
-
-// Find the reservations given a restaurant name regexp
-exports.get_reservations = function(req, res) {
-    get_orion_items("reservation", req.params.name, req, res);
-};
-
-// Update entities in orion
+/* Update entities in orion */
 exports.update_entities = function(req, res) {
   return_post = function(res, buffer, headers) {
       res.send(buffer);
@@ -117,3 +103,68 @@ exports.update_entities = function(req, res) {
 
   utils.do_post(options, post_data, return_post, res);
 };
+
+
+// Restaurants
+
+exports.create_restaurant = function (req, res) {
+    res.send("exports.create_restaurant");
+};
+exports.read_restaurant = function (req, res) {
+    res.send("exports.read_restaurant");
+};
+exports.update_restaurant = function (req, res) {
+    res.send("exports.update_restaurant");
+};
+exports.delete_restaurant = function (req, res) {
+    res.send("exports.delete_restaurant");
+};
+exports.get_restaurants = function(req, res) {
+    get_orion_entities("restaurant", req.params.name, req, res);
+};
+
+// Reviews
+
+exports.create_review = function (req, res) {
+    res.send("exports.create_review");
+};
+exports.read_review = function (req, res) {
+    res.send("exports.read_review");
+};
+exports.update_review = function (req, res) {
+    res.send("exports.update_review");
+};
+exports.delete_review = function (req, res) {
+    res.send("exports.delete_review");
+};
+exports.get_reviews = function(req, res) {
+    get_orion_entities("review", req.params.name, req, res);
+};
+
+// Reservations
+
+exports.create_reservation = function (req, res) {
+    res.send("exports.create_reservation");
+};
+exports.read_reservation = function (req, res) {
+    res.send("exports.read_reservation");
+};
+exports.update_reservation = function (req, res) {
+    res.send("exports.update_reservation");
+};
+exports.delete_reservation = function (req, res) {
+    res.send("exports.delete_reservation");
+};
+exports.get_reservations = function(req, res) {
+    get_orion_entities("reservation", req.params.name, req, res);
+};
+
+// User data
+
+exports.get_user_reviews = function (req, res) {
+    res.send("exports.create_reservation");
+};
+exports.get_user_reservations = function (req, res) {
+    res.send("exports.create_reservation");
+};
+
