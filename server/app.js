@@ -57,7 +57,7 @@ app.delete('/api/orion/review/:id',orion.delete_review);
 app.get('/api/orion/reviews',orion.get_reviews);
 app.get('/api/orion/reviews/:name',orion.get_reviews);
 
-app.post('/api/orion/entities/:org_id',orion.update_entities); 
+app.post('/api/orion/entities/:org_id',orion.update_entity);
 
 // User API
 app.get('/api/orion/user/:id/reviews', orion.get_user_reviews);
