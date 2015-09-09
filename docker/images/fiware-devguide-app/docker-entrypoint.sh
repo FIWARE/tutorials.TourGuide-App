@@ -84,6 +84,52 @@ function check_host_port () {
     fi
 }
 
+function check_url () {
+
+    local _timeout=10
+    local _tries=0
+    local _ok=0
+
+    if [ $# -lt 2 ] ; then
+        echo "check_url: missing parameters."
+        echo "Usage: check_url <url> <regex> [max-tries]"
+        exit 1
+    fi
+
+    local _url=$1
+    local _regex=$2
+    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
+    local CURL=$( which curl )
+
+    if [ ! -e ${CURL} ] ; then
+        echo "Unable to find 'curl' command."
+        exit 1
+    fi
+
+    while [ ${_tries} -lt ${_max_tries} -a ${_ok} -eq 0 ] ; do
+        echo -n "Checking url '${_url}' [try $(( ${_tries} + 1 ))/${_max_tries}] ... "
+        if ${CURL} -s ${_url} | grep -q "${_regex}" ; then
+            echo "OK."
+            _ok=1
+        else
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
+        fi
+    done
+
+    if [ ${_ok} -eq 0 ] ; then
+        echo "Url check failed after ${_tries} tries."
+        exit 1
+    else
+        echo "Url check succeeded."
+    fi
+}
+
 function check_file () {
 
     local _tries=0
@@ -172,6 +218,20 @@ check_file ${CONFIG_FILE}
 _configure_params
 # enable new virtualhosts
 a2ensite devguide-app
+
+# Subscribe to receive temperatures from orion
+if [ -e /subscribe-to-orion ] ; then
+
+    echo "Testing if orion is ready at http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version"
+    check_url http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version "<version>.*</version>"
+
+    echo "subscribing to orion"
+    for f in $( ls ${SUBSCRIPTIONS_PATH} ) ; do
+        "${SUBSCRIPTIONS_PATH}/${f}"
+    done
+    rm -f /subscribe-to-orion
+fi
+
 
 # Start container back
 

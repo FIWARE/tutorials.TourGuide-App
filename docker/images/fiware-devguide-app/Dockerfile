@@ -7,6 +7,7 @@ MAINTAINER Alvaro del Castillo <acs@bitergia.com>
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEPLOY_USER bitergia
 ENV DEPLOY_USER_DIR /home/${DEPLOY_USER}
+ENV SUBSCRIPTIONS_PATH /opt/subscribe
 
 ENV CC_APP_SERVER_PATH ${DEPLOY_USER_DIR}/fiware-devguide-app/server
 
@@ -36,8 +37,12 @@ RUN mkdir fix-node-passenger && \
     version=$( ls ruby-passenger*.orig.tar.gz | sed -e 's/^ruby-passenger_\(.*\).orig.tar.gz$/\1/' ) && \
     cp -r ${PWD}/ruby-passenger-${version}/node_lib /usr/share/passenger/ && \
     cd .. && \
-    rm -rf fix-node-passenger
+    rm -rf fix-node-passenger && \
+    mkdir ${SUBSCRIPTIONS_PATH} && \
+    touch /subscribe-to-orion
 # fi
+
+COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 
 # enable modules, disable default site, restart service
 RUN a2enmod ssl && a2enmod passenger && \

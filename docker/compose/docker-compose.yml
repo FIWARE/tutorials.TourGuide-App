@@ -77,6 +77,7 @@ devguide:
         - pepwilma
     environment:
         - ORION_HOSTNAME=pepwilma
+        - ORION_NO_PROXY_HOSTNAME=orion
         - ORION_PORT=1026
         - ORION_PEP_ENABLED=true
     # volumes:
