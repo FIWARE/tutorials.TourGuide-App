@@ -4,7 +4,7 @@ Start devguide with a clean database (use mongo:2.6 instead of bitergia/fiware-d
 Load the data as usual with the restaurant_feeder.js script and any other script neccessary.
 Locate the data volume inside /var/lib/docker:
 ```
-docker inspect compose_mongodbdata_1 | grep "/data/db" | grep volume
+docker inspect compose_mongodbdata_1 | grep -Po '(?<="Source": ")[^"]*'
 ```
 Stop (not kill) the containers.
 Generate tar from volume data (i.e.):
@@ -17,7 +17,7 @@ sudo chown $your_user:$your_user devguide-data.tar.gz
 ```
 Build the image:
 ```
-docker built -t bitergia/fiware-devguide-restaurant-data:$( date "+%Y%m%d" ) .
+docker build -t bitergia/fiware-devguide-restaurant-data:$( date "+%Y%m%d" ) .
 ```
 Test the image. If it's ok, push the image:
 ```
