@@ -218,3 +218,15 @@ exports.get_user_reservations = function (req, res) {
     res.send("exports.create_reservation");
 };
 
+// Temperatures
+exports.receive_temperature = function (req, res) {
+    var post_data = JSON.stringify(req.body);
+
+    console.log("Temperature received ...");
+    console.log(post_data);
+
+    res.send("exports.receive_temperature");
+};
+exports.set_restaurant_temperature = function (req, res) {
+    res.send("exports.set_restaurant_temperature");
+};

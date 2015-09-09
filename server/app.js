@@ -63,6 +63,9 @@ app.post('/api/orion/entities/:org_id',orion.update_entity);
 app.get('/api/orion/user/:id/reviews', orion.get_user_reviews);
 app.get('/api/orion/user/:id/reservations', orion.get_user_reservations);
 
+// Temperatures
+app.post('/api/orion/temperature', orion.receive_temperature);
+app.post('/api/orion/restaurant/:id/temperature', orion.set_restaurant_temperature);
 
 // END API REST
 
