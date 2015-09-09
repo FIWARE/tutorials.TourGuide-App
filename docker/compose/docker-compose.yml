@@ -51,6 +51,24 @@ pepwilma:
         - APP_HOSTNAME=orion
         - APP_PORT=1026
 
+idasiotacpp:
+    image: bitergia/idas-iota-cpp:1.2.0
+    links:
+        - mongodb
+        - orion
+    expose:
+        - "8080"
+        - "8081"
+
+ul20client:
+    image: bitergia/ul20-client:latest
+    links:
+        - orion
+        - idasiotacpp:iota
+    command: --acpi
+    environment:
+        - IOTA_PORT=8080
+
 devguide:
     image: bitergia/fiware-devguide-app
     links:
@@ -62,6 +80,6 @@ devguide:
         - ORION_PORT=1026
         - ORION_PEP_ENABLED=true
     # volumes:
-    #  - ~/devel/fiware-devguide-app:/home/bitergia/fiware-devguide-app
+    #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
     volumes_from:
         - idm
