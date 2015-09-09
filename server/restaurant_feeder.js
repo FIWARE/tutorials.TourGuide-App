@@ -204,6 +204,22 @@ var feed_orion_restaurants = function() {
         console.log("Total restaurants added: " + restaurants_added);
     }
 
+    var dictionary = {
+        "id":"name",
+        "addressFax":"faxNumber",
+        "menu":"priceRange",
+        "phoneNumber":"telephone",
+        "turismDescription":"description",
+        "web":"url"
+    };
+
+    var address_dictionary = {
+        "address":"streetAddress",
+        "locality":"addressLocality",
+        "municipality":"addressRegion",
+        "municipalityCode":"postalCode"
+    };
+
     Object.keys(restaurants_data).forEach(function(element, pos, _array) {
         // Call orion to append the entity
         var rname = restaurants_data[pos].documentName;
@@ -220,17 +236,46 @@ var feed_orion_restaurants = function() {
                                "value": "WGS84"
                              }];
         attributes.push(geo_attr);
+
+        address = {"name":"address","type":"PostalAddress", "value":[]};
+
+        var counter = 0;
+
         Object.keys(restaurants_data[pos]).forEach(function(element) {
         // Object.keys(restaurants_data[pos]).slice(0,2).forEach(function(element) {
             var val = restaurants_data[pos][element];
             // Orion does not support empty values in APPEND
-            if (val === '') {
-                val = " ";
+
+            if (element in address_dictionary) {
+
+                counter++;
+
+                if (val !== 'undefined' && val!=='' && val!=' ') {
+                    element = utils.replaceOnceUsingDictionary(address_dictionary, element, function(key, dictionary){
+                        return dictionary[key];
+                    });
+
+                    var attr = {"name":element,
+                                "value":fixedEncodeURIComponent(val)};
+
+                    address.value.push(attr);
+
+                    if (counter == 4){
+                        attributes.push(address);                      
+                    }
+                }
+
+            } else {
+                if (val !== 'undefined' && element in dictionary && val!=='' && val!=' ') {
+
+                    element = utils.replaceOnceUsingDictionary(dictionary, element, function(key, dictionary){
+                        return dictionary[key];
+                    });
+                    var attr = {"name":element,
+                                "value":fixedEncodeURIComponent(val)};
+                    attributes.push(attr);
+                }
             }
-            var attr = {"name":element,
-                        "type":"NA",
-                        "value":fixedEncodeURIComponent(val)};
-            attributes.push(attr)
         });
         q.push({"rname":rname, "attributes":attributes}, return_post);
     });

@@ -12,7 +12,6 @@
 
 */
 
-
 var utils = require('./utils');
 var fs = require('fs');
 var async = require('async');
@@ -95,21 +94,41 @@ var feed_orion_reservations = function() {
     Object.keys(restaurants_data).forEach(function(element, pos, _array) {
         // Call orion to append the entity
         var rname = restaurants_data[pos].contextElement.id;
+        var address = restaurants_data[pos].contextElement.attributes[0];
+        address.value[0].value = fixedEncodeURIComponent(address.value[0].value);
         rname += "-"+shortid.generate();
+        var reservations = ["Cancelled","Confirmed","Hold","Pending"];
+        underName = {"name":"underName","type":"Person", "value":[]};
+        reservationFor = {"name":"ReservationFor","type":"FoodEstablishment", "value":[]};
+
         // Time to add first attribute to orion as first approach
         var attributes = [];
-        var attr = {"name":"bookingTime",
-                    "type":"datetime",
-                    "value":new Date().toJSON()};
-        attributes.push(attr)
-        attr = {"name":"reservationFor",
-                "type":"Restaurant",
-                "value":fixedEncodeURIComponent(rname)};
-        attributes.push(attr)
-        attr = {"name":"underName",
-                "type":"Person",
-                "value":"Customer A"};
-        attributes.push(attr)
+        var attr = {"name":"reservationId",
+                    "value":shortid.generate()};
+        attributes.push(attr);
+
+        attr = {"name":"reservationStatus",
+                "value":utils.randomElement(reservations)};
+        attributes.push(attr);
+
+        var attr_name = {"name":"name",
+                "value":"user"+utils.randomIntInc(1,10)};
+        underName.value.push(attr_name);
+        attributes.push(underName);
+
+        attr = {"name":restaurants_data[pos].contextElement.id};
+        reservationFor.value.push(attr);
+        reservationFor.value.push(address);
+        attributes.push(reservationFor);
+
+        attr = {"name":"startTime",
+                "value":new Date().toJSON()};
+        attributes.push(attr);
+
+        attr = {"name":"partySize",
+                "value":utils.randomIntInc(1,5)};
+        attributes.push(attr);
+
         q.push({"rname":rname, "attributes":attributes}, return_post);
     });
 };

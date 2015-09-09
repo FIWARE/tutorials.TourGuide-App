@@ -100,14 +100,42 @@ var feed_orion_reviews = function() {
         rname += "-"+shortid.generate();
         // Time to add first attribute to orion as first approach
         var attributes = [];
-        var attr = {"name":"ratingValue",
-                    "type":"text",
-                    "value":"0"};
-        attributes.push(attr)
+
+        itemReviewed = {"name":"itemReviewed","type":"Restaurant", "value":[]};
+        reviewRating = {"name":"reviewRating","type":"Rating", "value":[]};
+        author = {"name":"author","type":"Person", "value":[]};
+        publisher = {"name":"publisher","type":"Organization", "value":[]};
+
+
+        var attr = {"name":"name",
+                    "value":restaurants_data[pos].contextElement.id};
+        itemReviewed.value.push(attr);
+        attributes.push(itemReviewed);
+
+        attr = {"name":"ratingValue",
+                    "value":utils.randomIntInc(1,5)};
+        reviewRating.value.push(attr);
+        attributes.push(reviewRating);
+
+        attr = {"name":"name",
+                "value":"Rating description"};
+        attributes.push(attr);
+
+        attr = {"name":"name",
+                "value":"user"+utils.randomIntInc(1,10)};
+        author.value.push(attr);
+        attributes.push(author);
+
         attr = {"name":"reviewBody",
-                "type":"text",
-                "value":"Rating review body"};
-        attributes.push(attr)
+                "value":"Body review"};
+        attributes.push(attr);
+
+        attr = {"name":"name",
+                "value":"Bitergia"};
+        publisher.value.push(attr);
+        attributes.push(publisher);
+
+
         q.push({"rname":rname, "attributes":attributes}, return_post);
     });
 };
