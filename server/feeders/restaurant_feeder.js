@@ -12,7 +12,7 @@
 */
 
 
-var utils = require('./utils');
+var utils = require('../utils');
 var fs = require('fs');
 var async = require('async');
 
@@ -20,8 +20,8 @@ var feed_host = "opendata.euskadi.eus";
 var feed_url = "http://"+feed_host;
 var feed_path = "/contenidos/ds_recursos_turisticos";
 feed_path += "/restaurantes_sidrerias_bodegas/opendata/restaurantes.json";
-var cache_file = "restaurants.json";
-var cache_file_geo = "restaurants_geo.json";
+var cache_file = "../data/restaurants.json";
+var cache_file_geo = "../data/restaurants_geo.json";
 var cache_geo = {};
 // var api_rest_host = "localhost";
 // var api_rest_port = 3000; // Dev with Express
