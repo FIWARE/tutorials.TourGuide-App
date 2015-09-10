@@ -26,16 +26,6 @@ var api_rest_simtasks = 2 // number of simultaneous calls to API REST
 var reviews_added = 0;
 var restaurants_data; // All data for the restaurants to be reviewed
 
-function fixedEncodeURIComponent (str) {
-    str=str.replace(/["]/g,'\\"');
-    str=str.replace(/\n/g,'\\n');
-    return str.replace(/[<>"'=;()\n\\]/g, function(c) {
-	var hex;
-	hex = c.charCodeAt( 0 ).toString( 16 );
-	return '%' + ((hex.length==2) ? hex : '0' + hex );
-    });
-}
-
 var feed_orion_reviews = function() {
     return_post = function(res, buffer, headers) {
         reviews_added++;
@@ -63,7 +53,7 @@ var feed_orion_reviews = function() {
                     {
                         "type": "review",
                         "isPattern": "false",
-                        "id": fixedEncodeURIComponent(rname),
+                        "id": utils.fixedEncodeURIComponent(rname),
                         "attributes": attributes
                     }
             ],

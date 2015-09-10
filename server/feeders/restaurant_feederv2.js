@@ -133,16 +133,6 @@ function read_geo_data_feed_orion() {
     }
 }
 
-function fixedEncodeURIComponent (str) {
-    str=str.replace(/["]/g,'\\"');
-    str=str.replace(/\n/g,'\\n');
-    return str.replace(/[<>"'=;()\n\\]/g, function(c) {
-	var hex;
-	hex = c.charCodeAt( 0 ).toString( 16 );
-	return '%' + ((hex.length==2) ? hex : '0' + hex );
-    });
-}
-
 var feed_orion_restaurants = function() {
     return_post = function(res, buffer, headers) {
         restaurants_added++;
@@ -226,7 +216,7 @@ var feed_orion_restaurants = function() {
                     element = utils.replaceOnceUsingDictionary(address_dictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
-                    attr.address[fixedEncodeURIComponent(element)] = fixedEncodeURIComponent(val);
+                    attr.address[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(val);
                 }
 
             } else {
@@ -235,7 +225,7 @@ var feed_orion_restaurants = function() {
                     element = utils.replaceOnceUsingDictionary(dictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
-                    attr[fixedEncodeURIComponent(element)] = fixedEncodeURIComponent(val);
+                    attr[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(val);
 
                 }
             }

@@ -23,16 +23,6 @@ var api_rest_simtasks = 2 // number of simultaneous calls to API REST
 var reservations_added = 0;
 var restaurants_data; // All data for the restaurants to be reserved
 
-function fixedEncodeURIComponent (str) {
-    str=str.replace(/["]/g,'\\"');
-    str=str.replace(/\n/g,'\\n');
-    return str.replace(/[<>"'=;()\n\\]/g, function(c) {
-	var hex;
-	hex = c.charCodeAt( 0 ).toString( 16 );
-	return '%' + ((hex.length==2) ? hex : '0' + hex );
-    });
-}
-
 var feed_orion_reservations = function() {
     return_post = function(res, buffer, headers) {
         reservations_added++;
@@ -60,7 +50,7 @@ var feed_orion_reservations = function() {
                     {
                         "type": "reservation",
                         "isPattern": "false",
-                        "id": fixedEncodeURIComponent(rname),
+                        "id": utils.fixedEncodeURIComponent(rname),
                         "attributes": attributes
                     }
             ],
@@ -95,7 +85,7 @@ var feed_orion_reservations = function() {
         // Call orion to append the entity
         var rname = restaurants_data[pos].contextElement.id;
         var address = restaurants_data[pos].contextElement.attributes[0];
-        address.value[0].value = fixedEncodeURIComponent(address.value[0].value);
+        address.value[0].value = utils.fixedEncodeURIComponent(address.value[0].value);
         rname += "-"+shortid.generate();
         var reservations = ["Cancelled","Confirmed","Hold","Pending"];
         underName = {"name":"underName","type":"Person", "value":[]};
