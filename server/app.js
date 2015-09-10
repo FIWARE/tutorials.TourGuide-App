@@ -3,6 +3,7 @@ var express = require('express'),
     auth =    require('./auth'),
     site =    require('./site'),
     orion =    require('./routes/orion');
+    orionv2 =  require('./routes/orionv2');
 
 var app = express();
 
@@ -66,6 +67,33 @@ app.get('/api/orion/user/:id/reservations', orion.get_user_reservations);
 // Temperatures
 app.post('/api/orion/temperature', orion.receive_temperature);
 app.post('/api/orion/restaurant/:id/temperature', orion.set_restaurant_temperature);
+
+// Orion V2
+
+// Restaurants, reservations and reviews: CRUD, listing and searches
+
+app.post('/api/orionv2/restaurant',orionv2.create_restaurant);
+app.get('/api/orionv2/restaurant/:id',orionv2.read_restaurant);
+app.put('/api/orionv2/restaurant/:id',orionv2.update_restaurant);
+app.delete('/api/orionv2/restaurant/:id',orionv2.delete_restaurant);
+app.get('/api/orionv2/restaurants',orionv2.get_restaurants);
+
+app.post('/api/orionv2/review',orionv2.create_review);
+app.get('/api/orionv2/review/:id',orionv2.read_review);
+app.put('/api/orionv2/review/:id',orionv2.update_review);
+app.delete('/api/orionv2/review/:id',orionv2.delete_review);
+app.get('/api/orionv2/reviews',orionv2.get_reviews);
+
+app.post('/api/orionv2/reservation',orionv2.create_reservation);
+app.get('/api/orionv2/reservation/:id',orionv2.read_reservation);
+app.put('/api/orionv2/reservation/:id',orionv2.update_reservation);
+app.delete('/api/orionv2/reservation/:id',orionv2.delete_reservation);
+app.get('/api/orionv2/reservations',orionv2.get_reservations);
+
+// User API v2
+app.get('/api/orionv2/user/:id/reviews', orionv2.get_user_reviews);
+app.get('/api/orionv2/user/:id/reservations', orionv2.get_user_reservations);
+
 
 // END API REST
 
