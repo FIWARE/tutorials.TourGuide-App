@@ -23,6 +23,8 @@ So for this purpose, we have already a simple file that launches:
 
 The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Bitergia/fiware-devguide-app/master/docker/compose/docker-compose.yml).
 
+**Note:** Mac users please check the [data volumes in OS X](#data-volumes-in-os-x) section to configure the `docker-compose.yml` properly.
+
 Once you get it, you just have to:
 
 ```
@@ -70,6 +72,19 @@ You can also use the [get-container-ip](https://github.com/Bitergia/docker/tree/
 
 Information on how to do that can be found [here](https://github.com/Bitergia/docker/tree/master/baseimages/ubuntu#about-ssh).
 **Note** that the information below is regarding the `bitergia/ubuntu-trusty` baseimage. If you have already pulled or made a `bitergia/fiware-devguide-app` image based in the `bitergia/ubuntu-trusty` image before applying the keys change, you will need to re-build both images again.
+
+### Data volumes in OS X
+
+Some users reported that, using data volumes is not working properly with `docker` in OS X. As we are providing an image with data already loaded, the solution is to modify the `docker-compose.yml` provided in this repository and link directly `mongodb` to the data image like:
+
+```
+mongodb:
+    image: bitergia/fiware-devguide-restaurant-data:20150728
+    expose:
+        - "27017"
+    command: --smallfiles
+```
+And also removing the `mongodbdata` section.
 
 ## User feedback
 
