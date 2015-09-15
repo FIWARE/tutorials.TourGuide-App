@@ -14,7 +14,7 @@ mongodb:
     command: --smallfiles
 
 orion:
-    image: bitergia/fiware-orion:develop
+    image: fiware/orion:latest
     links:
         - mongodb
     expose:
