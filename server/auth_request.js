@@ -2,7 +2,7 @@ http = require('http');
 var querystring = require('querystring');
 var config = require('./config');
 var host = 'compose_orion_1'; // To be changed to PEP for auth
-var port = config.orion_port
+var port = 1026 
 
 module.exports = performRequest
 
@@ -73,11 +73,15 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 201) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers.location);
+          success(res);
         } else if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
+          success(res);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
+          console.log(res.headers);
+          success(res);
         }
       } 
 
@@ -85,8 +89,11 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
+          success(res);
+
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
+          success(res);
         }
       }
 
@@ -94,8 +101,10 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 200 || res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
+          success(res);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
+          success(res);
         }
       }
 
@@ -103,16 +112,18 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
+          success(res);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
+          success(res);
         }
       }
 
       else {
         console.log(res.headers);
         console.log('No data to show');
+        success(res);
       }
-
     });
   });
 
