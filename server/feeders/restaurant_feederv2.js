@@ -26,7 +26,7 @@ var cache_file_geo = "../data/restaurants_geo.json";
 var cache_geo = {};
 var api_rest_host = "compose_devguide_1";
 var api_rest_port = 80;
-var api_rest_simtasks = 100; // number of simultaneous calls to API REST
+var api_rest_simtasks = 5; // number of simultaneous calls to API REST
 var restaurants_added = 0;
 var geo_wait_time_ms = 1000; // Wait ms between calls to Google API
 var restaurants_data; // All data for the restaurants
@@ -136,7 +136,7 @@ function read_geo_data_feed_orion() {
 var feed_orion_restaurants = function() {
     return_post = function(res, buffer, headers) {
         restaurants_added++;
-         console.log(buffer);
+         //console.log(buffer);
         console.log(restaurants_added+"/"+restaurants_data.length);
     };
 
@@ -145,16 +145,14 @@ var feed_orion_restaurants = function() {
     console.log("Feeding restaurants info in orion.");
     console.log("Number of restaurants: " + restaurants_data.length);
 
-    var api_rest_path = "/api/orion/entities/";
-    var org_name = "devguide";
-    var temperature_id = "NA";
-
     // Limit the number of calls to be done in parallel to orion
     var q = async.queue(function (task, callback) {
         var rname = task.rname;
         var attributes = task.attributes;
 
-        auth_request("v2/entities", "POST", attributes , function(data){ console.log(data)});
+        //console.log(attributes);
+
+        auth_request("v2/entities", "POST", attributes , callback);
     }, api_rest_simtasks);
 
 
@@ -186,25 +184,19 @@ var feed_orion_restaurants = function() {
 
         var attr = {"@context": "http://schema.org", 
                     "@type": "Restaurant", 
-                    "id":rname, 
+                    "id":encodeURIComponent(rname), 
                     "address": {},
-                    "department": utils.randomElement(organization)};
+                    "location": {},
+                    "department": utils.randomElement(organization),
+                    "aggregateRating": utils.randomIntInc(0,5)};
 
         attr.address["@type"] = "postalAddress";
 
         var address = get_address(restaurants_data[pos]);
         var geocode = get_geocode(address);
-
-        //TODO: Add location using V2 too
-
-        // Orion location attribute: http://bit.ly/1CmagJz
-        //geo_attr = {"name":"location","type":"coords","value":geocode};
-        //geo_attr.metadatas = [{
-        //                       "name": "location",
-        //                       "type": "string",
-        //                       "value": "WGS84"
-        //                     }];
-        //attributes.push(geo_attr);
+        attr.location["value"] = geocode;
+        attr.location["type"] = "geo:point";
+        attr.location["crs"] = "WGS84";
 
         Object.keys(restaurants_data[pos]).forEach(function(element) {
 
@@ -216,7 +208,7 @@ var feed_orion_restaurants = function() {
                     element = utils.replaceOnceUsingDictionary(address_dictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
-                    attr.address[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(val);
+                    attr.address[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(encodeURIComponent(val));
                 }
 
             } else {
@@ -225,13 +217,15 @@ var feed_orion_restaurants = function() {
                     element = utils.replaceOnceUsingDictionary(dictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
-                    attr[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(val);
+                    attr[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(encodeURIComponent(val));
 
                 }
             }
 
         });
+        //console.log("Push done");
         q.push({"rname":rname, "attributes":attr}, return_post);
+        //console.log(attr);
     });
 };
 
