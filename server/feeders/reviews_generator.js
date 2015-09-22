@@ -19,6 +19,7 @@ var utils = require('../utils');
 var fs = require('fs');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
+var auth_request = require('../auth_request');
 
 var api_rest_host = "compose_devguide_1";
 var api_rest_port = 80;
@@ -29,7 +30,6 @@ var restaurants_data; // All data for the restaurants to be reviewed
 var feed_orion_reviews = function() {
     return_post = function(res, buffer, headers) {
         reviews_added++;
-        // console.log(buffer);
         console.log(reviews_added+"/"+restaurants_data.length);
     };
 
@@ -45,38 +45,8 @@ var feed_orion_reviews = function() {
     var q = async.queue(function (task, callback) {
         var rname = task.rname;
         var attributes = task.attributes;
-        console.log(rname);
 
-        // Time to build the Context Element in Orion language
-        var post_data = {
-            "contextElements": [
-                    {
-                        "type": "review",
-                        "isPattern": "false",
-                        "id": utils.fixedEncodeURIComponent(rname),
-                        "attributes": attributes
-                    }
-            ],
-            "updateAction": "APPEND"
-        };
-
-        // POST to create a new entity
-        post_data = JSON.stringify(post_data);
-
-        var headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Content-Length': Buffer.byteLength(post_data)
-        };
-
-        var options = {
-                host: api_rest_host,
-                port: api_rest_port,
-                path: api_rest_path+org_name,
-                method: 'POST',
-                headers: headers
-            };
-        utils.do_post(options, post_data, callback);
+        auth_request("v2/entities", "POST", attributes , callback);
     }, api_rest_simtasks);
 
 
@@ -86,74 +56,46 @@ var feed_orion_reviews = function() {
 
     Object.keys(restaurants_data).forEach(function(element, pos, _array) {
         // Call orion to append the entity
-        var rname = restaurants_data[pos].contextElement.id;
+        var rname = restaurants_data[pos].id;
         rname += "-"+shortid.generate();
         // Time to add first attribute to orion as first approach
-        var attributes = [];
 
-        itemReviewed = {"name":"itemReviewed","type":"Restaurant", "value":[]};
-        reviewRating = {"name":"reviewRating","type":"Rating", "value":[]};
-        author = {"name":"author","type":"Person", "value":[]};
-        publisher = {"name":"publisher","type":"Organization", "value":[]};
+        var attr = {"@context": "http://schema.org", 
+                    "type": "Review", 
+                    "id":encodeURIComponent(rname),
+                    "itemReviewed":{}, 
+                    "reviewRating": {},
+                    "name": "Rating description",
+                    "author": {},
+                    "reviewBody": "Body review",
+                    "publisher": {}};
 
+        attr.itemReviewed["@type"]="Restaurant";
+        attr.itemReviewed["name"]=restaurants_data[pos].id;
 
-        var attr = {"name":"name",
-                    "value":restaurants_data[pos].contextElement.id};
-        itemReviewed.value.push(attr);
-        attributes.push(itemReviewed);
+        attr.reviewRating["@type"]="Rating";
+        attr.reviewRating["ratingValue"]=utils.randomIntInc(1,5);
 
-        attr = {"name":"ratingValue",
-                    "value":utils.randomIntInc(1,5)};
-        reviewRating.value.push(attr);
-        attributes.push(reviewRating);
+        attr.author["@type"]="Person";
+        attr.author["name"]="user"+utils.randomIntInc(1,10);
 
-        attr = {"name":"name",
-                "value":"Rating description"};
-        attributes.push(attr);
+        attr.publisher["@type"]="Organization";
+        attr.publisher["name"]="Bitergia";
 
-        attr = {"name":"name",
-                "value":"user"+utils.randomIntInc(1,10)};
-        author.value.push(attr);
-        attributes.push(author);
-
-        attr = {"name":"reviewBody",
-                "value":"Body review"};
-        attributes.push(attr);
-
-        attr = {"name":"name",
-                "value":"Bitergia"};
-        publisher.value.push(attr);
-        attributes.push(publisher);
-
-
-        q.push({"rname":rname, "attributes":attributes}, return_post);
+        q.push({"rname":rname, "attributes":attr}, return_post);
     });
 };
 
 // Load restaurant data from Orion
 var load_restaurant_data = function() {
 
-    var process_restaurants = function (res, data) {
-        restaurants_data = JSON.parse(data).contextResponses;
+    var process_restaurants = function (data) {
+        restaurants_data = JSON.parse(JSON.stringify(data));
         // Once we have all data for restaurants generate reviews for them
         feed_orion_reviews();
     };
 
-    // http://compose_devguide_1/api/orion/restaurants/
-    var url_path = "/api/orion/restaurants/";
-
-    var headers = {
-            'Accept': 'application/json',
-    };
-
-    var options = {
-        host: api_rest_host,
-        path: url_path,
-        method: 'GET',
-        headers: headers
-    };
-
-    utils.do_get(options, process_restaurants);
+    auth_request("v2/entities", "GET", { "type":"Restaurant", "limit":"1000" } , process_restaurants);
 };
 
 console.log("Generating random reviews for restaurants ...");
