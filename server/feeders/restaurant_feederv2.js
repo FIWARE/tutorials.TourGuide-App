@@ -17,92 +17,90 @@ var auth_request = require('../auth_request');
 var fs = require('fs');
 var async = require('async');
 
-var feed_host = "opendata.euskadi.eus";
-var feed_url = "http://"+feed_host;
-var feed_path = "/contenidos/ds_recursos_turisticos";
-feed_path += "/restaurantes_sidrerias_bodegas/opendata/restaurantes.json";
-var cache_file = "../data/restaurants.json";
-var cache_file_geo = "../data/restaurants_geo.json";
-var cache_geo = {};
-var api_rest_host = "compose_devguide_1";
-var api_rest_port = 80;
-var api_rest_simtasks = 5; // number of simultaneous calls to API REST
-var restaurants_added = 0;
-var geo_wait_time_ms = 1000; // Wait ms between calls to Google API
-var restaurants_data; // All data for the restaurants
-var api_count = 0; // 2500 requests per day, be careful
+var feedHost = "opendata.euskadi.eus";
+var feedUrl = "http://"+feedHost;
+var feedPath = "/contenidos/ds_recursos_turisticos";
+feedPath += "/restaurantes_sidrerias_bodegas/opendata/restaurantes.json";
+var cacheFile = "../data/restaurants.json";
+var cacheFileGeo = "../data/restaurants_geo.json";
+var cacheGeo = {};
+var apiRestSimtasks = 5; // number of simultaneous calls to API REST
+var restaurantsAdded = 0;
+var geoWaitTimeMs = 1000; // Wait ms between calls to Google API
+var restaurantsData; // All data for the restaurants
+var apiCount = 0; // 2500 requests per day, be careful
 
-function get_address(restaurant) {
+function getAddress(restaurant) {
     var address = restaurant.address + " ";
     address += restaurant.municipality;
     return address;
 }
 
-var get_geocode_api_next = function(pos, data) {
-    var total = restaurants_data.length;
+var getGeocodeApiNext = function(pos, data) {
+    var total = restaurantsData.length;
     try {
-        var geocode_json = JSON.parse(data);
-        cache_geo[get_address(restaurants_data[pos])] = geocode_json;
+        var geocodeJson = JSON.parse(data);
+        cacheGeo[getAddress(restaurantsData[pos])] = geocodeJson;
     } catch (e) {
-        cache_geo[get_address(restaurants_data[pos])] = data;
+        cacheGeo[getAddress(restaurantsData[pos])] = data;
     }
 
     if (pos < total-1) {
         console.log("API call " + pos + "/" + (total-1));
-        setTimeout(function() {get_geocode_api(++pos);}, geo_wait_time_ms);
+        setTimeout(function() {getGeocodeApi(++pos);}, geoWaitTimeMs);
     } else {
         // Once all read, write to cache file and feed data to orion
-        fs.writeFileSync(cache_file_geo, JSON.stringify(cache_geo));
-        console.log("TOTAL API CALLS: " + api_count);
-        feed_orion_restaurants();
+        fs.writeFileSync(cacheFileGeo, JSON.stringify(cacheGeo));
+        console.log("TOTAL API CALLS: " + apiCount);
+        feedOrionRestaurants();
     }
 }
 
 // pos: position in restaurant_data array
-var get_geocode_api = function(pos) {
+var getGeocodeApi = function(pos) {
     // First check if we already have the data
-    var address = get_address(restaurants_data[pos]);
+    var address = getAddress(restaurantsData[pos]);
 
-    if (cache_geo[address] !== undefined) {
-        get_geocode_api_next (pos, cache_geo[address]);
+    if (cacheGeo[address] !== undefined) {
+        getGeocodeApiNext (pos, cacheGeo[address]);
         return
     }
 
-    var api_key = process.argv[2];
-    var url_path = "/maps/api/geocode/json?";
-    url_path += "region=es&"; // All our restaurants are from Spain
-    url_path += "address="+encodeURIComponent(address);
-    url_path += "&key="+api_key;
+    var apiKey = process.argv[2];
+    var urlPath = "/maps/api/geocode/json?";
+    urlPath += "region=es&"; // All our restaurants are from Spain
+    urlPath += "address="+encodeURIComponent(address);
+    urlPath += "&key="+apiKey;
     var headers = {
             'Accept': 'application/json',
     };
 
     var options = {
         host: "maps.googleapis.com",
-        path: url_path,
+        path: urlPath,
         method: 'GET',
         headers: headers
     };
     var https = true;
-    api_count++;
-    utils.do_get(options, get_geocode_api_next, pos, https);
+    apiCount++;
+    utils.do_get(options, getGeocodeApiNext, pos, https);
 };
 
 
 
-function get_geocode (address) {
+function getGeocode (address) {
     var geocode;
 
-    if (cache_geo[address] === undefined) {
+    if (cacheGeo[address] === undefined) {
         console.log("Can't read geocodes");
     } else {
-        if (cache_geo[address].results !== undefined &&
-            Array.isArray(cache_geo[address].results) &&
-            cache_geo[address].results[0] != undefined) {
-            geocode_raw = cache_geo[address].results[0].geometry.location;
-            geocode = geocode_raw.lat+", "+geocode_raw.lng;
+        if (cacheGeo[address].results !== undefined &&
+            Array.isArray(cacheGeo[address].results) &&
+            cacheGeo[address].results[0] != undefined) {
+            geocodeRaw = cacheGeo[address].results[0].geometry.location;
+            geocode = geocodeRaw.lat+", "+geocodeRaw.lng;
         } else {
-            console.log("Bad geocode data: " + cache_geo[address]);
+            console.log("Bad geocode data: " + cacheGeo[address]);
         }
     }
 
@@ -110,40 +108,40 @@ function get_geocode (address) {
 }
 
 // Try to convert all address to geocode
-function read_geo_data_feed_orion() {
+function readGeoDataFeedOrion() {
     try {
-        var data = fs.readFileSync(cache_file_geo);
-        cache_geo = JSON.parse(data);
-        feed_orion_restaurants();
+        var data = fs.readFileSync(cacheFileGeo);
+        cacheGeo = JSON.parse(data);
+        feedOrionRestaurants();
     } catch (e) {
         if (e.code === 'ENOENT') {
-            var max_time = restaurants_data.length * geo_wait_time_ms / 1000;
+            var maxTime = restaurantsData.length * geoWaitTimeMs / 1000;
             console.log("Reading geocodes ... be patient ...");
-            console.log("Max time needed: " + max_time + " seconds.");
-            var api_key = process.argv[2];
-            if (api_key === undefined) {
+            console.log("Max time needed: " + maxTime + " seconds.");
+            var apiKey = process.argv[2];
+            if (apiKey === undefined) {
                 console.log("Please provide an API key:");
-                console.log("node restaurant_feeder.js <api_key_google_geocode>");
+                console.log("node restaurant_feeder.js <apiKey_google_geocode>");
                 throw("API key needed for geocodes.");
             }
-            get_geocode_api(0);
+            getGeocodeApi(0);
         } else {
             throw(e);
         }
     }
 }
 
-var feed_orion_restaurants = function() {
-    return_post = function(res, buffer, headers) {
-        restaurants_added++;
+var feedOrionRestaurants = function() {
+    returnPost = function(res, buffer, headers) {
+        restaurantsAdded++;
          //console.log(buffer);
-        console.log(restaurants_added+"/"+restaurants_data.length);
+        console.log(restaurantsAdded+"/"+restaurantsData.length);
     };
 
-    //restaurants_data = restaurants_data.slice(0,5); // debug with few items
+    //restaurantsData = restaurantsData.slice(0,5); // debug with few items
 
     console.log("Feeding restaurants info in orion.");
-    console.log("Number of restaurants: " + restaurants_data.length);
+    console.log("Number of restaurants: " + restaurantsData.length);
 
     // Limit the number of calls to be done in parallel to orion
     var q = async.queue(function (task, callback) {
@@ -153,11 +151,11 @@ var feed_orion_restaurants = function() {
         //console.log(attributes);
 
         auth_request("v2/entities", "POST", attributes , callback);
-    }, api_rest_simtasks);
+    }, apiRestSimtasks);
 
 
     q.drain = function() {
-        console.log("Total restaurants added: " + restaurants_added);
+        console.log("Total restaurants added: " + restaurantsAdded);
     }
 
     var dictionary = {
@@ -169,16 +167,16 @@ var feed_orion_restaurants = function() {
         "web":"url"
     };
 
-    var address_dictionary = {
+    var addressDictionary = {
         "address":"streetAddress",
         "locality":"addressLocality",
         "municipality":"addressRegion",
         "municipalityCode":"postalCode"
     };
 
-    Object.keys(restaurants_data).forEach(function(element, pos, _array) {
+    Object.keys(restaurantsData).forEach(function(element, pos, _array) {
         // Call orion to append the entity
-        var rname = restaurants_data[pos].documentName;
+        var rname = restaurantsData[pos].documentName;
         // Time to add first attribute to orion as first approach
         var organization = ["Franchise1","Franchise2","Franchise3","Franchise4"];
 
@@ -192,8 +190,8 @@ var feed_orion_restaurants = function() {
 
         attr.address["@type"] = "postalAddress";
 
-        var address = get_address(restaurants_data[pos]);
-        var geocode = get_geocode(address);
+        var address = getAddress(restaurantsData[pos]);
+        var geocode = getGeocode(address);
         attr.location["value"] = geocode;
         attr.location["type"] = "geo:point";
         attr.location["crs"] = "WGS84";
@@ -201,14 +199,14 @@ var feed_orion_restaurants = function() {
         attr.aggregateRating["ratingValue"]= utils.randomIntInc(1,5);
         attr.aggregateRating["reviewCount"]= utils.randomIntInc(1,100);
 
-        Object.keys(restaurants_data[pos]).forEach(function(element) {
+        Object.keys(restaurantsData[pos]).forEach(function(element) {
 
-            var val = restaurants_data[pos][element];
+            var val = restaurantsData[pos][element];
 
-            if (element in address_dictionary) {
+            if (element in addressDictionary) {
 
                 if (val !== 'undefined' && val!=='' && val!=' ') {
-                    element = utils.replaceOnceUsingDictionary(address_dictionary, element, function(key, dictionary){
+                    element = utils.replaceOnceUsingDictionary(addressDictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
                     attr.address[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(encodeURIComponent(val));
@@ -227,24 +225,24 @@ var feed_orion_restaurants = function() {
 
         });
         //console.log("Push done");
-        q.push({"rname":rname, "attributes":attr}, return_post);
+        q.push({"rname":rname, "attributes":attr}, returnPost);
         //console.log(attr);
     });
 };
 
 // Load restaurant data in Orion
-var load_restaurant_data = function() {
-    var process_get = function(res, data) {
-        fs.writeFileSync(cache_file, data);
-        restaurants_data = JSON.parse(data);
-        read_geo_data_feed_orion();
+var loadRestaurantData = function() {
+    var processGet = function(res, data) {
+        fs.writeFileSync(cacheFile, data);
+        restaurantsData = JSON.parse(data);
+        readGeoDataFeedOrion();
     };
 
     try {
-        var data = fs.readFileSync(cache_file);
-        console.log("Using cache file " + cache_file);
-        restaurants_data = JSON.parse(data);
-        read_geo_data_feed_orion();
+        var data = fs.readFileSync(cacheFile);
+        console.log("Using cache file " + cacheFile);
+        restaurantsData = JSON.parse(data);
+        readGeoDataFeedOrion();
     } catch (e) {
         if (e.code === 'ENOENT') {
             console.log("Downloading data ... be patient");
@@ -254,12 +252,12 @@ var load_restaurant_data = function() {
             };
 
             var options = {
-                host: feed_host,
-                path: feed_path,
+                host: feedHost,
+                path: feedPath,
                 method: 'GET',
                 headers: headers
             };
-            utils.do_get(options, process_get);
+            utils.do_get(options, processGet);
 
         } else {
             throw e;
@@ -269,4 +267,4 @@ var load_restaurant_data = function() {
 
 console.log("Loading restaurants info ...");
 
-load_restaurant_data();
+loadRestaurantData();
