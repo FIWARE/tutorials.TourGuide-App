@@ -144,7 +144,7 @@ exports.randomIntInc = function (low, high) {
 }
 
 exports.randomElement = function (elements) {
-    return elements[Math.floor(Math.random()*elements.length)]
+    return elements[Math.floor(Math.random()*elements.length)];
 }
 
 exports.fixedEncodeURIComponent = function (str) {
@@ -155,4 +155,45 @@ exports.fixedEncodeURIComponent = function (str) {
     hex = c.charCodeAt( 0 ).toString( 16 );
     return '%' + ((hex.length==2) ? hex : '0' + hex );
     });
+}
+
+exports.getRandomDate = function (from, to) {
+    if (!from) {
+        from = new Date(1900, 0, 1).getTime();
+    } else {
+        from = from.getTime();
+    }
+    if (!to) {
+        to = new Date(2100, 0, 1).getTime();
+    } else {
+        to = to.getTime();
+    }
+    return new Date(from + Math.random() * (to - from));
+}
+
+exports.convertHtmlToText = function (str) {
+
+    //-- remove BR tags and replace them with line break
+    str=str.replace(/<br>/gi, "\n");
+    str=str.replace(/<br\s\/>/gi, "\n");
+    str=str.replace(/<br\/>/gi, "\n");
+
+    //-- remove P and A tags but preserve what's inside of them
+    str=str.replace(/<p.*>/gi, "\n");
+    str=str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, " $2 ($1)");
+
+    //-- remove all inside SCRIPT and STYLE tags
+    str=str.replace(/<script.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/script>/gi, "");
+    str=str.replace(/<style.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/style>/gi, "");
+    //-- remove all else
+    str=str.replace(/<(?:.|\s)*?>/g, "");
+
+    //-- get rid of more than 2 multiple line breaks:
+    str=str.replace(/(?:(?:\r\n|\r|\n)\s*){2,}/gim, "\n\n");
+
+    //-- get rid of more than 2 spaces:
+    str = str.replace(/ +(?= )/g,'');
+
+    //-- return
+    return str;
 }
