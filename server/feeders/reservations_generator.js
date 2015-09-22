@@ -16,6 +16,7 @@ var utils = require('../utils');
 var fs = require('fs');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
+var auth_request = require('../auth_request');
 
 var api_rest_host = "compose_devguide_1";
 var api_rest_port = 80;
@@ -26,7 +27,6 @@ var restaurants_data; // All data for the restaurants to be reserved
 var feed_orion_reservations = function() {
     return_post = function(res, buffer, headers) {
         reservations_added++;
-        // console.log(buffer);
         console.log(reservations_added+"/"+restaurants_data.length);
     };
 
@@ -41,39 +41,9 @@ var feed_orion_reservations = function() {
     // Limit the number of calls to be done in parallel to orion
     var q = async.queue(function (task, callback) {
         var rname = task.rname;
-        console.log("Adding reservation to " + rname);
         var attributes = task.attributes;
 
-        // Time to build the Context Element in Orion language
-        var post_data = {
-            "contextElements": [
-                    {
-                        "type": "reservation",
-                        "isPattern": "false",
-                        "id": utils.fixedEncodeURIComponent(rname),
-                        "attributes": attributes
-                    }
-            ],
-            "updateAction": "APPEND"
-        };
-
-        // POST to create a new entity
-        post_data = JSON.stringify(post_data);
-
-        var headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Content-Length': Buffer.byteLength(post_data)
-        };
-
-        var options = {
-                host: api_rest_host,
-                port: api_rest_port,
-                path: api_rest_path+org_name,
-                method: 'POST',
-                headers: headers
-            };
-        utils.do_post(options, post_data, callback);
+        auth_request("v2/entities", "POST", attributes , callback);
     }, api_rest_simtasks);
 
 
@@ -83,70 +53,45 @@ var feed_orion_reservations = function() {
 
     Object.keys(restaurants_data).forEach(function(element, pos, _array) {
         // Call orion to append the entity
-        var rname = restaurants_data[pos].contextElement.id;
-        var address = restaurants_data[pos].contextElement.attributes[0];
-        address.value[0].value = utils.fixedEncodeURIComponent(address.value[0].value);
+        var rname = restaurants_data[pos].id;
         rname += "-"+shortid.generate();
+
+        //var address = restaurants_data[pos].contextElement.attributes[0];
+        //address.value[0].value = utils.fixedEncodeURIComponent(address.value[0].value);
+
         var reservations = ["Cancelled","Confirmed","Hold","Pending"];
-        underName = {"name":"underName","type":"Person", "value":[]};
-        reservationFor = {"name":"ReservationFor","type":"FoodEstablishment", "value":[]};
+
+        var attr = {"@context": "http://schema.org", 
+                    "type": "FoodEstablishmentReservation", 
+                    "id":encodeURIComponent(rname),
+                    "reservationStatus":utils.randomElement(reservations), 
+                    "underName": {},
+                    "reservationFor": {},
+                    "startTime": utils.getRandomDate(),
+                    "partySize": utils.randomIntInc(1,20)};
 
         // Time to add first attribute to orion as first approach
-        var attributes = [];
-        var attr = {"name":"reservationId",
-                    "value":shortid.generate()};
-        attributes.push(attr);
+        attr.underName["@type"] = "Person";
+        attr.underName["name"] = "user"+utils.randomIntInc(1,10);
 
-        attr = {"name":"reservationStatus",
-                "value":utils.randomElement(reservations)};
-        attributes.push(attr);
+        attr.reservationFor["@type"] = "FoodEstablishment";
+        attr.reservationFor["name"] = restaurants_data[pos].id;
+        attr.reservationFor["address"] = restaurants_data[pos].address;
 
-        var attr_name = {"name":"name",
-                "value":"user"+utils.randomIntInc(1,10)};
-        underName.value.push(attr_name);
-        attributes.push(underName);
-
-        attr = {"name":restaurants_data[pos].contextElement.id};
-        reservationFor.value.push(attr);
-        reservationFor.value.push(address);
-        attributes.push(reservationFor);
-
-        attr = {"name":"startTime",
-                "value":new Date().toJSON()};
-        attributes.push(attr);
-
-        attr = {"name":"partySize",
-                "value":utils.randomIntInc(1,5)};
-        attributes.push(attr);
-
-        q.push({"rname":rname, "attributes":attributes}, return_post);
+        q.push({"rname":rname, "attributes":attr}, return_post);
     });
 };
 
 // Load restaurant data from Orion
 var load_restaurant_data = function() {
 
-    var process_restaurants = function (res, data) {
-        restaurants_data = JSON.parse(data).contextResponses;
-        // Once we have all data for restaurants generate reservations for them
+    var process_restaurants = function (data) {
+        restaurants_data = JSON.parse(JSON.stringify(data));
+        // Once we have all data for restaurants generate reviews for them
         feed_orion_reservations();
     };
 
-    // http://compose_devguide_1/api/orion/restaurants/
-    var url_path = "/api/orion/restaurants/";
-
-    var headers = {
-            'Accept': 'application/json',
-    };
-
-    var options = {
-        host: api_rest_host,
-        path: url_path,
-        method: 'GET',
-        headers: headers
-    };
-
-    utils.do_get(options, process_restaurants);
+    auth_request("v2/entities", "GET", { "type":"Restaurant", "limit":"1000" } , process_restaurants);
 };
 
 console.log("Generating random reservations for restaurants ...");
