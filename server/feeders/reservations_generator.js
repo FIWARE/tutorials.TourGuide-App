@@ -18,25 +18,20 @@ var async = require('async');
 var shortid = require('shortid'); // unique ids generator
 var auth_request = require('../auth_request');
 
-var api_rest_host = "compose_devguide_1";
-var api_rest_port = 80;
-var api_rest_simtasks = 2 // number of simultaneous calls to API REST
-var reservations_added = 0;
-var restaurants_data; // All data for the restaurants to be reserved
+var apiRestSimtasks = 2 // number of simultaneous calls to API REST
+var reservationsAdded = 0;
+var restaurantsData; // All data for the restaurants to be reserved
 
-var feed_orion_reservations = function() {
-    return_post = function(res, buffer, headers) {
-        reservations_added++;
-        console.log(reservations_added+"/"+restaurants_data.length);
+var feedOrionReservations = function() {
+    returnPost = function(res, buffer, headers) {
+        reservationsAdded++;
+        console.log(reservationsAdded+"/"+restaurantsData.length);
     };
 
-    // restaurants_data = restaurants_data.slice(0,5); // debug with few items
+    // restaurantsData = restaurantsData.slice(0,5); // debug with few items
 
     console.log("Feeding reservations info in orion.");
-    console.log("Number of restaurants: " + restaurants_data.length);
-
-    var api_rest_path = "/api/orion/entities/";
-    var org_name = "devguide";
+    console.log("Number of restaurants: " + restaurantsData.length);
 
     // Limit the number of calls to be done in parallel to orion
     var q = async.queue(function (task, callback) {
@@ -44,19 +39,19 @@ var feed_orion_reservations = function() {
         var attributes = task.attributes;
 
         auth_request("v2/entities", "POST", attributes , callback);
-    }, api_rest_simtasks);
+    }, apiRestSimtasks);
 
 
     q.drain = function() {
-        console.log("Total reservations added: " + reservations_added);
+        console.log("Total reservations added: " + reservationsAdded);
     }
 
-    Object.keys(restaurants_data).forEach(function(element, pos, _array) {
+    Object.keys(restaurantsData).forEach(function(element, pos, _array) {
         // Call orion to append the entity
-        var rname = restaurants_data[pos].id;
+        var rname = restaurantsData[pos].id;
         rname += "-"+shortid.generate();
 
-        //var address = restaurants_data[pos].contextElement.attributes[0];
+        //var address = restaurantsData[pos].contextElement.attributes[0];
         //address.value[0].value = utils.fixedEncodeURIComponent(address.value[0].value);
 
         var reservations = ["Cancelled","Confirmed","Hold","Pending"];
@@ -75,25 +70,25 @@ var feed_orion_reservations = function() {
         attr.underName["name"] = "user"+utils.randomIntInc(1,10);
 
         attr.reservationFor["@type"] = "FoodEstablishment";
-        attr.reservationFor["name"] = restaurants_data[pos].id;
-        attr.reservationFor["address"] = restaurants_data[pos].address;
+        attr.reservationFor["name"] = restaurantsData[pos].id;
+        attr.reservationFor["address"] = restaurantsData[pos].address;
 
-        q.push({"rname":rname, "attributes":attr}, return_post);
+        q.push({"rname":rname, "attributes":attr}, returnPost);
     });
 };
 
 // Load restaurant data from Orion
-var load_restaurant_data = function() {
+var loadRestaurantData = function() {
 
-    var process_restaurants = function (data) {
-        restaurants_data = JSON.parse(JSON.stringify(data));
+    var processRestaurants = function (data) {
+        restaurantsData = JSON.parse(JSON.stringify(data));
         // Once we have all data for restaurants generate reviews for them
-        feed_orion_reservations();
+        feedOrionReservations();
     };
 
-    auth_request("v2/entities", "GET", { "type":"Restaurant", "limit":"1000" } , process_restaurants);
+    auth_request("v2/entities", "GET", { "type":"Restaurant", "limit":"1000" } , processRestaurants);
 };
 
 console.log("Generating random reservations for restaurants ...");
 
-load_restaurant_data();
+loadRestaurantData();
