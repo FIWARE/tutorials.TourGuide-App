@@ -1,11 +1,13 @@
 /*
- * ChanChan Utils
+ * DevGuide Utils
  */
 
-http = require('http');
-https = require('https');
+ http = require('http');
+ https = require('https');
+ utils = require('./utils');
+ var util = require('util');
 
-exports.do_get = function (options, callback, res, use_https) {
+ exports.do_get = function (options, callback, res, use_https) {
     var protocol = http;
     if (use_https) {protocol = https};
 
@@ -76,7 +78,7 @@ exports.do_post = function (options, data, callback, res, use_https) {
             // TODO: handle error.
             callback(res, e);
             console.log(e);
-          });
+        });
 
         // post the data
         post_req.write(data);
@@ -97,9 +99,9 @@ exports.replaceOnceUsingDictionary = function (dictionary, content, replacehandl
     }
     
     var patterns = [], // \b is used to mark boundaries "foo" doesn't match food
-        patternHash = {},
-        oldkey, key, index = 0,
-        output = [];
+    patternHash = {},
+    oldkey, key, index = 0,
+    output = [];
     for (key in dictionary) {
         // Case-insensitivity:
         key = (oldkey = key).toLowerCase();
@@ -112,7 +114,7 @@ exports.replaceOnceUsingDictionary = function (dictionary, content, replacehandl
         patternHash[key] = index++;
     }
     var pattern = new RegExp(patterns.join('|'), 'gi'),
-        lastIndex = 0;
+    lastIndex = 0;
 
     // We should actually test using !== null, but for foolproofness,
     //  we also reject empty strings
@@ -151,9 +153,9 @@ exports.fixedEncodeURIComponent = function (str) {
     str=str.replace(/["]/g,'\\"');
     str=str.replace(/\n/g,'\\n');
     return str.replace(/[<>"'=;()\n\\]/g, function(c) {
-    var hex;
-    hex = c.charCodeAt( 0 ).toString( 16 );
-    return '%' + ((hex.length==2) ? hex : '0' + hex );
+        var hex;
+        hex = c.charCodeAt( 0 ).toString( 16 );
+        return '%' + ((hex.length==2) ? hex : '0' + hex );
     });
 }
 
@@ -196,4 +198,94 @@ exports.convertHtmlToText = function (str) {
 
     //-- return
     return str;
+}
+
+exports.objectDataToSchema = function (element){
+
+    //-- Lists for matching JUST schema attributes
+
+    var restaurantSchemaElements = ["address","aggregateRating","name","department","description","priceRange","telephone","url"];
+    var reviewSchemaElements = ["itemReviewed","reviewRating","name","author","reviewBody","publisher"];
+    var reservationSchemaElements = ["reservationStatus","underName","reservationFor","startTime","partySize"];
+
+    var type = element.type;
+    var newElement = {"@context": "http://schema.org",
+                      "@type": type};
+
+    if (type == "Restaurant"){
+
+        //-- List elements matching
+
+        Object.keys(element).forEach(function(elementAttribute) {
+            var val = element[elementAttribute];
+            if (restaurantSchemaElements.indexOf(elementAttribute) != -1) {
+                newElement[elementAttribute] = val;
+            }
+        });
+
+        //-- Until Orion accepts latin characters, we should enconde/decode all the attributes values
+
+        newElement["name"] = decodeURIComponent(element.id);
+        newElement.address.streetAddress = decodeURIComponent(newElement.address.streetAddress);
+        newElement.address.addressLocality = decodeURIComponent(newElement.address.addressLocality);
+        newElement.address.addressRegion = decodeURIComponent(newElement.address.addressRegion);
+        newElement.description = decodeURIComponent(newElement.description);
+        newElement.url = decodeURIComponent(newElement.url);
+        newElement.telephone = decodeURIComponent(newElement.telephone);
+        return newElement;
+
+    } else if (type == "Review"){
+
+        Object.keys(element).forEach(function(elementAttribute) {
+            var val = element[elementAttribute];
+            if (reviewSchemaElements.indexOf(elementAttribute) != -1) {
+                newElement[elementAttribute] = val;
+            }
+        });
+        newElement.itemReviewed.name = decodeURIComponent(newElement.itemReviewed.name);
+        return newElement;
+
+
+    } else if (type == "FoodEstablishmentReservation") {
+
+        Object.keys(element).forEach(function(elementAttribute) {
+            var val = element[elementAttribute];
+            if (reservationSchemaElements.indexOf(elementAttribute) != -1) {
+                newElement[elementAttribute] = val;
+            }
+        });
+        newElement["reservationId"] = decodeURIComponent(element.id);
+        newElement.reservationFor.name = decodeURIComponent(newElement.reservationFor.name);
+        newElement.reservationFor.address.streetAddress = decodeURIComponent(newElement.reservationFor.address.streetAddress);
+        newElement.reservationFor.address.addressLocality = decodeURIComponent(newElement.reservationFor.address.addressLocality);
+        newElement.reservationFor.address.addressRegion = decodeURIComponent(newElement.reservationFor.address.addressRegion);
+        return newElement;
+
+
+    } else {
+        console.log("Undefined type");
+    }
+
+}
+
+exports.dataToSchema = function (listOfElements) {
+
+    var newListOfElements = [];
+
+    //-- If the object received is not a list, we add it inside one
+
+    if (util.isArray(listOfElements) == false ){
+        aux = listOfElements;
+        listOfElements = [];
+        listOfElements.push(aux);
+    }
+
+    Object.keys(listOfElements).forEach(function(element, pos, _array) {
+
+        newElement = utils.objectDataToSchema(listOfElements[pos]);
+        newListOfElements.push(newElement);
+
+    });
+
+    return JSON.stringify(newListOfElements);
 }
