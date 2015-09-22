@@ -1,5 +1,5 @@
 mongodbdata:
-    image: bitergia/fiware-devguide-restaurant-data:20150909
+    image: bitergia/fiware-devguide-restaurant-data:20150922
     volumes:
         - /data/db
     restart: no
