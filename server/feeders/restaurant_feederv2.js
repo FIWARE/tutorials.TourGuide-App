@@ -183,12 +183,12 @@ var feed_orion_restaurants = function() {
         var organization = ["Franchise1","Franchise2","Franchise3","Franchise4"];
 
         var attr = {"@context": "http://schema.org", 
-                    "@type": "Restaurant", 
+                    "type": "Restaurant", 
                     "id":encodeURIComponent(rname), 
                     "address": {},
                     "location": {},
                     "department": utils.randomElement(organization),
-                    "aggregateRating": utils.randomIntInc(0,5)};
+                    "aggregateRating": {}};
 
         attr.address["@type"] = "postalAddress";
 
@@ -197,6 +197,9 @@ var feed_orion_restaurants = function() {
         attr.location["value"] = geocode;
         attr.location["type"] = "geo:point";
         attr.location["crs"] = "WGS84";
+
+        attr.aggregateRating["ratingValue"]= utils.randomIntInc(1,5);
+        attr.aggregateRating["reviewCount"]= utils.randomIntInc(1,100);
 
         Object.keys(restaurants_data[pos]).forEach(function(element) {
 
@@ -217,7 +220,7 @@ var feed_orion_restaurants = function() {
                     element = utils.replaceOnceUsingDictionary(dictionary, element, function(key, dictionary){
                         return dictionary[key];
                     });
-                    attr[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(encodeURIComponent(val));
+                    attr[utils.fixedEncodeURIComponent(element)] = utils.fixedEncodeURIComponent(encodeURIComponent(utils.convertHtmlToText(val)));
 
                 }
             }
