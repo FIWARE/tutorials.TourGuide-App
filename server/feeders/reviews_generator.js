@@ -62,7 +62,7 @@ var feed_orion_reviews = function() {
 
         var attr = {"@context": "http://schema.org", 
                     "type": "Review", 
-                    "id":encodeURIComponent(rname),
+                    "id":rname,
                     "itemReviewed":{}, 
                     "reviewRating": {},
                     "name": "Rating description",

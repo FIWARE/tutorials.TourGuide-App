@@ -63,7 +63,7 @@ var feed_orion_reservations = function() {
 
         var attr = {"@context": "http://schema.org", 
                     "type": "FoodEstablishmentReservation", 
-                    "id":encodeURIComponent(rname),
+                    "id":rname,
                     "reservationStatus":utils.randomElement(reservations), 
                     "underName": {},
                     "reservationFor": {},
