@@ -1,9 +1,9 @@
-
-var express = require('express'),
-    auth =    require('./auth'),
-    site =    require('./site'),
-    orion =    require('./routes/orion');
-    orionv2 =  require('./routes/orionv2');
+'use strict';
+var express = require('express');
+var auth = require('./auth');
+var site = require('./site');
+var orion = require('./routes/orion');
+var orionv2 = require('./routes/orionv2');
 
 var app = express();
 
@@ -12,13 +12,12 @@ app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session({secret: '08bf59703922c49573f008b4ce58b5b0'}));
 app.configure(function () {
-    "use strict";
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(express.static(__dirname + '/public'));
 });
 
 // devguide app
-app.use("/client", express.static(__dirname + '/client'));
+app.use('/client', express.static(__dirname + '/client'));
 
 // main page
 app.get('/', site.index);
@@ -29,8 +28,8 @@ app.get('/', site.index);
 // Auth support
 app.get('/login',auth.login);
 app.get('/auth',auth.auth);
-app.get('/get_user_data',auth.get_user_data);
-app.get('/get_username',auth.get_username);
+app.get('/get_user_data',auth.getUserData);
+app.get('/get_username',auth.getUsername);
 app.get('/logout',auth.logout);
 
 // API REST definition
@@ -72,27 +71,27 @@ app.post('/api/orion/restaurant/:id/temperature', orion.set_restaurant_temperatu
 
 // Restaurants, reservations and reviews: CRUD, listing and searches
 
-app.post('/api/orionv2/restaurant',orionv2.create_restaurant);
-app.get('/api/orionv2/restaurant/:id',orionv2.read_restaurant);
-app.put('/api/orionv2/restaurant/:id',orionv2.update_restaurant);
-app.delete('/api/orionv2/restaurant/:id',orionv2.delete_restaurant);
-app.get('/api/orionv2/restaurants',orionv2.get_restaurants);
+app.post('/api/orionv2/restaurant',orionv2.createRestaurant);
+app.get('/api/orionv2/restaurant/:id',orionv2.readRestaurant);
+app.put('/api/orionv2/restaurant/:id',orionv2.updateRestaurant);
+app.delete('/api/orionv2/restaurant/:id',orionv2.deleteRestaurant);
+app.get('/api/orionv2/restaurants',orionv2.getRestaurants);
 
-app.post('/api/orionv2/review',orionv2.create_review);
-app.get('/api/orionv2/review/:id',orionv2.read_review);
-app.put('/api/orionv2/review/:id',orionv2.update_review);
-app.delete('/api/orionv2/review/:id',orionv2.delete_review);
-app.get('/api/orionv2/reviews',orionv2.get_reviews);
+app.post('/api/orionv2/review',orionv2.createReview);
+app.get('/api/orionv2/review/:id',orionv2.readReview);
+app.put('/api/orionv2/review/:id',orionv2.updateReview);
+app.delete('/api/orionv2/review/:id',orionv2.deleteReview);
+app.get('/api/orionv2/reviews',orionv2.getReviews);
 
-app.post('/api/orionv2/reservation',orionv2.create_reservation);
-app.get('/api/orionv2/reservation/:id',orionv2.read_reservation);
-app.put('/api/orionv2/reservation/:id',orionv2.update_reservation);
-app.delete('/api/orionv2/reservation/:id',orionv2.delete_reservation);
-app.get('/api/orionv2/reservations',orionv2.get_reservations);
+app.post('/api/orionv2/reservation',orionv2.createReservation);
+app.get('/api/orionv2/reservation/:id',orionv2.readReservation);
+app.put('/api/orionv2/reservation/:id',orionv2.updateReservation);
+app.delete('/api/orionv2/reservation/:id',orionv2.deleteReservation);
+app.get('/api/orionv2/reservations',orionv2.getReservations);
 
 // User API v2
-app.get('/api/orionv2/user/:id/reviews', orionv2.get_user_reviews);
-app.get('/api/orionv2/user/:id/reservations', orionv2.get_user_reservations);
+app.get('/api/orionv2/user/:id/reviews', orionv2.getUserReviews);
+app.get('/api/orionv2/user/:id/reservations', orionv2.getUserReservations);
 
 
 // END API REST
@@ -109,7 +108,7 @@ app.use(function(err, req, res, next) {
     }
 
     res.status(404);
-    res.send(err.message || "ups!");
+    res.send(err.message || 'ups!');
 });
 
 // start server

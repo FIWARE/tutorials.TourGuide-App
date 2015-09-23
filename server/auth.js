@@ -1,19 +1,19 @@
 /*
  * ChanChan auth
  */
-
+'use strict';
 var OAuth2 = require('./oauth2').OAuth2;
 var config = require('./config');
 
 // Config data from config.js file
-var client_id = config.client_id;
-var client_secret = config.client_secret;
-var idmURL = config.idm_url;
-var response_type = config.response_type;
-var callbackURL = config.callback_url;
+var clientId = config.clientId;
+var clientSecret = config.clientSecret;
+var idmURL = config.idmUrl;
+var responseType = config.responseType;
+var callbackURL = config.callbackUrl;
 
-var oauth = new OAuth2(client_id,
-                        client_secret,
+var oauth = new OAuth2(clientId,
+                        clientSecret,
                         idmURL,
                         '/oauth2/authorize',
                         '/oauth2/token',
@@ -27,8 +27,8 @@ exports.login = function(req, res) {
 
         if (results === undefined) {
             res.status(404);
-            res.send("Auth token not received in results.");
-            console.log("Auth token not received in results.")
+            res.send('Auth token not received in results.');
+            console.log('Auth token not received in results.');
         } else {
             // Stores the access_token in a session cookie
             req.session.access_token = results.access_token;
@@ -41,7 +41,7 @@ exports.login = function(req, res) {
 
 // Redirect the user to the IdM for authentication
 exports.auth = function(req, res) {
-    var path = oauth.getAuthorizeUrl(response_type);
+    var path = oauth.getAuthorizeUrl(responseType);
     res.redirect(path);
 };
 
@@ -52,8 +52,8 @@ exports.logout = function(req, res) {
     res.redirect('/');
 };
 
-exports.get_user_data = function(req, res, callback) {
-    var url = config.idm_url + '/user/';
+exports.getUserData = function(req, res, callback) {
+    var url = idmURL + '/user/';
     var user = null;
     oauth.get(url, req.session.access_token,
         function(e, response) {
@@ -63,8 +63,8 @@ exports.get_user_data = function(req, res, callback) {
     );
 };
 
-exports.get_username = function(req, res, callback) {
-    var url = config.idm_url + '/user/';
+exports.getUsername = function(req, res, callback) {
+    var url = idmURL + '/user/';
     var user = null;
     oauth.get(url, req.session.access_token,
         function(e, response) {
