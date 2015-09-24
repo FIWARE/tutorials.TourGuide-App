@@ -243,43 +243,66 @@ exports.objectDataToSchema = function (element) {
       var val = element[elementAttribute];
       if (restaurantSchemaElements.indexOf(elementAttribute) !==
         -1) {
-        newElement[elementAttribute] = val;
+        if (val !== 'undefined') {
+          newElement[elementAttribute] = val;
+        }
       }
     });
 
     //-- Until Orion accepts latin characters, 
-    // we should enconde/decode all the attributes values
+    //-- we should enconde/decode all the attributes values
 
     newElement.name = decodeURIComponent(element.id);
-    newElement.address.streetAddress = decodeURIComponent(
-      newElement.address.streetAddress);
-    newElement.address.addressLocality = decodeURIComponent(
-      newElement.address
-      .addressLocality);
-    newElement.address.addressRegion = decodeURIComponent(
-      newElement.address.addressRegion);
-    newElement.description = decodeURIComponent(newElement.description);
-    newElement.url = decodeURIComponent(newElement.url);
-    newElement.telephone = decodeURIComponent(newElement.telephone);
+    if (newElement.address.streetAddress) {
+      newElement.address.streetAddress = decodeURIComponent(
+        newElement.address
+        .streetAddress);
+    }
+    if (newElement.address.addressLocality) {
+      newElement.address.addressLocality = decodeURIComponent(
+        newElement.address
+        .addressLocality);
+    }
+    if (newElement.address.addressRegion) {
+      newElement.address.addressRegion = decodeURIComponent(
+        newElement.address
+        .addressRegion);
+    }
+    if (newElement.description) {
+      newElement.description = decodeURIComponent(newElement.description);
+    }
+    if (newElement.url) {
+      newElement.url = decodeURIComponent(newElement.url);
+    }
+    if (newElement.telephone) {
+      newElement.telephone = decodeURIComponent(newElement.telephone);
+    }
     return newElement;
+
   } else if (type === 'Review') {
 
     Object.keys(element).forEach(function (elementAttribute) {
       var val = element[elementAttribute];
       if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
-        newElement[elementAttribute] = val;
+        if (val !== 'undefined') {
+          newElement[elementAttribute] = val;
+        }
       }
     });
     newElement.itemReviewed.name = decodeURIComponent(newElement.itemReviewed
       .name);
     return newElement;
 
+
   } else if (type === 'FoodEstablishmentReservation') {
+
     Object.keys(element).forEach(function (elementAttribute) {
       var val = element[elementAttribute];
       if (reservationSchemaElements.indexOf(elementAttribute) !==
         -1) {
-        newElement[elementAttribute] = val;
+        if (val !== 'undefined') {
+          newElement[elementAttribute] = val;
+        }
       }
     });
     newElement.reservationId = decodeURIComponent(element.id);
@@ -295,6 +318,8 @@ exports.objectDataToSchema = function (element) {
       decodeURIComponent(
         newElement.reservationFor.address.addressRegion);
     return newElement;
+
+
   } else {
     console.log('Undefined type');
   }
