@@ -9,29 +9,32 @@ var utils = require('../utils');
 // Restaurants
 
 exports.createRestaurant = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body, 
+  authRequest('v2/entities', 'POST', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.readRestaurant = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'GET', {
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+    .id)), 'GET', {
     'type': 'Restaurant'
   }, function (data) {
     res.send(utils.dataToSchema(data));
   });
 };
 exports.updateRestaurant = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'PATCH', req.body, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'PATCH', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.deleteRestaurant = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'DELETE', {}, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'DELETE', {},
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.getRestaurants = function (req, res) {
   authRequest('v2/entities', 'GET', {
@@ -45,29 +48,32 @@ exports.getRestaurants = function (req, res) {
 // Reviews
 
 exports.createReview = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body, 
+  authRequest('v2/entities', 'POST', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.readReview = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'GET', {
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+    .id)), 'GET', {
     'type': 'Review'
   }, function (data) {
     res.send(utils.dataToSchema(data));
   });
 };
 exports.updateReview = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'PATCH', req.body, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'PATCH', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.deleteReview = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'DELETE', {}, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'DELETE', {},
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.getReviews = function (req, res) {
   authRequest('v2/entities', 'GET', {
@@ -81,13 +87,14 @@ exports.getReviews = function (req, res) {
 // Reservations
 
 exports.createReservation = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body, 
+  authRequest('v2/entities', 'POST', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.readReservation = function (req, res) {
-  authRequest('v2/entities/' +req.params.id, 'GET', {
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+    .id)), 'GET', {
     'type': 'FoodEstablishmentReservation'
   }, function (data) {
     res.send(utils.dataToSchema(data));
@@ -95,16 +102,18 @@ exports.readReservation = function (req, res) {
 };
 // update_reservation function replaces ALL of the elements
 exports.updateReservation = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'PATCH', req.body, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'PATCH', req.body,
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.deleteReservation = function (req, res) {
-  authRequest('v2/entities/' + req.params.id, 'DELETE', {}, 
+  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
+      .id)), 'DELETE', {},
     function (data) {
       res.send(utils.dataToSchema(data));
-  });
+    });
 };
 exports.getReservations = function (req, res) {
   authRequest('v2/entities', 'GET', {
