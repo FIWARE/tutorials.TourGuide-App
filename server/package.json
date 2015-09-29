@@ -9,7 +9,8 @@
     "node-geocoder": "^3.1.0",
     "node-mysql": "0.4.x",
     "querystring": "0.2.0",
-    "shortid": "2.2.2"
+    "shortid": "2.2.2",
+    "q": "~1.4.1"
   },
   "repository": {
     "type": "git",

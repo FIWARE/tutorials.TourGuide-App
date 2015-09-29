@@ -77,6 +77,7 @@ devguide:
         - orion
         - idm
         - pepwilma
+        - idasiotacpp:idas
     environment:
         - ORION_HOSTNAME=pepwilma
         - ORION_NO_PROXY_HOSTNAME=orion
@@ -84,5 +85,6 @@ devguide:
         - ORION_PEP_ENABLED=true
     # volumes:
     #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
+        - IDAS_PORT=8080
     volumes_from:
         - idm

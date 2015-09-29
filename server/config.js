@@ -1,3 +1,4 @@
+/* jshint node:true */
 var config = {};
 
 // URL to the FI-WARE Identity Management GE
@@ -24,5 +25,14 @@ config.responseType = 'code';
 config.orionPort = 'ORION_PORT';
 config.orionHostname = 'ORION_HOSTNAME';
 config.orionPepEnabled = 'ORION_PEP_ENABLED';
+
+// IDAS
+config.idasHostname = 'IDAS_HOSTNAME';
+config.idasPort = 'IDAS_PORT';
+config.idasFiwareService = 'IDAS_FIWARE_SERVICE';
+config.idasFiwareServicePath = 'IDAS_FIWARE_SERVICE_PATH';
+config.idasApiKey = 'IDAS_API_KEY';
+// Do not use the pep proxy (yet) for IDAS.
+config.idasContextBrokerHostname = 'ORION_NO_PROXY_HOSTNAME';
 
 module.exports = config;

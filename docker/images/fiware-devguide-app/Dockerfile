@@ -66,4 +66,5 @@ USER root
 
 ADD docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod 755 /docker-entrypoint.sh
+ADD https://raw.githubusercontent.com/Bitergia/docker/master/utils/entrypoint-common.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

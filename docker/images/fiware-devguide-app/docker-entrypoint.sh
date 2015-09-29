@@ -1,19 +1,29 @@
 #!/bin/bash
 
-[ -z "${IDM_HOSTNAME}" ] && echo "IDM_HOSTNAME is undefined.  Using default value of 'idm'" && export IDM_HOSTNAME=idm
-[ -z "${IDM_PORT}" ] && echo "IDM_PORT is undefined.  Using default value of '5000'" && export IDM_PORT=443
-[ -z "${CONFIG_FILE}" ] && echo "CONFIG_FILE is undefined.  Using default value of '/config/idm2chanchan.json'" && export CONFIG_FILE=/config/idm2chanchan.json
-[ -z "${DEFAULT_MAX_TRIES}" ] && echo "DEFAULT_MAX_TRIES is undefined.  Using default value of '60'" && export DEFAULT_MAX_TRIES=60
+source /entrypoint-common.sh
 
-[ -z "${ORION_HOSTNAME}" ] && echo "ORION_HOSTNAME is undefined.  Using default value of 'orion'" && export ORION_HOSTNAME=orion
-[ -z "${ORION_PORT}" ] && echo "ORION_PORT is undefined.  Using default value of '1026'" && export ORION_PORT=1026
-[ -z "${ORION_PEP_ENABLED}" ] && echo "ORION_PEP_ENABLED is undefined.  Using default value of 'false'" && export ORION_PEP_ENABLED=false
+check_var IDM_HOSTNAME idm
+check_var IDM_PORT 5000
+check_var CONFIG_FILE /config/idm2chanchan.json
+
+check_var ORION_HOSTNAME orion
+check_var ORION_PORT 1026
+check_var ORION_PEP_ENABLED false
+
+check_var IDAS_HOSTNAME idas
+check_var IDAS_PORT 8080
+check_var IDAS_FIWARE_SERVICE devguideidas
+check_var IDAS_FIWARE_SERVICE_PATH /
+check_var IDAS_API_KEY devguideidas
 
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
 fi
 if [[ ${ORION_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export ORION_PORT=${BASH_REMATCH[1]}
+fi
+if [[ ${IDAS_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
+    export IDAS_PORT=${BASH_REMATCH[1]}
 fi
 
 case "${ORION_PEP_ENABLED}" in
@@ -35,136 +45,6 @@ DOCROOT="${CC_APP_SERVER_PATH}/public"
 VHOST_HTTP="/etc/apache2/sites-available/devguide-app.conf"
 APACHE_LOG_DIR=/var/log/apache2
 
-function check_host_port () {
-
-    local _timeout=10
-    local _tries=0
-    local _is_open=0
-
-    if [ $# -lt 2 ] ; then
-        echo "check_host_port: missing parameters."
-        echo "Usage: check_host_port <host> <port> [max-tries]"
-        exit 1
-    fi
-
-    local _host=$1
-    local _port=$2
-    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
-    local NC=$( which nc )
-
-    if [ ! -e "${NC}" ] ; then
-        echo "Unable to find 'nc' command."
-        exit 1
-    fi
-
-    echo "Testing if port '${_port}' is open at host '${_host}'."
-
-    while [ ${_tries} -lt ${_max_tries} -a ${_is_open} -eq 0 ] ; do
-        echo -n "Checking connection to '${_host}:${_port}' [try $(( ${_tries} + 1 ))/${_max_tries}] ... "
-        if ${NC} -z -w ${_timeout} ${_host} ${_port} ; then
-            echo "OK."
-            _is_open=1
-        else
-            sleep 1
-            _tries=$(( ${_tries} + 1 ))
-            if [ ${_tries} -lt ${_max_tries} ] ; then
-                echo "Retrying."
-            else
-                echo "Failed."
-            fi
-        fi
-    done
-
-    if [ ${_is_open} -eq 0 ] ; then
-        echo "Failed to connect to port '${_port}' on host '${_host}' after ${_tries} tries."
-        echo "Port is closed or host is unreachable."
-        exit 1
-    else
-        echo "Port '${_port}' at host '${_host}' is open."
-    fi
-}
-
-function check_url () {
-
-    local _timeout=10
-    local _tries=0
-    local _ok=0
-
-    if [ $# -lt 2 ] ; then
-        echo "check_url: missing parameters."
-        echo "Usage: check_url <url> <regex> [max-tries]"
-        exit 1
-    fi
-
-    local _url=$1
-    local _regex=$2
-    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
-    local CURL=$( which curl )
-
-    if [ ! -e ${CURL} ] ; then
-        echo "Unable to find 'curl' command."
-        exit 1
-    fi
-
-    while [ ${_tries} -lt ${_max_tries} -a ${_ok} -eq 0 ] ; do
-        echo -n "Checking url '${_url}' [try $(( ${_tries} + 1 ))/${_max_tries}] ... "
-        if ${CURL} -s ${_url} | grep -q "${_regex}" ; then
-            echo "OK."
-            _ok=1
-        else
-            sleep 1
-            _tries=$(( ${_tries} + 1 ))
-            if [ ${_tries} -lt ${_max_tries} ] ; then
-                echo "Retrying."
-            else
-                echo "Failed."
-            fi
-        fi
-    done
-
-    if [ ${_ok} -eq 0 ] ; then
-        echo "Url check failed after ${_tries} tries."
-        exit 1
-    else
-        echo "Url check succeeded."
-    fi
-}
-
-function check_file () {
-
-    local _tries=0
-    local _is_available=0
-
-    local _file=$1
-    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
-
-    echo "Testing if file '${_file}' is available."
-
-    while [ ${_tries} -lt ${_max_tries} -a ${_is_available} -eq 0 ] ; do
-        echo -n "Checking file '${_file}' [try $(( ${_tries} + 1 ))/${_max_tries}] ... "
-        if [ -r ${_file} ] ; then
-            echo "OK."
-            _is_available=1
-        else
-            sleep 1
-            _tries=$(( ${_tries} + 1 ))
-            if [ ${_tries} -lt ${_max_tries} ] ; then
-                echo "Retrying."
-            else
-                echo "Failed."
-            fi
-        fi
-    done
-
-    if [ ${_is_available} -eq 0 ] ; then
-        echo "Failed to to retrieve '${_file}' after ${_tries} tries."
-        echo "File is unavailable."
-        exit 1
-    else
-        echo "File '${_file}' is available."
-    fi
-}
-
 function _configure_params () {
 
     # get the desired values
@@ -178,7 +58,14 @@ function _configure_params () {
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
         -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
         -e "s|ORION_PORT|${ORION_PORT}|g" \
-        -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g"
+        -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g" \
+        -e "s|IDAS_HOSTNAME|${IDAS_HOSTNAME}|g" \
+        -e "s|IDAS_PORT|${IDAS_PORT}|g" \
+        -e "s|IDAS_FIWARE_SERVICE_PATH|${IDAS_FIWARE_SERVICE_PATH}|g" \
+        -e "s|IDAS_FIWARE_SERVICE|${IDAS_FIWARE_SERVICE}|g" \
+        -e "s|IDAS_API_KEY|${IDAS_API_KEY}|g" \
+        -e "s|ORION_NO_PROXY_HOSTNAME|${ORION_NO_PROXY_HOSTNAME}|g"
+
     sed -i ${VHOST_HTTP} \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g"
 }
@@ -231,7 +118,6 @@ if [ -e /subscribe-to-orion ] ; then
     done
     rm -f /subscribe-to-orion
 fi
-
 
 # Start container back
 
