@@ -337,6 +337,24 @@ exports.objectDataToSchema = function (element) {
 
 };
 
+exports.sortObject = function (element) {
+  var sorted = {},
+  key, aux = [];
+
+  for (key in element) {
+    if (element.hasOwnProperty(key)) {
+      aux.push(key);
+    }
+  }
+
+  aux.sort();
+
+  for (key = 0; key < aux.length; key++) {
+    sorted[aux[key]] = element[aux[key]];
+  }
+  return sorted;
+};
+
 exports.dataToSchema = function (listOfElements) {
 
   var newListOfElements = [];
@@ -384,6 +402,6 @@ exports.restaurantToOrion = function (schemaObject, geoObject) {
     schemaObject.address.postalCode = encodeURIComponent(geoObject.zipcode);
   }
 
-  return schemaObject;
+  return utils.sortObject(schemaObject);
 
 };
