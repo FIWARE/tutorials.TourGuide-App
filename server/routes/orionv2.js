@@ -5,15 +5,27 @@
 'use strict';
 var authRequest = require('../authrequest');
 var utils = require('../utils');
+var geocoder = require('node-geocoder')('google', 'http');
 
 // Restaurants
 
 exports.createRestaurant = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body,
-    function (data) {
-      res.send(utils.dataToSchema(data));
+  var elementToOrion = req.body;
+  var address = elementToOrion.address.streetAddress + ' '+
+  elementToOrion.address.addressLocality;
+  geocoder.geocode(address)
+    .then(function(geoRes) {
+      elementToOrion = utils.restaurantToOrion(elementToOrion, geoRes[0]);
+      authRequest('v2/entities', 'POST', elementToOrion, function (data){
+        console.log(data);
+        res.end();
+      });
+    })
+    .catch(function(err) {
+        console.log(err);
     });
 };
+
 exports.readRestaurant = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
     .id)), 'GET', {
