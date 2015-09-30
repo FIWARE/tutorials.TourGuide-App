@@ -144,7 +144,7 @@ var feedOrionRestaurants = function () {
   var addressDictionary = {
     'address': 'streetAddress',
     'locality': 'addressLocality',
-    'municipality': 'addressRegion',
+    'historicTerritory': 'addressRegion',
     'municipalityCode': 'postalCode'
   };
 
@@ -157,16 +157,13 @@ var feedOrionRestaurants = function () {
     ];
 
     var attr = {
-      '@context': 'http://schema.org',
       'type': 'Restaurant',
-      'id': encodeURIComponent(rname),
+      'id': utils.fixedEncodeURIComponent(encodeURIComponent(rname)),
       'address': {},
       'location': {},
       'department': utils.randomElement(organization),
       'aggregateRating': {}
     };
-
-    attr.address['@type'] = 'postalAddress';
 
     var address = getAddress(restaurantsData[pos]);
     var geocode = getGeocode(address);
