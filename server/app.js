@@ -79,19 +79,19 @@ app.post('/api/orion/restaurant/:id/temperature', orion.set_restaurant_temperatu
 
 app.post('/api/orionv2/restaurant', orionv2.createRestaurant);
 app.get('/api/orionv2/restaurant/:id', orionv2.readRestaurant);
-app.put('/api/orionv2/restaurant/:id', orionv2.updateRestaurant);
+app.patch('/api/orionv2/restaurant/:id', orionv2.updateRestaurant);
 app.delete('/api/orionv2/restaurant/:id', orionv2.deleteRestaurant);
 app.get('/api/orionv2/restaurants', orionv2.getRestaurants);
 
 app.post('/api/orionv2/review', orionv2.createReview);
 app.get('/api/orionv2/review/:id', orionv2.readReview);
-app.put('/api/orionv2/review/:id', orionv2.updateReview);
+app.patch('/api/orionv2/review/:id', orionv2.updateReview);
 app.delete('/api/orionv2/review/:id', orionv2.deleteReview);
 app.get('/api/orionv2/reviews', orionv2.getReviews);
 
 app.post('/api/orionv2/reservation', orionv2.createReservation);
 app.get('/api/orionv2/reservation/:id', orionv2.readReservation);
-app.put('/api/orionv2/reservation/:id', orionv2.updateReservation);
+app.patch('/api/orionv2/reservation/:id', orionv2.updateReservation);
 app.delete('/api/orionv2/reservation/:id', orionv2.deleteReservation);
 app.get('/api/orionv2/reservations', orionv2.getReservations);
 

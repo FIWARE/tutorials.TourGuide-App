@@ -38,16 +38,21 @@ exports.updateRestaurant = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'PATCH', req.body,
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.deleteRestaurant = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'DELETE', {},
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
+
+// -- TODO: handle pagination over the whole set of restaurants
+
 exports.getRestaurants = function (req, res) {
   authRequest('v2/entities', 'GET', {
     'type': 'Restaurant',
@@ -62,7 +67,8 @@ exports.getRestaurants = function (req, res) {
 exports.createReview = function (req, res) {
   authRequest('v2/entities', 'POST', req.body,
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.readReview = function (req, res) {
@@ -77,14 +83,16 @@ exports.updateReview = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'PATCH', req.body,
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.deleteReview = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'DELETE', {},
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.getReviews = function (req, res) {
@@ -101,7 +109,8 @@ exports.getReviews = function (req, res) {
 exports.createReservation = function (req, res) {
   authRequest('v2/entities', 'POST', req.body,
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.readReservation = function (req, res) {
@@ -117,14 +126,16 @@ exports.updateReservation = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'PATCH', req.body,
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.deleteReservation = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
       .id)), 'DELETE', {},
     function (data) {
-      res.send(utils.dataToSchema(data));
+      console.log(data);
+      res.end();
     });
 };
 exports.getReservations = function (req, res) {
