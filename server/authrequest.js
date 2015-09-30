@@ -75,48 +75,48 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 201) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers.location);
-          success(res);
+          success(responseString);
         } else if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(res);
+          success(responseString);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
           console.log(res.headers);
-          success(res);
+          success(responseString);
         }
       } else if (method == 'PATCH') {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(res);
+          success(responseString);
 
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(res);
+          success(responseString);
         }
       } else if (method == 'PUT') {
         if (res.statusCode == 200 || res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(res);
+          success(responseString);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(res);
+          success(responseString);
         }
       } else if (method == 'DELETE') {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(res);
+          success(responseString);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(res);
+          success(responseString);
         }
       } else {
         console.log(res.headers);
         console.log('No data to show');
-        success(res);
+        success(responseString);
       }
     });
   });
