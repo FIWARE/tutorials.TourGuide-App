@@ -253,6 +253,7 @@ exports.objectDataToSchema = function (element) {
     //-- we should enconde/decode all the attributes values
 
     newElement.name = decodeURIComponent(element.id);
+    newElement.address['@type'] = 'postalAddress';
     if (newElement.address.streetAddress) {
       newElement.address.streetAddress = decodeURIComponent(
         newElement.address
@@ -277,6 +278,15 @@ exports.objectDataToSchema = function (element) {
     if (newElement.telephone) {
       newElement.telephone = decodeURIComponent(newElement.telephone);
     }
+    // -- Display geo-location schema.org like
+    if (element.location.value) {
+      var geoCoords = element.location.value.split(',');
+      newElement.geo = {};
+      newElement.geo['@type'] = 'GeoCoordinates';
+      newElement.geo.latitude = geoCoords[0];
+      newElement.geo.longitude = geoCoords[1];
+    }
+
     return newElement;
 
   } else if (type === 'Review') {
@@ -308,6 +318,7 @@ exports.objectDataToSchema = function (element) {
     newElement.reservationId = decodeURIComponent(element.id);
     newElement.reservationFor.name = decodeURIComponent(
         newElement.reservationFor.name);
+    newElement.reservationFor.address['@type'] = 'postalAddress';
     newElement.reservationFor.address.streetAddress =
       decodeURIComponent(
         newElement.reservationFor.address.streetAddress);
@@ -347,4 +358,32 @@ exports.dataToSchema = function (listOfElements) {
   });
 
   return JSON.stringify(newListOfElements);
+};
+
+exports.restaurantToOrion = function (schemaObject, geoObject) {
+
+  schemaObject.type = schemaObject['@type'];
+  schemaObject.id = encodeURIComponent(schemaObject.name);
+  schemaObject.description = encodeURIComponent(schemaObject.description);
+  delete schemaObject['@type'];
+  delete schemaObject.name;
+  if (geoObject) {
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.crs = 'WGS84';
+    schemaObject.location.value = geoObject.latitude + ', ' +
+      geoObject.longitude;
+    schemaObject.address.streetAddress = encodeURIComponent(
+      geoObject.streetName +
+      ' ' + geoObject.streetNumber);
+    schemaObject.address.addressLocality = encodeURIComponent(
+      geoObject.city);
+    schemaObject.address.addressRegion = encodeURIComponent(
+      geoObject.administrativeLevels
+      .level2long);
+    schemaObject.address.postalCode = encodeURIComponent(geoObject.zipcode);
+  }
+
+  return schemaObject;
+
 };
