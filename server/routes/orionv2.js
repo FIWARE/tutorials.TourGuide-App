@@ -65,7 +65,9 @@ exports.getRestaurants = function (req, res) {
 // Reviews
 
 exports.createReview = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body,
+  var elementToOrion = req.body;
+  elementToOrion = utils.reviewToOrion(elementToOrion);
+  authRequest('v2/entities', 'POST', elementToOrion,
     function (data) {
       console.log(data);
       res.end();

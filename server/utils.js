@@ -7,6 +7,7 @@ var http = require('http');
 var https = require('https');
 var utils = require('./utils');
 var util = require('util');
+var shortid = require('shortid');
 
 exports.doGet = function (options, callback, res, useHttps) {
   var protocol = http;
@@ -172,12 +173,12 @@ exports.fixedEncodeURIComponent = function (str) {
 
 exports.getRandomDate = function (from, to) {
   if (!from) {
-    from = new Date(1900, 0, 1).getTime();
+    from = new Date(2015, 10, 1).getTime();
   } else {
     from = from.getTime();
   }
   if (!to) {
-    to = new Date(2100, 0, 1).getTime();
+    to = new Date(2015, 10, 25).getTime();
   } else {
     to = to.getTime();
   }
@@ -223,7 +224,7 @@ exports.objectDataToSchema = function (element) {
   ];
   var reviewSchemaElements = ['itemReviewed', 'reviewRating',
     'name',
-    'author', 'reviewBody', 'publisher'
+    'author', 'reviewBody', 'publisher', 'dateCreated'
   ];
   var reservationSchemaElements = ['reservationStatus', 'underName',
     'reservationFor', 'startTime', 'partySize'
@@ -414,7 +415,27 @@ exports.restaurantToOrion = function (schemaObject, geoObject) {
 
   schemaObject = utils.addGeolocation(schemaObject, geoObject);
   schemaObject = utils.fixAddress(schemaObject, geoObject);
-  
+
+  return utils.sortObject(schemaObject);
+
+};
+
+exports.reviewToOrion = function (schemaObject) {
+
+  // -- TODO: add user from session
+  // -- TODO: check how to implement 'position field'
+  // -- - idea is, whenever a new review is created into
+  // -- - a restaurant, the review position increase;
+  // -- - but the only one able to modify it is the user
+  // -- - We need that way cause we cannot display 'ids'
+
+  schemaObject.type = schemaObject['@type'];
+  var rname = encodeURIComponent(schemaObject.itemReviewed.name);
+  rname += '-' + shortid.generate();
+  schemaObject.id = rname;
+  schemaObject.author = {};
+  schemaObject.author['@type'] = 'Person';
+  schemaObject.dateCreated = Date.now();
   return utils.sortObject(schemaObject);
 
 };
