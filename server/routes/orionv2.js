@@ -109,11 +109,21 @@ exports.getReviews = function (req, res) {
 // Reservations
 
 exports.createReservation = function (req, res) {
-  authRequest('v2/entities', 'POST', req.body,
-    function (data) {
-      console.log(data);
-      res.end();
-    });
+  var elementToOrion;
+  // -- We first get information regarding the restaurant
+  authRequest('v2/entities/' + 
+    encodeURIComponent(encodeURIComponent(req.body.reservationFor.name)), 
+    'GET', {'type': 'Restaurant'},
+    function(restaurantObject) {
+      elementToOrion = req.body;
+      elementToOrion = utils.reservationToOrion(elementToOrion);
+      elementToOrion.reservationFor.address = restaurantObject.address;
+      authRequest('v2/entities', 'POST', elementToOrion,
+      function (data) {
+        console.log(data);
+        res.end();
+      });
+  });
 };
 exports.readReservation = function (req, res) {
   authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params

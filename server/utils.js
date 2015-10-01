@@ -8,6 +8,7 @@ var https = require('https');
 var utils = require('./utils');
 var util = require('util');
 var shortid = require('shortid');
+var authRequest = require('./authrequest');
 
 exports.doGet = function (options, callback, res, useHttps) {
   var protocol = http;
@@ -438,4 +439,17 @@ exports.reviewToOrion = function (schemaObject) {
   schemaObject.dateCreated = Date.now();
   return utils.sortObject(schemaObject);
 
+};
+
+exports.reservationToOrion = function (schemaObject) {
+
+  // -- TODO: add user from session
+
+  schemaObject.type = schemaObject['@type'];
+  var rname = encodeURIComponent(schemaObject.reservationFor.name);
+  rname += '-' + shortid.generate();
+  schemaObject.id = rname;
+  schemaObject.underName = {};
+  schemaObject.underName['@type'] = 'Person';
+  return schemaObject;
 };
