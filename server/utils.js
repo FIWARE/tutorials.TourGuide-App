@@ -378,19 +378,8 @@ exports.dataToSchema = function (listOfElements) {
   return JSON.stringify(newListOfElements);
 };
 
-exports.restaurantToOrion = function (schemaObject, geoObject) {
-
-  schemaObject.type = schemaObject['@type'];
-  schemaObject.id = encodeURIComponent(schemaObject.name);
-  schemaObject.description = encodeURIComponent(schemaObject.description);
-  delete schemaObject['@type'];
-  delete schemaObject.name;
+exports.fixAddress = function (schemaObject, geoObject) {
   if (geoObject) {
-    schemaObject.location = {};
-    schemaObject.location.type = 'geo:point';
-    schemaObject.location.crs = 'WGS84';
-    schemaObject.location.value = geoObject.latitude + ', ' +
-      geoObject.longitude;
     schemaObject.address.streetAddress = encodeURIComponent(
       geoObject.streetName +
       ' ' + geoObject.streetNumber);
@@ -401,7 +390,31 @@ exports.restaurantToOrion = function (schemaObject, geoObject) {
       .level2long);
     schemaObject.address.postalCode = encodeURIComponent(geoObject.zipcode);
   }
+  return schemaObject;
+};
 
+exports.addGeolocation = function (schemaObject, geoObject) {
+  if (geoObject) {
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.crs = 'WGS84';
+    schemaObject.location.value = geoObject.latitude + ', ' +
+      geoObject.longitude;
+  }
+  return schemaObject;
+};
+
+exports.restaurantToOrion = function (schemaObject, geoObject) {
+
+  schemaObject.type = schemaObject['@type'];
+  schemaObject.id = encodeURIComponent(schemaObject.name);
+  schemaObject.description = encodeURIComponent(schemaObject.description);
+  delete schemaObject['@type'];
+  delete schemaObject.name;
+
+  schemaObject = utils.addGeolocation(schemaObject, geoObject);
+  schemaObject = utils.fixAddress(schemaObject, geoObject);
+  
   return utils.sortObject(schemaObject);
 
 };
