@@ -281,7 +281,8 @@ exports.objectDataToSchema = function (element) {
       newElement.telephone = decodeURIComponent(newElement.telephone);
     }
     // -- Display geo-location schema.org like
-    if (element.location.value) {
+    if (element.location.value && typeof element.location.value === 'string') {
+      console.log(element);
       var geoCoords = element.location.value.split(',');
       newElement.geo = {};
       newElement.geo['@type'] = 'GeoCoordinates';
