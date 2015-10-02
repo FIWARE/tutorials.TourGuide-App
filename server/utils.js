@@ -383,15 +383,31 @@ exports.dataToSchema = function (listOfElements) {
 
 exports.fixAddress = function (schemaObject, geoObject) {
   if (geoObject) {
-    schemaObject.address.streetAddress = encodeURIComponent(
+    if (geoObject.streetName && geoObject.streetNumber) {
+      schemaObject.address.streetAddress = encodeURIComponent(
       geoObject.streetName +
       ' ' + geoObject.streetNumber);
-    schemaObject.address.addressLocality = encodeURIComponent(
+    } else if (geoObject.streetName) {
+      schemaObject.address.streetAddress = encodeURIComponent(
+      geoObject.streetName);
+    }
+    if (geoObject.city) {
+      schemaObject.address.addressLocality = encodeURIComponent(
       geoObject.city);
-    schemaObject.address.addressRegion = encodeURIComponent(
+    } else if (geoObject.administrativeLevels.level2long) {
+      schemaObject.address.addressLocality = encodeURIComponent(
       geoObject.administrativeLevels
       .level2long);
-    schemaObject.address.postalCode = encodeURIComponent(geoObject.zipcode);
+    }
+    if (geoObject.administrativeLevels.level2long) {
+      schemaObject.address.addressRegion = encodeURIComponent(
+      geoObject.administrativeLevels
+      .level2long);
+    }
+    if (geoObject.zipcode){
+      schemaObject.address.postalCode = encodeURIComponent(
+        geoObject.zipcode);
+    }
   }
   return schemaObject;
 };
