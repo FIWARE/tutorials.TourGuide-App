@@ -18,17 +18,16 @@ var utils = require('../utils');
 var authRequest = require('../authrequest');
 var fs = require('fs');
 var async = require('async');
+var geocoder = require('node-geocoder')('google', 'http');
 
 var feedHost = 'opendata.euskadi.eus';
 var feedPath = '/contenidos/ds_recursos_turisticos';
 feedPath +=
   '/restaurantes_sidrerias_bodegas/opendata/restaurantes.json';
 var cacheFile = '../data/restaurants.json';
-var cacheFileGeo = '../data/restaurants_geo.json';
-var cacheGeo = {};
-var apiRestSimtasks = 5; // number of simultaneous calls to API REST
+var apiRestSimtasks = 1; // number of simultaneous calls to API REST
 var restaurantsAdded = 0;
-var geoWaitTimeMs = 1000; // Wait ms between calls to Google API
+var geoWaitTimeMs = 200; // Wait ms between calls to Google API
 var restaurantsData; // All data for the restaurants
 var apiCount = 0; // 2500 requests per day, be careful
 
@@ -36,77 +35,6 @@ var getAddress = function (restaurant) {
   var address = restaurant.address + ' ';
   address += restaurant.municipality;
   return address;
-};
-
-var getGeocodeApiNext = function (pos, data) {
-  var total = restaurantsData.length;
-  try {
-    var geocodeJson = JSON.parse(data);
-    cacheGeo[getAddress(restaurantsData[pos])] = geocodeJson;
-  } catch (e) {
-    cacheGeo[getAddress(restaurantsData[pos])] = data;
-  }
-
-  if (pos < total - 1) {
-    console.log('API call ' + pos + '/' + (total - 1));
-    setTimeout(function () {
-      getGeocodeApi(++pos);
-    }, geoWaitTimeMs);
-  } else {
-    // Once all read, write to cache file and feed data to orion
-    fs.writeFileSync(cacheFileGeo, JSON.stringify(cacheGeo));
-    console.log('TOTAL API CALLS: ' + apiCount);
-    feedOrionRestaurants();
-  }
-};
-
-// pos: position in restaurant_data array
-var getGeocodeApi = function (pos) {
-  // First check if we already have the data
-  var address = getAddress(restaurantsData[pos]);
-
-  if (cacheGeo[address] !== undefined) {
-    getGeocodeApiNext(pos, cacheGeo[address]);
-    return;
-  }
-
-  var apiKey = process.argv[2];
-  var urlPath = '/maps/api/geocode/json?';
-  urlPath += 'region=es&'; // All our restaurants are from Spain
-  urlPath += 'address=' + encodeURIComponent(address);
-  urlPath += '&key=' + apiKey;
-  var headers = {
-    'Accept': 'application/json',
-  };
-
-  var options = {
-    host: 'maps.googleapis.com',
-    path: urlPath,
-    method: 'GET',
-    headers: headers
-  };
-  var https = true;
-  apiCount++;
-  utils.doGet(options, getGeocodeApiNext, pos, https);
-};
-
-var getGeocode = function (address) {
-  var geocode;
-
-  if (cacheGeo[address] === undefined) {
-    console.log('Can\'t read geocodes');
-  } else {
-    if (cacheGeo[address].results !== undefined &&
-      Array.isArray(cacheGeo[address].results) &&
-      cacheGeo[address].results[0] !== undefined) {
-      var geocodeRaw = cacheGeo[address].results[0].geometry.location;
-      geocode = geocodeRaw.lat + ', ' + geocodeRaw.lng;
-    } else {
-      console.log('Bad geocode data: ' + cacheGeo[address]);
-    }
-  }
-
-  return geocode;
 };
 
 var feedOrionRestaurants = function () {
@@ -123,8 +51,22 @@ var feedOrionRestaurants = function () {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function (task, callback) {
     var attributes = task.attributes;
+    var address = attributes.address.streetAddress + ' ' +
+    attributes.address.addressRegion;
+    address = decodeURIComponent(address);
 
-    authRequest('v2/entities', 'POST', attributes, callback);
+    setTimeout(function () {
+     geocoder.geocode(address)
+     .then(function(geoRes) {
+      attributes = utils.addGeolocation(attributes, geoRes[0]);
+      attributes = utils.fixAddress(attributes, geoRes[0]);
+      authRequest('v2/entities', 'POST', attributes, callback);
+    })
+     .catch(function(err) {
+      console.log(err);
+      authRequest('v2/entities', 'POST', attributes, callback);
+    });
+   }, geoWaitTimeMs);
   }, apiRestSimtasks);
 
 
@@ -165,12 +107,6 @@ var feedOrionRestaurants = function () {
       'aggregateRating': {}
     };
 
-    var address = getAddress(restaurantsData[pos]);
-    var geocode = getGeocode(address);
-    attr.location.value = geocode;
-    attr.location.type = 'geo:point';
-    attr.location.crs = 'WGS84';
-
     attr.aggregateRating.ratingValue = utils.randomIntInc(1, 5);
     attr.aggregateRating.reviewCount = utils.randomIntInc(1,
       100);
@@ -209,37 +145,8 @@ var feedOrionRestaurants = function () {
         }
       }
     });
-
-    q.push({
-      'attributes': attr
-    }, returnPost);
+    q.push({'attributes': attr}, returnPost);
   });
-};
-
-
-// Try to convert all address to geocode
-var readGeoDataFeedOrion = function () {
-  try {
-    var data = fs.readFileSync(cacheFileGeo);
-    cacheGeo = JSON.parse(data);
-    feedOrionRestaurants();
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      var maxTime = restaurantsData.length * geoWaitTimeMs / 1000;
-      console.log('Reading geocodes ... be patient ...');
-      console.log('Max time needed: ' + maxTime + ' seconds.');
-      var apiKey = process.argv[2];
-      if (apiKey === undefined) {
-        console.log('Please provide an API key:');
-        console.log(
-          'node restaurant_feeder.js <apiKey_google_geocode>');
-        throw ('API key needed for geocodes.');
-      }
-      getGeocodeApi(0);
-    } else {
-      throw (e);
-    }
-  }
 };
 
 // Load restaurant data in Orion
@@ -247,14 +154,14 @@ var loadRestaurantData = function () {
   var processGet = function (res, data) {
     fs.writeFileSync(cacheFile, data);
     restaurantsData = JSON.parse(data);
-    readGeoDataFeedOrion();
+    feedOrionRestaurants();
   };
 
   try {
     var data = fs.readFileSync(cacheFile);
     console.log('Using cache file ' + cacheFile);
     restaurantsData = JSON.parse(data);
-    readGeoDataFeedOrion();
+    feedOrionRestaurants();
   } catch (e) {
     if (e.code === 'ENOENT') {
       console.log('Downloading data ... be patient');
