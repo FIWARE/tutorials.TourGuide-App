@@ -20,11 +20,11 @@ exports.index = function (req, res) {
       var resHtml = 'Welcome ' + user.id + '!';
       resHtml += '<br><ul>';
       resHtml +=
-        '<li><a href=\'/api/orionv2/restaurants/\'>Restaurants</a></li>';
+        '<li><a href=\'/api/orion/restaurants/\'>Restaurants</a></li>';
       resHtml +=
-        '<li><a href=\'/api/orionv2/reviews/\'>Reviews</a></li>';
+        '<li><a href=\'/api/orion/reviews/\'>Reviews</a></li>';
       resHtml +=
-        '<li><a href=\'/api/orionv2/reservations/\'>Reservations</a></li>';
+        '<li><a href=\'/api/orion/reservations/\'>Reservations</a></li>';
       resHtml += '</ul><br>';
       resHtml += '<br><a href=\'/logout\'>Log out</a>';
       res.send(resHtml);
