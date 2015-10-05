@@ -161,7 +161,7 @@ var feed_orion_restaurants = function() {
         var post_data = {
             "contextElements": [
                     {
-                        "type": "restaurant",
+                        "type": "Restaurant",
                         "isPattern": "false",
                         "id": utils.fixedEncodeURIComponent(context_id),
                         "attributes": attributes
