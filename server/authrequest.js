@@ -9,7 +9,7 @@ var port = 1026;
 
 module.exports = performRequest;
 
-function performRequest(endpoint, method, data, success) {
+function performRequest(endpoint, method, data, callback) {
   /*jshint camelcase: false */
   
   var dataString = JSON.stringify(data);
@@ -57,17 +57,10 @@ function performRequest(endpoint, method, data, success) {
       if (method == 'GET') {
         var responseObject;
         if (res.statusCode == 200 && (responseString !== '[]' && responseString !== '{}')) {
-          console.log('Response', res.statusCode, 'OK');
           responseObject = JSON.parse(responseString);
-          success(responseObject);
-
-        } else if (res.statusCode == 404) {
-          console.log('Response', res.statusCode, 'NOT FOUND');
-          responseObject = JSON.parse(responseString);
-          success(responseObject);
-
+          callback(null, responseObject);
         } else {
-          console.log('The returned object is empty');
+          callback(new Error(res.statusCode));
         }
 
       } else if (method == 'POST') {
@@ -75,48 +68,45 @@ function performRequest(endpoint, method, data, success) {
         if (res.statusCode == 201) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers.location);
-          success(responseString);
+          callback(null, res.statusCode);
         } else if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(responseString);
+          callback(null, res.statusCode);
         } else {
-          console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          console.log(res.headers);
-          success(responseString);
+          callback(new Error(res.statusCode));
         }
       } else if (method == 'PATCH') {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(responseString);
-
+          callback(null, res.statusCode);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(responseString);
+          callback(new Error(res.statusCode));
         }
       } else if (method == 'PUT') {
         if (res.statusCode == 200 || res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(responseString);
+          callback(null, res.statusCode);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(responseString);
+          callback(new Error(res.statusCode));
         }
       } else if (method == 'DELETE') {
         if (res.statusCode == 204) {
           console.log('Response', res.statusCode, 'OK');
           console.log(res.headers);
-          success(responseString);
+          callback(null, res.statusCode);
         } else {
           console.log('Response', res.statusCode, 'NOT HANDLED YET');
-          success(responseString);
+          callback(new Error(res.statusCode));
         }
       } else {
         console.log(res.headers);
         console.log('No data to show');
-        success(responseString);
+        callback(responseString);
       }
     });
   });

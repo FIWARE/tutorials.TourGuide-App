@@ -26,9 +26,13 @@ var reviewsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reviewed
 
 var feedOrionReviews = function() {
-  var returnPost = function() {
-    reviewsAdded++;
-    console.log(reviewsAdded + '/' + restaurantsData.length);
+  var returnPost = function(err, data) {
+    if (err) {
+      console.log('Problem with request: ' + err.message);
+    } else {
+      reviewsAdded++;
+      console.log(reviewsAdded + '/' + restaurantsData.length);
+    }
   };
 
   // restaurantsData = restaurantsData.slice(0,5); // debug with few items
@@ -87,15 +91,18 @@ var feedOrionReviews = function() {
 // Load restaurant data from Orion
 var loadRestaurantData = function() {
 
-  var processRestaurants = function(data) {
-    restaurantsData = JSON.parse(JSON.stringify(data));
-    // Once we have all data for restaurants generate reviews for them
-    feedOrionReviews();
+  var processRestaurants = function(err, data) {
+    if (err) {
+      console.log('Problem with request: ' + err.message);
+    } else {
+      restaurantsData = JSON.parse(JSON.stringify(data));
+      feedOrionReviews();
+    }
   };
 
-  authRequest('v2/entities', 
-    'GET', 
-    {'type': 'Restaurant', 'limit': '1000'}, 
+  authRequest('v2/entities',
+    'GET',
+    {'type': 'Restaurant', 'limit': '1000'},
     processRestaurants);
 };
 

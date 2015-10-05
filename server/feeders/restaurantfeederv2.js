@@ -38,9 +38,13 @@ var getAddress = function (restaurant) {
 };
 
 var feedOrionRestaurants = function () {
-  var returnPost = function () {
-    restaurantsAdded++;
-    console.log(restaurantsAdded + '/' + restaurantsData.length);
+  var returnPost = function (err, data) {
+    if (err) {
+      console.log('Problem with request: ' + err.message);
+    } else {
+      restaurantsAdded++;
+      console.log(restaurantsAdded + '/' + restaurantsData.length);
+    }
   };
 
   //restaurantsData = restaurantsData.slice(0,5); // debug with few items
