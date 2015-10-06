@@ -1,6 +1,6 @@
 /*jshint node:true */
 /*
- * restaurant_feederv2.js
+ * restaurantfeeder.js
  * Copyright(c) 2015 Bitergia
  * Author: Alvaro del Castillo <acs@bitergia.com>, 
  * Alberto Martín <alberto.martin@bitergia.com>
