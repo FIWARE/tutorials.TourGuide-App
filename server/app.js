@@ -59,11 +59,6 @@ app.patch('/api/orion/reservation/:id', orion.updateReservation);
 app.delete('/api/orion/reservation/:id', orion.deleteReservation);
 app.get('/api/orion/reservations', orion.getReservations);
 
-// User API v2
-app.get('/api/orion/user/:id/reviews', orion.getUserReviews);
-app.get('/api/orion/user/:id/reservations', orion.getUserReservations);
-
-
 // END API REST
 
 app.get('*', function (req, res, next) {
