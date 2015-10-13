@@ -139,7 +139,7 @@ function createService() {
 function registerSensor(name, type) {
   var idasUrl = '/iot/devices';
   var headers = defaultHeaders;
-  var entityName = type + '_' + name;
+  var entityName = type + '_' + encodeURIComponent(name);
 
   // build payload
   var data = sensorsTemplates[type];
@@ -202,7 +202,7 @@ function registerSensor(name, type) {
 function sendObservation(name, type, data) {
   var idasUrl = '/iot/d';
   var headers = defaultHeaders;
-  var entityName = type + '_' + name;
+  var entityName = type + '_' + encodeURIComponent(name);
   var idasParams = [
     'k=' + idasApiKey,
     'i=' + encodeURIComponent(entityName)

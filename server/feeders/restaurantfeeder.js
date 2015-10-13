@@ -57,7 +57,6 @@ var feedOrionRestaurants = function () {
     var attributes = task.attributes;
     var address = attributes.address.streetAddress + ' ' +
     attributes.address.addressRegion;
-    address = decodeURIComponent(address);
 
     setTimeout(function () {
      geocoder.geocode(address)
@@ -104,7 +103,7 @@ var feedOrionRestaurants = function () {
 
     var attr = {
       'type': 'Restaurant',
-      'id': utils.fixedEncodeURIComponent(encodeURIComponent(rname)),
+      'id': utils.fixedEncodeURIComponent(rname),
       'address': {},
       'location': {},
       'department': utils.randomElement(organization),
@@ -127,9 +126,8 @@ var feedOrionRestaurants = function () {
             function (key, dictionary) {
               return dictionary[key];
             });
-          attr.address[utils.fixedEncodeURIComponent(
-            element)] = utils.fixedEncodeURIComponent(
-            encodeURIComponent(val));
+          attr.address[utils.fixedEncodeURIComponent(element)] =
+          utils.fixedEncodeURIComponent(val);
         }
 
       } else {
@@ -143,8 +141,7 @@ var feedOrionRestaurants = function () {
               });
             attr[utils.fixedEncodeURIComponent(element)] =
               utils.fixedEncodeURIComponent(
-                encodeURIComponent(utils.convertHtmlToText(
-                  val)));
+                utils.convertHtmlToText(val));
           }
         }
       }

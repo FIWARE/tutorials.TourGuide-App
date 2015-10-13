@@ -251,38 +251,11 @@ exports.objectDataToSchema = function (element) {
       }
     });
 
-    //-- Until Orion accepts latin characters, 
-    //-- we should enconde/decode all the attributes values
-
-    newElement.name = decodeURIComponent(element.id);
+    newElement.name = element.id;
     newElement.address['@type'] = 'postalAddress';
-    if (newElement.address.streetAddress) {
-      newElement.address.streetAddress = decodeURIComponent(
-        newElement.address
-        .streetAddress);
-    }
-    if (newElement.address.addressLocality) {
-      newElement.address.addressLocality = decodeURIComponent(
-        newElement.address
-        .addressLocality);
-    }
-    if (newElement.address.addressRegion) {
-      newElement.address.addressRegion = decodeURIComponent(
-        newElement.address
-        .addressRegion);
-    }
-    if (newElement.description) {
-      newElement.description = decodeURIComponent(newElement.description);
-    }
-    if (newElement.url) {
-      newElement.url = decodeURIComponent(newElement.url);
-    }
-    if (newElement.telephone) {
-      newElement.telephone = decodeURIComponent(newElement.telephone);
-    }
+
     // -- Display geo-location schema.org like
     if (element.location.value && typeof element.location.value === 'string') {
-      console.log(element);
       var geoCoords = element.location.value.split(',');
       newElement.geo = {};
       newElement.geo['@type'] = 'GeoCoordinates';
@@ -302,8 +275,6 @@ exports.objectDataToSchema = function (element) {
         }
       }
     });
-    newElement.itemReviewed.name = decodeURIComponent(newElement.itemReviewed
-      .name);
     return newElement;
 
 
@@ -384,29 +355,26 @@ exports.dataToSchema = function (listOfElements) {
 exports.fixAddress = function (schemaObject, geoObject) {
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress = encodeURIComponent(
+      schemaObject.address.streetAddress =
       geoObject.streetName +
-      ' ' + geoObject.streetNumber);
+      ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = encodeURIComponent(
-      geoObject.streetName);
+      schemaObject.address.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = encodeURIComponent(
-      geoObject.city);
+      schemaObject.address.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality = encodeURIComponent(
+      schemaObject.address.addressLocality =
       geoObject.administrativeLevels
-      .level2long);
+      .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion = encodeURIComponent(
+      schemaObject.address.addressRegion =
       geoObject.administrativeLevels
-      .level2long);
+      .level2long;
     }
     if (geoObject.zipcode){
-      schemaObject.address.postalCode = encodeURIComponent(
-        geoObject.zipcode);
+      schemaObject.address.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
@@ -426,8 +394,7 @@ exports.addGeolocation = function (schemaObject, geoObject) {
 exports.restaurantToOrion = function (schemaObject, geoObject) {
 
   schemaObject.type = schemaObject['@type'];
-  schemaObject.id = encodeURIComponent(schemaObject.name);
-  schemaObject.description = encodeURIComponent(schemaObject.description);
+  schemaObject.id = schemaObject.name;
   delete schemaObject['@type'];
   delete schemaObject.name;
 
@@ -448,7 +415,7 @@ exports.reviewToOrion = function (schemaObject) {
   // -- - We need that way cause we cannot display 'ids'
 
   schemaObject.type = schemaObject['@type'];
-  var rname = encodeURIComponent(schemaObject.itemReviewed.name);
+  var rname = schemaObject.itemReviewed.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
   schemaObject.author = {};
@@ -463,7 +430,7 @@ exports.reservationToOrion = function (schemaObject) {
   // -- TODO: add user from session
 
   schemaObject.type = schemaObject['@type'];
-  var rname = encodeURIComponent(schemaObject.reservationFor.name);
+  var rname = schemaObject.reservationFor.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
   schemaObject.underName = {};

@@ -27,14 +27,14 @@ exports.createRestaurant = function (req, res) {
       });
     })
     .catch(function(err) {
-        console.log(err);
+      console.log(err);
     });
 };
 
 exports.readRestaurant = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-    .id)), 'GET', {
-    'type': 'Restaurant'
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'GET', {
+    'type': 'Testing'
   }, function (err, data) {
     if (err) {
       res.statusCode = err.message;
@@ -45,8 +45,8 @@ exports.readRestaurant = function (req, res) {
   });
 };
 exports.updateRestaurant = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'PATCH', req.body,
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'PATCH', req.body,
     function (err, data){
         if (err) {
           res.statusCode = err.message;
@@ -58,8 +58,8 @@ exports.updateRestaurant = function (req, res) {
       });
 };
 exports.deleteRestaurant = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'DELETE', {},
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'DELETE', {},
     function (err, data){
         if (err) {
           res.statusCode = err.message;
@@ -104,8 +104,8 @@ exports.createReview = function (req, res) {
       });
 };
 exports.readReview = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-    .id)), 'GET', {
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'GET', {
     'type': 'Review'
   }, function (err, data) {
     if (err) {
@@ -117,8 +117,8 @@ exports.readReview = function (req, res) {
   });
 };
 exports.updateReview = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'PATCH', req.body,
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'PATCH', req.body,
     function (err, data){
         if (err) {
           res.statusCode = err.message;
@@ -130,8 +130,8 @@ exports.updateReview = function (req, res) {
       });
 };
 exports.deleteReview = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'DELETE', {},
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id), 'DELETE', {},
     function (err, data){
         if (err) {
           res.statusCode = err.message;
@@ -158,36 +158,39 @@ exports.getReviews = function (req, res) {
 
 // Reservations
 
-exports.createReservation = function (req, res) {
+exports.createReservation = function(req, res) {
   var elementToOrion;
   // -- We first get information regarding the restaurant
-  authRequest('v2/entities/' +
-    encodeURIComponent(encodeURIComponent(req.body.reservationFor.name)),
-    'GET', {'type': 'Restaurant'},
+  authRequest('v2/entities/' + req.body.reservationFor.name,
+    'GET', {
+      'type': 'Restaurant'
+    },
     function(err, restaurantObject) {
       if (err) {
         res.statusCode = err.message;
         res.end();
-    } else {
+      } else {
         elementToOrion = req.body;
         elementToOrion = utils.reservationToOrion(elementToOrion);
         elementToOrion.reservationFor.address = restaurantObject.address;
         authRequest('v2/entities', 'POST', elementToOrion,
-        function (err, data){
-          if (err) {
-            res.statusCode = err.message;
-            res.end();
-          } else {
-            res.statusCode = data;
-            res.end();
-          }
-      });
-    }
-  });
+          function(err, data) {
+            if (err) {
+              res.statusCode = err.message;
+              res.end();
+            } else {
+              res.statusCode = data;
+              res.end();
+            }
+          });
+      }
+    });
 };
+
 exports.readReservation = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-    .id)), 'GET', {
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id),
+     'GET', {
     'type': 'FoodEstablishmentReservation'
   }, function (err, data) {
     if (err) {
@@ -200,8 +203,9 @@ exports.readReservation = function (req, res) {
 };
 
 exports.updateReservation = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'PATCH', req.body,
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id),
+  'PATCH', req.body,
     function (err, data){
         if (err) {
           res.statusCode = err.message;
@@ -213,8 +217,9 @@ exports.updateReservation = function (req, res) {
       });
 };
 exports.deleteReservation = function (req, res) {
-  authRequest('v2/entities/' + encodeURIComponent(encodeURIComponent(req.params
-      .id)), 'DELETE', {},
+  authRequest('v2/entities/' + encodeURIComponent(req.params
+    .id),
+  'DELETE', {},
     function (err, data){
         if (err) {
           res.statusCode = err.message;

@@ -29,9 +29,10 @@ function performRequest(endpoint, method, data, callback) {
   } else {
     headers = {
       'Content-Type': 'application/json',
-      'Content-Length': dataString.length
+      'Content-Length': Buffer.byteLength(dataString, 'utf-8')
     };
   }
+
   var options = {
     host: host,
     port: port,
