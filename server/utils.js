@@ -246,16 +246,23 @@ exports.objectDataToSchema = function (element) {
       if (restaurantSchemaElements.indexOf(elementAttribute) !==
         -1) {
         if (val !== 'undefined') {
-          newElement[elementAttribute] = val;
+          if (typeof val === 'string'){
+            newElement[elementAttribute] = unescape(val);
+          }else{
+            newElement[elementAttribute] = val;
+          }
         }
       }
     });
 
-    newElement.name = element.id;
+    newElement.name = unescape(element.id);
     newElement.address['@type'] = 'postalAddress';
 
     // -- Display geo-location schema.org like
-    if (element.location.value && typeof element.location.value === 'string') {
+
+    if (element.location &&
+        element.location.value &&
+        typeof element.location.value === 'string') {
       var geoCoords = element.location.value.split(',');
       newElement.geo = {};
       newElement.geo['@type'] = 'GeoCoordinates';
@@ -289,24 +296,15 @@ exports.objectDataToSchema = function (element) {
         }
       }
     });
-    newElement.reservationId = decodeURIComponent(element.id);
-    newElement.reservationFor.name = decodeURIComponent(
+    newElement.reservationId = unescape(element.id);
+    newElement.reservationFor.name = unescape(
         newElement.reservationFor.name);
     newElement.reservationFor.address['@type'] = 'postalAddress';
-    newElement.reservationFor.address.streetAddress =
-      decodeURIComponent(
-        newElement.reservationFor.address.streetAddress);
-    newElement.reservationFor.address.addressLocality =
-      decodeURIComponent(
-        newElement.reservationFor.address.addressLocality);
-    newElement.reservationFor.address.addressRegion =
-      decodeURIComponent(
-        newElement.reservationFor.address.addressRegion);
     return newElement;
 
 
   } else {
-    console.log('Undefined type');
+    console.log('Undefined type received to convert');
   }
 
 };
@@ -336,6 +334,7 @@ exports.dataToSchema = function (listOfElements) {
   //-- If the object received is not a list, we add it inside one
 
   if (util.isArray(listOfElements) === false) {
+    
     var aux = listOfElements;
     listOfElements = [];
     listOfElements.push(aux);
@@ -349,7 +348,7 @@ exports.dataToSchema = function (listOfElements) {
 
   });
 
-  return JSON.stringify(newListOfElements);
+  return newListOfElements;
 };
 
 exports.fixAddress = function (schemaObject, geoObject) {

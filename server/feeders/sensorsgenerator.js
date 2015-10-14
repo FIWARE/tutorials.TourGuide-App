@@ -93,21 +93,19 @@ var feedIDASSensors = function() {
 var loadRestaurantData = function() {
 
   // Generate the sensors once we have all restaurant data
-  var processRestaurants = function(err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      restaurantsData = JSON.parse(JSON.stringify(data));
-      feedIDASSensors();
-    }
+  var processRestaurants = function(data) {
+    restaurantsData = JSON.parse(JSON.stringify(data.body));
+    feedIDASSensors();
   };
 
-  authRequest('v2/entities',
-              'GET', {
-                'type': 'Restaurant',
-                'limit': '1000'
-              },
-              processRestaurants);
+  authRequest(
+    '/v2/entities',
+    'GET',
+    {'type': 'Restaurant','limit': '1000'})
+  .then(processRestaurants)
+  .catch(function(err){
+    console.log(err);
+  });
 };
 
 console.log('Generating sensors for restaurants...');

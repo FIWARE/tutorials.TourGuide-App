@@ -26,13 +26,9 @@ var reviewsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reviewed
 
 var feedOrionReviews = function() {
-  var returnPost = function(err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      reviewsAdded++;
-      console.log(reviewsAdded + '/' + restaurantsData.length);
-    }
+  var returnPost = function(data) {
+    reviewsAdded++;
+    console.log(reviewsAdded + '/' + restaurantsData.length);
   };
 
   // restaurantsData = restaurantsData.slice(0,5); // debug with few items
@@ -44,7 +40,11 @@ var feedOrionReviews = function() {
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
 
-    authRequest('v2/entities', 'POST', attributes, callback);
+    authRequest('/v2/entities', 'POST', attributes)
+    .then(callback)
+    .catch(function(err){
+      console.log(err);
+    });
   }, apiRestSimtasks);
 
 
@@ -91,19 +91,19 @@ var feedOrionReviews = function() {
 // Load restaurant data from Orion
 var loadRestaurantData = function() {
 
-  var processRestaurants = function(err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      restaurantsData = JSON.parse(JSON.stringify(data));
-      feedOrionReviews();
-    }
+  var processRestaurants = function(data) {
+    restaurantsData = JSON.parse(JSON.stringify(data.body));
+    feedOrionReviews();
   };
 
-  authRequest('v2/entities',
+  authRequest(
+    '/v2/entities',
     'GET',
-    {'type': 'Restaurant', 'limit': '1000'},
-    processRestaurants);
+    {'type': 'Restaurant', 'limit': '1000'})
+  .then(processRestaurants)
+  .catch(function(err) {
+    console.log(err);
+  });
 };
 
 console.log('Generating random reviews for restaurants ...');

@@ -19,19 +19,14 @@ var utils = require('../utils');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
 var authRequest = require('../authrequest');
-
 var apiRestSimtasks = 10; // number of simultaneous calls to API REST
 var reservationsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reserved
 
 var feedOrionReservations = function() {
-  var returnPost = function(err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      reservationsAdded++;
-      console.log(reservationsAdded + '/' + restaurantsData.length);
-    }
+  var returnPost = function(data) {
+    reservationsAdded++;
+    console.log(reservationsAdded + '/' + restaurantsData.length);
   };
 
   // restaurantsData = restaurantsData.slice(0,5); // debug with few items
@@ -43,7 +38,11 @@ var feedOrionReservations = function() {
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
 
-    authRequest('v2/entities', 'POST', attributes, callback);
+    authRequest('/v2/entities', 'POST', attributes)
+    .then(callback)
+    .catch(function(err){
+      console.log(err);
+    });
   }, apiRestSimtasks);
 
 
@@ -87,21 +86,19 @@ var loadRestaurantData = function() {
 
   // Once we have all data for restaurants generate reviews for them
 
-  var processRestaurants = function(err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      restaurantsData = JSON.parse(JSON.stringify(data));
-      feedOrionReservations();
-    }
+  var processRestaurants = function(data) {
+    restaurantsData = JSON.parse(JSON.stringify(data.body));
+    feedOrionReservations();
   };
 
-  authRequest('v2/entities',
-    'GET', {
-      'type': 'Restaurant',
-      'limit': '1000'
-    },
-    processRestaurants);
+  authRequest(
+    '/v2/entities',
+    'GET', 
+    {'type': 'Restaurant','limit': '1000'})
+  .then(processRestaurants)
+  .catch(function(err){
+    console.log(err);
+  });
 };
 
 console.log('Generating random reservations for restaurants ...');

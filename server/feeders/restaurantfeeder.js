@@ -38,13 +38,9 @@ var getAddress = function (restaurant) {
 };
 
 var feedOrionRestaurants = function () {
-  var returnPost = function (err, data) {
-    if (err) {
-      console.log('Problem with request: ' + err.message);
-    } else {
-      restaurantsAdded++;
-      console.log(restaurantsAdded + '/' + restaurantsData.length);
-    }
+  var returnPost = function (data) {
+    restaurantsAdded++;
+    console.log(restaurantsAdded + '/' + restaurantsData.length);
   };
 
   //restaurantsData = restaurantsData.slice(0,5); // debug with few items
@@ -63,11 +59,19 @@ var feedOrionRestaurants = function () {
      .then(function(geoRes) {
       attributes = utils.addGeolocation(attributes, geoRes[0]);
       attributes = utils.fixAddress(attributes, geoRes[0]);
-      authRequest('v2/entities', 'POST', attributes, callback);
+      authRequest('/v2/entities', 'POST', attributes)
+      .then(callback)
+      .catch(function(err){
+        console.log(err);
+      });
     })
      .catch(function(err) {
       console.log(err);
-      authRequest('v2/entities', 'POST', attributes, callback);
+      authRequest('/v2/entities', 'POST', attributes)
+      .then(callback)
+      .catch(function(err){
+        console.log(err);
+      });
     });
    }, geoWaitTimeMs);
   }, apiRestSimtasks);
@@ -98,7 +102,7 @@ var feedOrionRestaurants = function () {
     var rname = restaurantsData[pos].documentName;
 
     var organization = ['Franchise1', 'Franchise2',
-      'Franchise3', 'Franchise4'
+    'Franchise3', 'Franchise4'
     ];
 
     var attr = {
@@ -140,8 +144,8 @@ var feedOrionRestaurants = function () {
                 return dictionary[key];
               });
             attr[utils.fixedEncodeURIComponent(element)] =
-              utils.fixedEncodeURIComponent(
-                utils.convertHtmlToText(val));
+            utils.fixedEncodeURIComponent(
+              utils.convertHtmlToText(val));
           }
         }
       }
