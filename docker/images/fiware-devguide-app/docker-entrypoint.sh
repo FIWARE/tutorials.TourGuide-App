@@ -16,6 +16,8 @@ check_var IDAS_FIWARE_SERVICE devguideidas
 check_var IDAS_FIWARE_SERVICE_PATH /
 check_var IDAS_API_KEY devguideidas
 
+check_var ORION_SUBSCRIPTIONS_ENABLED true
+
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
 fi
@@ -107,7 +109,7 @@ _configure_params
 a2ensite devguide-app
 
 # Subscribe to receive temperatures from orion
-if [ -e /subscribe-to-orion ] ; then
+if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then
 
     echo "Testing if orion is ready at http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version"
     check_url http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version "<version>.*</version>"
@@ -116,7 +118,6 @@ if [ -e /subscribe-to-orion ] ; then
     for f in $( ls ${SUBSCRIPTIONS_PATH} ) ; do
         "${SUBSCRIPTIONS_PATH}/${f}"
     done
-    rm -f /subscribe-to-orion
 fi
 
 # Start container back

@@ -86,5 +86,6 @@ devguide:
     # volumes:
     #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
         - IDAS_PORT=8080
+        - ORION_SUBSCRIPTIONS_ENABLED=false
     volumes_from:
         - idm

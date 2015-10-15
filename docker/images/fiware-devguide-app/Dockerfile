@@ -38,8 +38,7 @@ RUN mkdir fix-node-passenger && \
     cp -r ${PWD}/ruby-passenger-${version}/node_lib /usr/share/passenger/ && \
     cd .. && \
     rm -rf fix-node-passenger && \
-    mkdir ${SUBSCRIPTIONS_PATH} && \
-    touch /subscribe-to-orion
+    mkdir ${SUBSCRIPTIONS_PATH}
 # fi
 
 COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
