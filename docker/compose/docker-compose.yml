@@ -83,9 +83,9 @@ devguide:
         - ORION_NO_PROXY_HOSTNAME=orion
         - ORION_PORT=1026
         - ORION_PEP_ENABLED=true
-    # volumes:
-    #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
         - IDAS_PORT=8080
         - ORION_SUBSCRIPTIONS_ENABLED=false
     volumes_from:
         - idm
+    # volumes:
+    #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
