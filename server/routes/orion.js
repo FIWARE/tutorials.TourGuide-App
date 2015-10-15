@@ -6,6 +6,7 @@
 var authRequest = require('../authrequest');
 var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
+var async = require('async');
 
 // Restaurants
 
@@ -370,4 +371,91 @@ exports.getOrganizationsReservations = function(req, res) {
       res.end();
     });
 };
+
+// Sensors
+exports.updateSensors = function(req, res) {
+  var data = req.body;
+  console.log('Sensor notification received:',
+              data.contextResponses.length, 'notifications');
+
+  function processNotification(elem, callback) {
+
+    var item = elem.contextElement;
+    var restaurant = {};
+
+    restaurant.Pattern = /^SENSOR_(?:TEMP|HUM)_(.*)_(Kitchen|Dining)$/;
+
+    if (item.id.search(restaurant.Pattern) == -1) {
+      // not a restaurant sensor
+      console.log('Ignored notification:', item.id);
+      res.end();
+      return callback(null);
+    }
+
+    restaurant.Name = restaurant.Pattern.exec(item.id)[1];
+    restaurant.Room = restaurant.Pattern.exec(item.id)[2];
+
+    console.log('Restaurant:', restaurant.Name);
+
+    // get the restaurant info
+    authRequest(
+      '/v2/entities/' + restaurant.Name,
+      'GET',
+      {'type': 'Restaurant'})
+      .then(
+        function(data) {
+          // restaurant exists
+          var newProperty = restaurant.Room + '_' + item.attributes[0].name;
+          var schema = {};
+          schema[newProperty] = {
+            '@type': 'PropertyValue',
+            'additionalType': item.attributes[0].name,
+            'propertyID': item.id,
+            'name': restaurant.Room,
+            'value': item.attributes[0].value
+          };
+          console.log('Schema:', schema);
+          // update restaurant
+          return authRequest(
+            '/v2/entities/' + restaurant.Name,
+            'POST',
+            schema)
+            .then(
+              function(data) {
+                // restaurant updated
+                callback(null);
+              })
+            .catch(
+              function(err) {
+                // error updating restaurant
+                console.log('ERROR:', err.message);
+                callback(err);
+              }
+            );
+        })
+      .catch(
+        function(err) {
+          console.log(err);
+          callback(err);
+        }
+      );
+  }
+
+  function processEnd(err) {
+    if (err) {
+      console.log(err);
+      res.statusCode = 500;
+      res.end();
+    } else {
+      console.log('done');
+      res.statusCode = 200;
+      res.end();
+    }
+  }
+
+  async.eachSeries(
+    data.contextResponses,
+    processNotification,
+    processEnd
+  );
 };
