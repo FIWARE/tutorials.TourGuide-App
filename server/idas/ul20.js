@@ -281,8 +281,7 @@ function initializeSensor(name, type) {
   case 'SENSOR_HUM':
     return updateHumiditySensor(name, '20');
   default:
-    var reason = 'Unsupported sensor type: ' + type;
-    return Q.reject(reason);
+    return Q.reject('Unsupported sensor type: ' + type);
   }
 }
 

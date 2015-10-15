@@ -1,4 +1,4 @@
-/*jshint node:true */
+/* jshint node: true, nonstandard: true */
 /*
  * DevGuide Utils
  */
@@ -10,23 +10,23 @@ var util = require('util');
 var shortid = require('shortid');
 var authRequest = require('./authrequest');
 
-exports.doGet = function (options, callback, res, useHttps) {
+exports.doGet = function(options, callback, res, useHttps) {
   var protocol = http;
   if (useHttps) {
     protocol = https;
   }
 
-  var request = protocol.get(options, function (response) {
+  var request = protocol.get(options, function(response) {
     // data is streamed in chunks from the server
     // so we have to handle the "data" event
-    var buffer = '',
-      data;
+    var buffer = '';
+    var data;
 
-    response.on('data', function (chunk) {
+    response.on('data', function(chunk) {
       buffer += chunk;
     });
 
-    response.on('end', function () {
+    response.on('end', function() {
       var msg = '';
       try {
         data = JSON.parse(buffer);
@@ -44,7 +44,7 @@ exports.doGet = function (options, callback, res, useHttps) {
       callback(res, msg);
     });
   });
-  request.on('error', function (err) {
+  request.on('error', function(err) {
     console.log('FAILED GET REQUEST');
     err = new Error();
     err.status = 502; // Bad gateway
@@ -53,7 +53,7 @@ exports.doGet = function (options, callback, res, useHttps) {
   });
 };
 
-exports.doPost = function (options, data, callback, res, useHttps) {
+exports.doPost = function(options, data, callback, res, useHttps) {
 
   try {
     var protocol = http;
@@ -61,19 +61,19 @@ exports.doPost = function (options, data, callback, res, useHttps) {
       protocol = https;
     }
 
-    var postReq = protocol.request(options, function (response) {
+    var postReq = protocol.request(options, function(response) {
       // console.log("DOING POST");
 
       response.setEncoding('utf8');
 
       var buffer = '';
 
-      response.on('data', function (chunk) {
+      response.on('data', function(chunk) {
         buffer += chunk;
 
       });
 
-      response.on('end', function () {
+      response.on('end', function() {
         // console.log(buffer);
         callback(res, buffer, response.headers);
       });
@@ -81,7 +81,7 @@ exports.doPost = function (options, data, callback, res, useHttps) {
 
     // console.log("POST Request created");
 
-    postReq.on('error', function (e) {
+    postReq.on('error', function(e) {
       // TODO: handle error.
       callback(res, e);
       console.log(e);
@@ -97,19 +97,21 @@ exports.doPost = function (options, data, callback, res, useHttps) {
   }
 };
 
-exports.replaceOnceUsingDictionary = function (dictionary, content,
+exports.replaceOnceUsingDictionary = function(dictionary, content,
   replacehandler) {
   if (typeof replacehandler !== 'function') {
     // Default replacehandler function.
-    replacehandler = function (key, dictionary) {
+    replacehandler = function(key, dictionary) {
       return dictionary[key];
     };
   }
 
-  var patterns = [], // \b is used to mark boundaries "foo" doesn't match food
-    patternHash = {},
-    oldkey, key, index = 0,
-    output = [];
+  var patterns = []; // \b is used to mark boundaries "foo" doesn't match food
+  var patternHash = {};
+  var oldkey;
+  var key;
+  var index = 0;
+  var output = [];
   for (key in dictionary) {
     // Case-insensitivity:
     key = (oldkey = key).toLowerCase();
@@ -120,12 +122,12 @@ exports.replaceOnceUsingDictionary = function (dictionary, content,
         '\\$1') +
       ')\\b');
 
-    // Add entry to hash variable, 
+    // Add entry to hash variable,
     // for an optimized backtracking at the next loop
     patternHash[key] = index++;
   }
-  var pattern = new RegExp(patterns.join('|'), 'gi'),
-    lastIndex = 0;
+  var pattern = new RegExp(patterns.join('|'), 'gi');
+  var lastIndex = 0;
 
   // We should actually test using !== null, but for foolproofness,
   //  we also reject empty strings
@@ -154,25 +156,25 @@ exports.replaceOnceUsingDictionary = function (dictionary, content,
   return output.join('');
 };
 
-exports.randomIntInc = function (low, high) {
+exports.randomIntInc = function(low, high) {
   return Math.floor(Math.random() * (high - low + 1) + low);
 };
 
-exports.randomElement = function (elements) {
+exports.randomElement = function(elements) {
   return elements[Math.floor(Math.random() * elements.length)];
 };
 
-exports.fixedEncodeURIComponent = function (str) {
+exports.fixedEncodeURIComponent = function(str) {
   str = str.replace(/["]/g, '\\"');
   str = str.replace(/\n/g, '\\n');
-  return str.replace(/[<>"'=;()\n\\]/g, function (c) {
+  return str.replace(/[<>"'=;()\n\\]/g, function(c) {
     var hex;
     hex = c.charCodeAt(0).toString(16);
     return '%' + ((hex.length === 2) ? hex : '0' + hex);
   });
 };
 
-exports.getRandomDate = function (from, to) {
+exports.getRandomDate = function(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
   } else {
@@ -186,7 +188,7 @@ exports.getRandomDate = function (from, to) {
   return new Date(from + Math.random() * (to - from));
 };
 
-exports.convertHtmlToText = function (str) {
+exports.convertHtmlToText = function(str) {
 
   //-- remove BR tags and replace them with line break
   str = str.replace(/<br>/gi, '\n');
@@ -215,20 +217,37 @@ exports.convertHtmlToText = function (str) {
   return str;
 };
 
-exports.objectDataToSchema = function (element) {
+exports.objectDataToSchema = function(element) {
 
   //-- Lists for matching JUST schema attributes
 
-  var restaurantSchemaElements = ['address', 'aggregateRating',
+  var restaurantSchemaElements = [
+    'address',
+    'aggregateRating',
     'name',
-    'department', 'description', 'priceRange', 'telephone', 'url'
+    'department',
+    'description',
+    'priceRange',
+    'telephone',
+    'url'
   ];
-  var reviewSchemaElements = ['itemReviewed', 'reviewRating',
+
+  var reviewSchemaElements = [
+    'itemReviewed',
+    'reviewRating',
     'name',
-    'author', 'reviewBody', 'publisher', 'dateCreated'
+    'author',
+    'reviewBody',
+    'publisher',
+    'dateCreated'
   ];
-  var reservationSchemaElements = ['reservationStatus', 'underName',
-    'reservationFor', 'startTime', 'partySize'
+
+  var reservationSchemaElements = [
+    'reservationStatus',
+    'underName',
+    'reservationFor',
+    'startTime',
+    'partySize'
   ];
 
   var type = element.type;
@@ -241,14 +260,15 @@ exports.objectDataToSchema = function (element) {
 
     //-- List elements matching
 
-    Object.keys(element).forEach(function (elementAttribute) {
+    Object.keys(element).forEach(function(elementAttribute) {
       var val = element[elementAttribute];
+
       if (restaurantSchemaElements.indexOf(elementAttribute) !==
         -1) {
         if (val !== 'undefined') {
-          if (typeof val === 'string'){
+          if (typeof val === 'string') {
             newElement[elementAttribute] = unescape(val);
-          }else{
+          } else {
             newElement[elementAttribute] = val;
           }
         }
@@ -274,7 +294,7 @@ exports.objectDataToSchema = function (element) {
 
   } else if (type === 'Review') {
 
-    Object.keys(element).forEach(function (elementAttribute) {
+    Object.keys(element).forEach(function(elementAttribute) {
       var val = element[elementAttribute];
       if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
         if (val !== 'undefined') {
@@ -284,10 +304,9 @@ exports.objectDataToSchema = function (element) {
     });
     return newElement;
 
-
   } else if (type === 'FoodEstablishmentReservation') {
 
-    Object.keys(element).forEach(function (elementAttribute) {
+    Object.keys(element).forEach(function(elementAttribute) {
       var val = element[elementAttribute];
       if (reservationSchemaElements.indexOf(elementAttribute) !==
         -1) {
@@ -302,16 +321,16 @@ exports.objectDataToSchema = function (element) {
     newElement.reservationFor.address['@type'] = 'postalAddress';
     return newElement;
 
-
   } else {
     console.log('Undefined type received to convert');
   }
 
 };
 
-exports.sortObject = function (element) {
-  var sorted = {},
-  key, aux = [];
+exports.sortObject = function(element) {
+  var sorted = {};
+  var key;
+  var aux = [];
 
   for (key in element) {
     if (element.hasOwnProperty(key)) {
@@ -327,20 +346,20 @@ exports.sortObject = function (element) {
   return sorted;
 };
 
-exports.dataToSchema = function (listOfElements) {
+exports.dataToSchema = function(listOfElements) {
 
   var newListOfElements = [];
 
   //-- If the object received is not a list, we add it inside one
 
   if (util.isArray(listOfElements) === false) {
-    
+
     var aux = listOfElements;
     listOfElements = [];
     listOfElements.push(aux);
   }
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     var newElement = utils.objectDataToSchema(listOfElements[
       pos]);
@@ -351,7 +370,7 @@ exports.dataToSchema = function (listOfElements) {
   return newListOfElements;
 };
 
-exports.fixAddress = function (schemaObject, geoObject) {
+exports.fixAddress = function(schemaObject, geoObject) {
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
       schemaObject.address.streetAddress =
@@ -372,14 +391,14 @@ exports.fixAddress = function (schemaObject, geoObject) {
       geoObject.administrativeLevels
       .level2long;
     }
-    if (geoObject.zipcode){
+    if (geoObject.zipcode) {
       schemaObject.address.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
 };
 
-exports.addGeolocation = function (schemaObject, geoObject) {
+exports.addGeolocation = function(schemaObject, geoObject) {
   if (geoObject) {
     schemaObject.location = {};
     schemaObject.location.type = 'geo:point';
@@ -390,7 +409,7 @@ exports.addGeolocation = function (schemaObject, geoObject) {
   return schemaObject;
 };
 
-exports.restaurantToOrion = function (schemaObject, geoObject) {
+exports.restaurantToOrion = function(schemaObject, geoObject) {
 
   schemaObject.type = schemaObject['@type'];
   schemaObject.id = schemaObject.name;
@@ -404,7 +423,7 @@ exports.restaurantToOrion = function (schemaObject, geoObject) {
 
 };
 
-exports.reviewToOrion = function (schemaObject) {
+exports.reviewToOrion = function(schemaObject) {
 
   // -- TODO: add user from session
   // -- TODO: check how to implement 'position field'
@@ -424,7 +443,7 @@ exports.reviewToOrion = function (schemaObject) {
 
 };
 
-exports.reservationToOrion = function (schemaObject) {
+exports.reservationToOrion = function(schemaObject) {
 
   // -- TODO: add user from session
 

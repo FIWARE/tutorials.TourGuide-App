@@ -49,21 +49,26 @@ var feedIDASSensors = function() {
   // Limit the number of calls to be done in parallel
   var q = async.queue(function(task, callback) {
     idas.registerSensor(task.name, task.type)
-      .then(function(response) {
-        sensorsAdded++;
-        return idas.initializeSensor(task.name, task.type)
-          .delay(100) // This is to avoid clogging iotagent with requests.
-          .then(function(response) {
-            sensorsInitialized++;
-          }, function(error) {
-            console.log('initializeSensor Error:', error);
-          });
-      }, function(error) {
-        console.log('createSensor Error:', error);
-      })
-      .done(function(response) {
-        callback();
-      });
+      .then(
+        function(response) {
+          sensorsAdded++;
+          return idas.initializeSensor(task.name, task.type)
+            .delay(100) // This is to avoid clogging iotagent with requests.
+            .then(
+              function(response) {
+                sensorsInitialized++;
+              },
+              function(error) {
+                console.log('initializeSensor Error:', error);
+              });
+        },
+        function(error) {
+          console.log('createSensor Error:', error);
+        })
+      .done(
+        function(response) {
+          callback();
+        });
   }, apiRestSimtasks);
 
   // Display totals when queue is empty
@@ -103,7 +108,7 @@ var loadRestaurantData = function() {
     'GET',
     {'type': 'Restaurant','limit': '1000'})
   .then(processRestaurants)
-  .catch(function(err){
+  .catch(function(err) {
     console.log(err);
   });
 };

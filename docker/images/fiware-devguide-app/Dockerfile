@@ -45,7 +45,7 @@ COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 
 # enable modules, disable default site, restart service
 RUN a2enmod ssl && a2enmod passenger && \
-    a2dissite 000-default 
+    a2dissite 000-default
 
 USER ${DEPLOY_USER}
 WORKDIR ${DEPLOY_USER_DIR}
