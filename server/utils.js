@@ -250,6 +250,15 @@ exports.objectDataToSchema = function(element) {
     'partySize'
   ];
 
+  // sensors data
+  var additionalProperties = [
+    'Kitchen_temperature',
+    'Kitchen_humidity',
+    'Dining_temperature',
+    'Dining_humidity'
+  ];
+  restaurantSchemaElements.push.apply(restaurantSchemaElements,
+                                      additionalProperties);
   var type = element.type;
   var newElement = {
     '@context': 'http://schema.org',
@@ -260,20 +269,33 @@ exports.objectDataToSchema = function(element) {
 
     //-- List elements matching
 
+    // array for sensors
+    var additionalProperty = [];
+
     Object.keys(element).forEach(function(elementAttribute) {
       var val = element[elementAttribute];
 
-      if (restaurantSchemaElements.indexOf(elementAttribute) !==
-        -1) {
+      if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
         if (val !== 'undefined') {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
+          if (additionalProperties.indexOf(elementAttribute) !== -1) {
+            additionalProperty.push(val);
           } else {
-            newElement[elementAttribute] = val;
+            if (typeof val === 'string') {
+              newElement[elementAttribute] = unescape(val);
+            } else {
+              newElement[elementAttribute] = val;
+            }
           }
         }
       }
     });
+
+    if (additionalProperty.length) {
+      newElement.additionalProperty = additionalProperty;
+    }
+
+    //-- Until Orion accepts latin characters,
+    //-- we should enconde/decode all the attributes values
 
     newElement.name = unescape(element.id);
     newElement.address['@type'] = 'postalAddress';
