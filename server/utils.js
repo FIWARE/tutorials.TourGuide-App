@@ -227,9 +227,7 @@ function objectToArray(element) {
   return element;
 }
 
-function objectDataToSchema(element) {
-
-  //-- Lists for matching JUST schema attributes
+function restaurantToSchema(element) {
 
   var restaurantSchemaElements = [
     'address',
@@ -242,6 +240,68 @@ function objectDataToSchema(element) {
     'url'
   ];
 
+  // sensors data
+  var additionalProperties = [
+    'Kitchen_temperature',
+    'Kitchen_humidity',
+    'Dining_temperature',
+    'Dining_humidity'
+  ];
+
+  restaurantSchemaElements.push.apply(restaurantSchemaElements,
+                                      additionalProperties);
+  var newElement = {
+    '@context': 'http://schema.org',
+    '@type': element.type
+  };
+
+  //-- List elements matching
+
+  // array for sensors
+  var additionalProperty = [];
+
+  Object.keys(element).forEach(function(elementAttribute) {
+    var val = element[elementAttribute];
+
+    if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
+      if (val !== 'undefined') {
+        if (additionalProperties.indexOf(elementAttribute) !== -1) {
+          additionalProperty.push(val);
+        } else {
+          if (typeof val === 'string') {
+            newElement[elementAttribute] = unescape(val);
+          } else {
+            newElement[elementAttribute] = val;
+          }
+        }
+      }
+    }
+  });
+
+  if (additionalProperty.length) {
+    newElement.additionalProperty = additionalProperty;
+  }
+
+  newElement.name = unescape(element.id);
+  newElement.address['@type'] = 'postalAddress';
+
+  // -- Display geo-location schema.org like
+
+  if (element.location &&
+      element.location.value &&
+      typeof element.location.value === 'string') {
+    var geoCoords = element.location.value.split(',');
+    newElement.geo = {};
+    newElement.geo['@type'] = 'GeoCoordinates';
+    newElement.geo.latitude = geoCoords[0];
+    newElement.geo.longitude = geoCoords[1];
+  }
+
+  return newElement;
+}
+
+function reviewToSchema(element) {
+
   var reviewSchemaElements = [
     'itemReviewed',
     'reviewRating',
@@ -252,6 +312,24 @@ function objectDataToSchema(element) {
     'dateCreated'
   ];
 
+  var newElement = {
+    '@context': 'http://schema.org',
+    '@type': element.type
+  };
+
+  Object.keys(element).forEach(function(elementAttribute) {
+      var val = element[elementAttribute];
+      if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
+        if (val !== 'undefined') {
+          newElement[elementAttribute] = val;
+        }
+      }
+    });
+  return newElement;
+}
+
+function reservationToSchema(element) {
+
   var reservationSchemaElements = [
     'reservationStatus',
     'underName',
@@ -260,103 +338,54 @@ function objectDataToSchema(element) {
     'partySize'
   ];
 
-  // sensors data
-  var additionalProperties = [
-    'Kitchen_temperature',
-    'Kitchen_humidity',
-    'Dining_temperature',
-    'Dining_humidity'
-  ];
-  restaurantSchemaElements.push.apply(restaurantSchemaElements,
-                                      additionalProperties);
-  var type = element.type;
   var newElement = {
     '@context': 'http://schema.org',
-    '@type': type
+    '@type': element.type
   };
 
-  if (type === 'Restaurant') {
-
-    //-- List elements matching
-
-    // array for sensors
-    var additionalProperty = [];
-
-    Object.keys(element).forEach(function(elementAttribute) {
-      var val = element[elementAttribute];
-
-      if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
-        if (val !== 'undefined') {
-          if (additionalProperties.indexOf(elementAttribute) !== -1) {
-            additionalProperty.push(val);
-          } else {
-            if (typeof val === 'string') {
-              newElement[elementAttribute] = unescape(val);
-            } else {
-              newElement[elementAttribute] = val;
-            }
-          }
-        }
+  Object.keys(element).forEach(function(elementAttribute) {
+    var val = element[elementAttribute];
+    if (reservationSchemaElements.indexOf(elementAttribute) !==
+      -1) {
+      if (val !== 'undefined') {
+        newElement[elementAttribute] = val;
       }
-    });
-
-    if (additionalProperty.length) {
-      newElement.additionalProperty = additionalProperty;
     }
+  });
+  newElement.reservationId = unescape(element.id);
+  newElement.reservationFor.name = unescape(
+    newElement.reservationFor.name);
+  newElement.reservationFor.address['@type'] = 'postalAddress';
 
-    //-- Until Orion accepts latin characters,
-    //-- we should enconde/decode all the attributes values
+  return newElement;
+}
 
-    newElement.name = unescape(element.id);
-    newElement.address['@type'] = 'postalAddress';
+function objectDataToSchema(element) {
 
-    // -- Display geo-location schema.org like
+  var newElement;
+  var type = element.type;
 
-    if (element.location &&
-        element.location.value &&
-        typeof element.location.value === 'string') {
-      var geoCoords = element.location.value.split(',');
-      newElement.geo = {};
-      newElement.geo['@type'] = 'GeoCoordinates';
-      newElement.geo.latitude = geoCoords[0];
-      newElement.geo.longitude = geoCoords[1];
-    }
+  switch (type) {
 
+  case 'Restaurant':
+
+    newElement = restaurantToSchema(element);
     return newElement;
 
-  } else if (type === 'Review') {
+  case 'Review':
 
-    Object.keys(element).forEach(function(elementAttribute) {
-      var val = element[elementAttribute];
-      if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
-        if (val !== 'undefined') {
-          newElement[elementAttribute] = val;
-        }
-      }
-    });
+    newElement = reviewToSchema(element);
     return newElement;
 
-  } else if (type === 'FoodEstablishmentReservation') {
+  case 'FoodEstablishmentReservation':
 
-    Object.keys(element).forEach(function(elementAttribute) {
-      var val = element[elementAttribute];
-      if (reservationSchemaElements.indexOf(elementAttribute) !==
-        -1) {
-        if (val !== 'undefined') {
-          newElement[elementAttribute] = val;
-        }
-      }
-    });
-    newElement.reservationId = unescape(element.id);
-    newElement.reservationFor.name = unescape(
-        newElement.reservationFor.name);
-    newElement.reservationFor.address['@type'] = 'postalAddress';
+    newElement = reservationToSchema(element);
     return newElement;
 
-  } else {
+  default:
     console.log('Undefined type received to convert');
-  }
 
+  }
 }
 
 function sortObject(element) {
@@ -382,7 +411,7 @@ function dataToSchema(listOfElements) {
 
   var newListOfElements = [];
 
-  newListOfElements = objectToArray(listOfElements);
+  listOfElements = objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
 
@@ -491,6 +520,9 @@ module.exports = {
   getRandomDate: getRandomDate,
   convertHtmlToText: convertHtmlToText,
   objectToArray: objectToArray,
+  restaurantToSchema: restaurantToSchema,
+  reviewToSchema: reviewToSchema,
+  reservationToSchema: reservationToSchema,
   objectDataToSchema: objectDataToSchema,
   sortObject: sortObject,
   dataToSchema: dataToSchema,
