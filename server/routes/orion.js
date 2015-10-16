@@ -261,19 +261,35 @@ exports.getRestaurantReviews = function (req, res) {
   });
 };
 
-exports.getOrganizationReviews = function(req, res) {
+exports.getOrganizationReviews = function (req, res) {
+  var organizationReviews = [];
+  var reviews = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Review','limit': '1000'})
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
+  .then(function (reviews){
+    authRequest(
+      '/v2/entities',
+      'GET',
+      {'type': 'Restaurant','limit': '1000'})
+    .then(function (restaurants){
+      organizationReviews = utils.getOrgReviews(
+        req.params.org,
+        restaurants.body,
+        reviews.body);
+      res.statusCode = restaurants.statusCode;
+      res.json(utils.dataToSchema(organizationReviews));
     })
-    .catch(function(err) {
+    .catch(function (err){
       res.statusCode = err.statusCode;
       res.end();
     });
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
 };
 
 // Reservations

@@ -573,6 +573,36 @@ function getRestaurantReviews(restaurant, listOfElements) {
   return newListOfElements;
 }
 
+function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
+
+  var newListOfElements = [];
+  var franchiseReviews = [];
+  var newListOfRestaurants = [];
+
+  listOfRestaurants = objectToArray(listOfRestaurants);
+  listOfReviews = objectToArray(listOfReviews);
+
+  Object.keys(listOfRestaurants).forEach(function (element, pos) {
+
+    if (listOfRestaurants[pos].department == franchise) {
+
+      newListOfRestaurants.push(listOfRestaurants[pos].id);
+
+    }
+  });
+
+  Object.keys(listOfReviews).forEach(function (element, pos) {
+
+    if (newListOfRestaurants.indexOf(
+      listOfReviews[pos].itemReviewed.name) !== -1) {
+
+      newListOfElements.push(listOfReviews[pos]);
+
+    }
+  });
+
+  return newListOfElements;
+}
 
 module.exports = {
   doGet: doGet,
@@ -597,5 +627,6 @@ module.exports = {
   reservationToOrion: reservationToOrion,
   getOrgRestaurants: getOrgRestaurants,
   getUserReviews: getUserReviews,
-  getRestaurantReviews: getRestaurantReviews
+  getRestaurantReviews: getRestaurantReviews,
+  getOrgReviews: getOrgReviews
 };
