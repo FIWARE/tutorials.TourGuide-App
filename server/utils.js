@@ -217,6 +217,17 @@ exports.convertHtmlToText = function(str) {
   return str;
 };
 
+exports.objectToArray = function(element) {
+
+  if (util.isArray(element) === false) {
+
+    var aux = element;
+    element = [];
+    element.push(aux);
+  }
+  return element;
+};
+
 exports.objectDataToSchema = function(element) {
 
   //-- Lists for matching JUST schema attributes
@@ -372,14 +383,7 @@ exports.dataToSchema = function(listOfElements) {
 
   var newListOfElements = [];
 
-  //-- If the object received is not a list, we add it inside one
-
-  if (util.isArray(listOfElements) === false) {
-
-    var aux = listOfElements;
-    listOfElements = [];
-    listOfElements.push(aux);
-  }
+  newListOfElements = utils.objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
 
