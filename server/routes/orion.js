@@ -225,20 +225,21 @@ exports.getReviews = function(req, res) {
     });
 };
 
-exports.getUserReviews = function(req, res) {
+exports.getUserReviews = function (req, res) {
+  var userReviews = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Review','limit': '1000'})
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
-
+  .then(function (data){
+    userReviews = utils.getUserReviews(req.params.user, data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(userReviews));
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
 };
 
 exports.getOrganizationReviews = function(req, res) {

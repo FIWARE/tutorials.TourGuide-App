@@ -537,6 +537,24 @@ function getOrgRestaurants(org, listOfElements) {
   return newListOfElements;
 }
 
+function getUserReviews(user, listOfElements) {
+
+  var newListOfElements = [];
+
+  listOfElements = objectToArray(listOfElements);
+
+  Object.keys(listOfElements).forEach(function (element, pos) {
+
+    if (listOfElements[pos].author.name == user) {
+
+      newListOfElements.push(listOfElements[pos]);
+
+    }
+  });
+
+  return newListOfElements;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -558,5 +576,6 @@ module.exports = {
   restaurantToOrion: restaurantToOrion,
   reviewToOrion: reviewToOrion,
   reservationToOrion: reservationToOrion,
-  getOrgRestaurants: getOrgRestaurants
+  getOrgRestaurants: getOrgRestaurants,
+  getUserReviews: getUserReviews
 };
