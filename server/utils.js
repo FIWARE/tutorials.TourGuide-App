@@ -5,12 +5,11 @@
 'use strict';
 var http = require('http');
 var https = require('https');
-var utils = require('./utils');
 var util = require('util');
 var shortid = require('shortid');
 var authRequest = require('./authrequest');
 
-exports.doGet = function(options, callback, res, useHttps) {
+function doGet(options, callback, res, useHttps) {
   var protocol = http;
   if (useHttps) {
     protocol = https;
@@ -51,9 +50,9 @@ exports.doGet = function(options, callback, res, useHttps) {
     callback(res, err);
     console.log(err);
   });
-};
+}
 
-exports.doPost = function(options, data, callback, res, useHttps) {
+function doPost(options, data, callback, res, useHttps) {
 
   try {
     var protocol = http;
@@ -95,9 +94,9 @@ exports.doPost = function(options, data, callback, res, useHttps) {
     callback(res, error);
     console.log(error);
   }
-};
+}
 
-exports.replaceOnceUsingDictionary = function(dictionary, content,
+function replaceOnceUsingDictionary(dictionary, content,
   replacehandler) {
   if (typeof replacehandler !== 'function') {
     // Default replacehandler function.
@@ -154,17 +153,17 @@ exports.replaceOnceUsingDictionary = function(dictionary, content,
   }
   output.push(content.substring(lastIndex, content.length));
   return output.join('');
-};
+}
 
-exports.randomIntInc = function(low, high) {
+function randomIntInc(low, high) {
   return Math.floor(Math.random() * (high - low + 1) + low);
-};
+}
 
-exports.randomElement = function(elements) {
+function randomElement(elements) {
   return elements[Math.floor(Math.random() * elements.length)];
-};
+}
 
-exports.fixedEncodeURIComponent = function(str) {
+function fixedEncodeURIComponent(str) {
   str = str.replace(/["]/g, '\\"');
   str = str.replace(/\n/g, '\\n');
   return str.replace(/[<>"'=;()\n\\]/g, function(c) {
@@ -172,9 +171,9 @@ exports.fixedEncodeURIComponent = function(str) {
     hex = c.charCodeAt(0).toString(16);
     return '%' + ((hex.length === 2) ? hex : '0' + hex);
   });
-};
+}
 
-exports.getRandomDate = function(from, to) {
+function getRandomDate(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
   } else {
@@ -186,9 +185,9 @@ exports.getRandomDate = function(from, to) {
     to = to.getTime();
   }
   return new Date(from + Math.random() * (to - from));
-};
+}
 
-exports.convertHtmlToText = function(str) {
+function convertHtmlToText(str) {
 
   //-- remove BR tags and replace them with line break
   str = str.replace(/<br>/gi, '\n');
@@ -215,9 +214,9 @@ exports.convertHtmlToText = function(str) {
 
   //-- return
   return str;
-};
+}
 
-exports.objectToArray = function(element) {
+function objectToArray(element) {
 
   if (util.isArray(element) === false) {
 
@@ -226,9 +225,9 @@ exports.objectToArray = function(element) {
     element.push(aux);
   }
   return element;
-};
+}
 
-exports.objectDataToSchema = function(element) {
+function objectDataToSchema(element) {
 
   //-- Lists for matching JUST schema attributes
 
@@ -358,9 +357,9 @@ exports.objectDataToSchema = function(element) {
     console.log('Undefined type received to convert');
   }
 
-};
+}
 
-exports.sortObject = function(element) {
+function sortObject(element) {
   var sorted = {};
   var key;
   var aux = [];
@@ -377,26 +376,26 @@ exports.sortObject = function(element) {
     sorted[aux[key]] = element[aux[key]];
   }
   return sorted;
-};
+}
 
-exports.dataToSchema = function(listOfElements) {
+function dataToSchema(listOfElements) {
 
   var newListOfElements = [];
 
-  newListOfElements = utils.objectToArray(listOfElements);
+  newListOfElements = objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
 
-    var newElement = utils.objectDataToSchema(listOfElements[
+    var newElement = objectDataToSchema(listOfElements[
       pos]);
     newListOfElements.push(newElement);
 
   });
 
   return newListOfElements;
-};
+}
 
-exports.fixAddress = function(schemaObject, geoObject) {
+function fixAddress(schemaObject, geoObject) {
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
       schemaObject.address.streetAddress =
@@ -422,9 +421,9 @@ exports.fixAddress = function(schemaObject, geoObject) {
     }
   }
   return schemaObject;
-};
+}
 
-exports.addGeolocation = function(schemaObject, geoObject) {
+function addGeolocation(schemaObject, geoObject) {
   if (geoObject) {
     schemaObject.location = {};
     schemaObject.location.type = 'geo:point';
@@ -433,23 +432,23 @@ exports.addGeolocation = function(schemaObject, geoObject) {
       geoObject.longitude;
   }
   return schemaObject;
-};
+}
 
-exports.restaurantToOrion = function(schemaObject, geoObject) {
+function restaurantToOrion(schemaObject, geoObject) {
 
   schemaObject.type = schemaObject['@type'];
   schemaObject.id = schemaObject.name;
   delete schemaObject['@type'];
   delete schemaObject.name;
 
-  schemaObject = utils.addGeolocation(schemaObject, geoObject);
-  schemaObject = utils.fixAddress(schemaObject, geoObject);
+  schemaObject = addGeolocation(schemaObject, geoObject);
+  schemaObject = fixAddress(schemaObject, geoObject);
 
-  return utils.sortObject(schemaObject);
+  return sortObject(schemaObject);
 
-};
+}
 
-exports.reviewToOrion = function(schemaObject) {
+function reviewToOrion(schemaObject) {
 
   // -- TODO: add user from session
   // -- TODO: check how to implement 'position field'
@@ -465,11 +464,11 @@ exports.reviewToOrion = function(schemaObject) {
   schemaObject.author = {};
   schemaObject.author['@type'] = 'Person';
   schemaObject.dateCreated = Date.now();
-  return utils.sortObject(schemaObject);
+  return sortObject(schemaObject);
 
-};
+}
 
-exports.reservationToOrion = function(schemaObject) {
+function reservationToOrion(schemaObject) {
 
   // -- TODO: add user from session
 
@@ -480,4 +479,24 @@ exports.reservationToOrion = function(schemaObject) {
   schemaObject.underName = {};
   schemaObject.underName['@type'] = 'Person';
   return schemaObject;
+}
+
+module.exports = {
+  doGet: doGet,
+  doPost: doPost,
+  replaceOnceUsingDictionary: replaceOnceUsingDictionary,
+  randomIntInc: randomIntInc,
+  randomElement: randomElement,
+  fixedEncodeURIComponent: fixedEncodeURIComponent,
+  getRandomDate: getRandomDate,
+  convertHtmlToText: convertHtmlToText,
+  objectToArray: objectToArray,
+  objectDataToSchema: objectDataToSchema,
+  sortObject: sortObject,
+  dataToSchema: dataToSchema,
+  fixAddress: fixAddress,
+  addGeolocation: addGeolocation,
+  restaurantToOrion: restaurantToOrion,
+  reviewToOrion: reviewToOrion,
+  reservationToOrion: reservationToOrion
 };
