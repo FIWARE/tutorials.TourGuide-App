@@ -260,8 +260,13 @@ function restaurantToSchema(element) {
   // array for sensors
   var additionalProperty = [];
 
+  // -- Element value
+
+  var val;
+
   Object.keys(element).forEach(function(elementAttribute) {
-    var val = element[elementAttribute];
+    
+    val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
       if (val !== 'undefined') {
@@ -317,8 +322,10 @@ function reviewToSchema(element) {
     '@type': element.type
   };
 
+  var val;
+
   Object.keys(element).forEach(function(elementAttribute) {
-      var val = element[elementAttribute];
+      val = element[elementAttribute];
       if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
         if (val !== 'undefined') {
           newElement[elementAttribute] = val;
@@ -343,8 +350,10 @@ function reservationToSchema(element) {
     '@type': element.type
   };
 
+  var val;
+
   Object.keys(element).forEach(function(elementAttribute) {
-    var val = element[elementAttribute];
+    val = element[elementAttribute];
     if (reservationSchemaElements.indexOf(elementAttribute) !==
       -1) {
       if (val !== 'undefined') {
@@ -410,13 +419,13 @@ function sortObject(element) {
 function dataToSchema(listOfElements) {
 
   var newListOfElements = [];
+  var newElement;
 
   listOfElements = objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
 
-    var newElement = objectDataToSchema(listOfElements[
-      pos]);
+    newElement = objectDataToSchema(listOfElements[pos]);
     newListOfElements.push(newElement);
 
   });
