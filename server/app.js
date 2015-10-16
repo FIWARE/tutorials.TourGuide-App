@@ -46,6 +46,8 @@ app.get('/api/orion/restaurant/:id', orion.readRestaurant);
 app.patch('/api/orion/restaurant/:id', orion.updateRestaurant);
 app.delete('/api/orion/restaurant/:id', orion.deleteRestaurant);
 app.get('/api/orion/restaurants', orion.getRestaurants);
+app.get('/api/orion/restaurants/organization/:org',
+  orion.getOrganizationRestaurants);
 
 app.post('/api/orion/review', orion.createReview);
 app.get('/api/orion/review/:id', orion.readReview);

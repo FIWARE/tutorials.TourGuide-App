@@ -519,6 +519,24 @@ function reservationToOrion(schemaObject) {
   return schemaObject;
 }
 
+function getOrgRestaurants(org, listOfElements) {
+
+  var newListOfElements = [];
+
+  listOfElements = objectToArray(listOfElements);
+
+  Object.keys(listOfElements).forEach(function (element, pos) {
+
+    if (listOfElements[pos].department == org) {
+
+      newListOfElements.push(listOfElements[pos]);
+
+    }
+  });
+
+  return newListOfElements;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -539,5 +557,6 @@ module.exports = {
   addGeolocation: addGeolocation,
   restaurantToOrion: restaurantToOrion,
   reviewToOrion: reviewToOrion,
-  reservationToOrion: reservationToOrion
+  reservationToOrion: reservationToOrion,
+  getOrgRestaurants: getOrgRestaurants
 };

@@ -127,19 +127,23 @@ exports.getUserRestaurants = function(req, res) {
 
 };
 
-exports.getOrganizationRestaurants = function(req, res) {
+exports.getOrganizationRestaurants = function (req, res) {
+  var organizationRestaurants = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Restaurant','limit': '1000'})
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  .then(function (data){
+    organizationRestaurants = utils.getOrgRestaurants(
+      req.params.org,
+      data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(organizationRestaurants));
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
 };
 
 // Reviews
