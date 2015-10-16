@@ -55,6 +55,8 @@ app.patch('/api/orion/review/:id', orion.updateReview);
 app.delete('/api/orion/review/:id', orion.deleteReview);
 app.get('/api/orion/reviews', orion.getReviews);
 app.get('/api/orion/reviews/user/:user', orion.getUserReviews);
+app.get('/api/orion/reviews/restaurant/:restaurant',
+  orion.getRestaurantReviews);
 
 app.post('/api/orion/reservation', orion.createReservation);
 app.get('/api/orion/reservation/:id', orion.readReservation);

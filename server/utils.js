@@ -555,6 +555,25 @@ function getUserReviews(user, listOfElements) {
   return newListOfElements;
 }
 
+function getRestaurantReviews(restaurant, listOfElements) {
+
+  var newListOfElements = [];
+
+  listOfElements = objectToArray(listOfElements);
+
+  Object.keys(listOfElements).forEach(function (element, pos) {
+
+    if (listOfElements[pos].itemReviewed.name == restaurant) {
+
+      newListOfElements.push(listOfElements[pos]);
+
+    }
+  });
+
+  return newListOfElements;
+}
+
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -577,5 +596,6 @@ module.exports = {
   reviewToOrion: reviewToOrion,
   reservationToOrion: reservationToOrion,
   getOrgRestaurants: getOrgRestaurants,
-  getUserReviews: getUserReviews
+  getUserReviews: getUserReviews,
+  getRestaurantReviews: getRestaurantReviews
 };

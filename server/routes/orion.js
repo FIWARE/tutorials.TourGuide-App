@@ -242,6 +242,25 @@ exports.getUserReviews = function (req, res) {
   });
 };
 
+exports.getRestaurantReviews = function (req, res) {
+  var restaurantReviews = [];
+  authRequest(
+    '/v2/entities',
+    'GET',
+    {'type': 'Review','limit': '1000'})
+  .then(function (data){
+    restaurantReviews = utils.getRestaurantReviews(
+      req.params.restaurant,
+      data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(restaurantReviews));
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
+};
+
 exports.getOrganizationReviews = function(req, res) {
   authRequest(
     '/v2/entities',
