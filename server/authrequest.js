@@ -52,7 +52,8 @@ function performRequest(endpoint, method, data) {
     options = {
       method: 'DELETE',
       uri: host + ':' + port + endpoint,
-      resolveWithFullResponse: true
+      resolveWithFullResponse: true,
+      json: true
     };
     break;
   default:
