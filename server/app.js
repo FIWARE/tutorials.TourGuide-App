@@ -69,6 +69,8 @@ app.get('/api/orion/reservations', orion.getReservations);
 app.get('/api/orion/reservations/user/:user', orion.getUserReservations);
 app.get('/api/orion/reservations/restaurant/:restaurant',
   orion.getRestaurantReservations);
+app.get('/api/orion/reservations/organization/:org',
+  orion.getOrganizationReservations);
 
 // Sensors
 

@@ -263,7 +263,6 @@ exports.getRestaurantReviews = function (req, res) {
 
 exports.getOrganizationReviews = function (req, res) {
   var organizationReviews = [];
-  var reviews = [];
   authRequest(
     '/v2/entities',
     'GET',
@@ -420,19 +419,34 @@ exports.getRestaurantReservations = function (req, res) {
   });
 };
 
-exports.getOrganizationsReservations = function(req, res) {
+exports.getOrganizationReservations = function(req, res) {
+  var organizationsReservations = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'FoodEstablishmentReservation','limit': '1000'})
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
+  .then(function (reservations){
+    authRequest(
+      '/v2/entities',
+      'GET',
+      {'type': 'Restaurant','limit': '1000'})
+    .then(function (restaurants){
+      organizationsReservations = utils.getOrgReservations(
+        req.params.org,
+        restaurants.body,
+        reservations.body);
+      res.statusCode = restaurants.statusCode;
+      res.json(utils.dataToSchema(organizationsReservations));
     })
-    .catch(function(err) {
+    .catch(function (err){
       res.statusCode = err.statusCode;
       res.end();
     });
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
 };
 
 // Sensors
