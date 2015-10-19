@@ -19,6 +19,9 @@
     "url": "https://github.com/Bitergia/fiware-devguide-app"
   },
   "devDependencies": {
-    "jshint": "^2.8.0"
+    "jshint": "^2.8.0",
+    "grunt": "~0.4.5",
+    "grunt-jscs": "~2.1.0",
+    "grunt-contrib-jshint": "~0.11.3"
   }
 }
