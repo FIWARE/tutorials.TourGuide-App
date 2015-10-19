@@ -1,10 +1,12 @@
-/* jshint node:true */
 /*
  * idasul20.js
  * Copyright(c) 2015 Bitergia
  * Author: David Muriel <dmuriel@bitergia.com>
  * MIT Licensed
 */
+
+// jshint node: true
+
 'use strict';
 
 var http = require('http');
@@ -143,8 +145,12 @@ function registerSensor(name, type) {
 
   // build payload
   var data = sensorsTemplates[type];
-  data['devices'][0]['device_id'] = entityName;
-  data['devices'][0]['entity_name'] = entityName;
+  // jshint camelcase: false
+  // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+  data.devices[0].device_id = entityName;
+  data.devices[0].entity_name = entityName;
+  // jshint camelcase: true
+  // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
   var dataString = JSON.stringify(data);
   headers['Content-Length'] = dataString.length;
@@ -175,8 +181,9 @@ function registerSensor(name, type) {
       if (res.statusCode == 201) {
         console.log('Registered new device: ' + entityName);
         q.resolve(responseString);
-      } else if (res.statusCode == 409 &&
-                 responseObject.reason == 'There are conflicts, entity already exists') {
+      } else if (
+        res.statusCode == 409 &&
+        responseObject.reason == 'There are conflicts, entity already exists') {
         console.log('Device', entityName, 'already exists.');
         q.resolve(responseString);
       } else {

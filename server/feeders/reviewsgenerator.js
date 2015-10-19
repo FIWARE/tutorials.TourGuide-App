@@ -1,20 +1,22 @@
-/*jshint node:true */
 /*
  * reviews_generator.js
  * Copyright(c) 2015 Bitergia
- * Author: Alvaro del Castillo <acs@bitergia.com>, 
+ * Author: Alvaro del Castillo <acs@bitergia.com>,
  * Alberto Martín <amartin@bitergia.com>
  * MIT Licensed
 
   Generates random reviews for restaurants in orion
 
   First it gets all restaurant information
-  Then a random automatic review is generated 
+  Then a random automatic review is generated
   Then the review is added to Orion CB
 
   TODO:
   - Create more real reviews using templates for comments and random ratings
 */
+
+// jshint node: true
+
 'use strict';
 
 var utils = require('../utils');
@@ -42,11 +44,10 @@ var feedOrionReviews = function() {
 
     authRequest('/v2/entities', 'POST', attributes)
     .then(callback)
-    .catch(function(err){
+    .catch(function(err) {
       console.log(err);
     });
   }, apiRestSimtasks);
-
 
   q.drain = function() {
     console.log('Total reviews added: ' + reviewsAdded);

@@ -1,4 +1,5 @@
-/* jshint node:true */
+// jshint node: true
+
 var config = {};
 
 // URL to the FI-WARE Identity Management GE

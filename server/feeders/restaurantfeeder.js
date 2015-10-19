@@ -1,8 +1,7 @@
-/*jshint node:true */
 /*
  * restaurantfeeder.js
  * Copyright(c) 2015 Bitergia
- * Author: Alvaro del Castillo <acs@bitergia.com>, 
+ * Author: Alvaro del Castillo <acs@bitergia.com>,
  * Alberto Martín <alberto.martin@bitergia.com>
  * MIT Licensed
 
@@ -12,6 +11,9 @@
   Then restaurant geocode is gathered using Google API in serial execution
   Then all restaurant data is added to Orion CB
 */
+
+// jshint node: true
+
 'use strict';
 
 var utils = require('../utils');
@@ -31,14 +33,14 @@ var geoWaitTimeMs = 200; // Wait ms between calls to Google API
 var restaurantsData; // All data for the restaurants
 var apiCount = 0; // 2500 requests per day, be careful
 
-var getAddress = function (restaurant) {
+var getAddress = function(restaurant) {
   var address = restaurant.address + ' ';
   address += restaurant.municipality;
   return address;
 };
 
-var feedOrionRestaurants = function () {
-  var returnPost = function (data) {
+var feedOrionRestaurants = function() {
+  var returnPost = function(data) {
     restaurantsAdded++;
     console.log(restaurantsAdded + '/' + restaurantsData.length);
   };
@@ -49,19 +51,19 @@ var feedOrionRestaurants = function () {
   console.log('Number of restaurants: ' + restaurantsData.length);
 
   // Limit the number of calls to be done in parallel to orion
-  var q = async.queue(function (task, callback) {
+  var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
     var address = attributes.address.streetAddress + ' ' +
     attributes.address.addressRegion;
 
-    setTimeout(function () {
+    setTimeout(function() {
      geocoder.geocode(address)
      .then(function(geoRes) {
       attributes = utils.addGeolocation(attributes, geoRes[0]);
       attributes = utils.fixAddress(attributes, geoRes[0]);
       authRequest('/v2/entities', 'POST', attributes)
       .then(callback)
-      .catch(function(err){
+      .catch(function(err) {
         console.log(err);
       });
     })
@@ -69,15 +71,14 @@ var feedOrionRestaurants = function () {
       console.log(err);
       authRequest('/v2/entities', 'POST', attributes)
       .then(callback)
-      .catch(function(err){
+      .catch(function(err) {
         console.log(err);
       });
     });
    }, geoWaitTimeMs);
   }, apiRestSimtasks);
 
-
-  q.drain = function () {
+  q.drain = function() {
     console.log('Total restaurants added: ' + restaurantsAdded);
   };
 
@@ -97,7 +98,7 @@ var feedOrionRestaurants = function () {
     'municipalityCode': 'postalCode'
   };
 
-  Object.keys(restaurantsData).forEach(function (element, pos) {
+  Object.keys(restaurantsData).forEach(function(element, pos) {
 
     var rname = restaurantsData[pos].documentName;
 
@@ -118,7 +119,7 @@ var feedOrionRestaurants = function () {
     attr.aggregateRating.reviewCount = utils.randomIntInc(1,
       100);
 
-    Object.keys(restaurantsData[pos]).forEach(function (element) {
+    Object.keys(restaurantsData[pos]).forEach(function(element) {
 
       var val = restaurantsData[pos][element];
 
@@ -127,7 +128,7 @@ var feedOrionRestaurants = function () {
         if (val !== 'undefined' && val !== '') {
           element = utils.replaceOnceUsingDictionary(
             addressDictionary, element,
-            function (key, dictionary) {
+            function(key, dictionary) {
               return dictionary[key];
             });
           attr.address[utils.fixedEncodeURIComponent(element)] =
@@ -140,7 +141,7 @@ var feedOrionRestaurants = function () {
 
             element = utils.replaceOnceUsingDictionary(
               dictionary, element,
-              function (key, dictionary) {
+              function(key, dictionary) {
                 return dictionary[key];
               });
             attr[utils.fixedEncodeURIComponent(element)] =
@@ -155,8 +156,8 @@ var feedOrionRestaurants = function () {
 };
 
 // Load restaurant data in Orion
-var loadRestaurantData = function () {
-  var processGet = function (res, data) {
+var loadRestaurantData = function() {
+  var processGet = function(res, data) {
     fs.writeFileSync(cacheFile, data);
     restaurantsData = JSON.parse(data);
     feedOrionRestaurants();

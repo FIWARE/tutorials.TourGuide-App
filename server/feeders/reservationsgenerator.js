@@ -1,18 +1,20 @@
-/*jshint node:true */
 /*
  * reservations_generator.js
  * Copyright(c) 2015 Bitergia
- * Author: Alvaro del Castillo <acs@bitergia.com>, 
+ * Author: Alvaro del Castillo <acs@bitergia.com>,
  * Alberto Martín <amartin@bitergia.com>
  * MIT Licensed
 
   Generates random reservations for restaurants in orion
 
   First it gets all restaurant information
-  Then a random automatic reservation is generated 
+  Then a random automatic reservation is generated
   Then the reservation is added to Orion CB
 
 */
+
+// jshint node: true
+
 'use strict';
 
 var utils = require('../utils');
@@ -40,11 +42,10 @@ var feedOrionReservations = function() {
 
     authRequest('/v2/entities', 'POST', attributes)
     .then(callback)
-    .catch(function(err){
+    .catch(function(err) {
       console.log(err);
     });
   }, apiRestSimtasks);
-
 
   q.drain = function() {
     console.log('Total reservations added: ' + reservationsAdded);
@@ -93,10 +94,10 @@ var loadRestaurantData = function() {
 
   authRequest(
     '/v2/entities',
-    'GET', 
+    'GET',
     {'type': 'Restaurant','limit': '1000'})
   .then(processRestaurants)
-  .catch(function(err){
+  .catch(function(err) {
     console.log(err);
   });
 };

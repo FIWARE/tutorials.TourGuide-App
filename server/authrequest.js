@@ -1,6 +1,7 @@
-/* jshint node:true */
-/* jshint maxlen: 80 */
+// jshint node: true
+
 'use strict';
+
 var rp = require('request-promise');
 var querystring = require('querystring');
 var Q = require('q');

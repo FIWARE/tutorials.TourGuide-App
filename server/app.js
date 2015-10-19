@@ -1,5 +1,7 @@
-/*jshint node:true */
+// jshint node: true
+
 'use strict';
+
 var express = require('express');
 var auth = require('./auth');
 var site = require('./site');
@@ -13,7 +15,7 @@ app.use(express.cookieParser());
 app.use(express.session({
   secret: '08bf59703922c49573f008b4ce58b5b0'
 }));
-app.configure(function () {
+app.configure(function() {
   app.use(express.errorHandler({
     dumpExceptions: true,
     showStack: true
@@ -60,7 +62,6 @@ app.get('/api/orion/reviews/restaurant/:restaurant',
 app.get('/api/orion/reviews/organization/:org',
   orion.getOrganizationReviews);
 
-
 app.post('/api/orion/reservation', orion.createReservation);
 app.get('/api/orion/reservation/:id', orion.readReservation);
 app.patch('/api/orion/reservation/:id', orion.updateReservation);
@@ -78,13 +79,13 @@ app.post('/api/orion/sensors', orion.updateSensors);
 
 // END API REST
 
-app.get('*', function (req, res, next) {
+app.get('*', function(req, res, next) {
   var err = new Error();
   err.status = 404;
   next(err);
 });
 
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   if (err.status !== 404) {
     return next();
   }
@@ -95,6 +96,6 @@ app.use(function (err, req, res, next) {
 
 // start server
 app.set('port', process.env.PORT || 3000);
-var server = app.listen(app.get('port'), function () {
+var server = app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
 });

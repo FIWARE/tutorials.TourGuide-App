@@ -1,4 +1,3 @@
-/* jshint node:true */
 /*
  * sensorsgenerator.js
  * Copyright(c) 2015 Bitergia
@@ -11,6 +10,9 @@
   Then registers the sensors for each restaurant.
 
 */
+
+// jshint node: true
+
 'use strict';
 
 var async = require('async');

@@ -1,8 +1,11 @@
-/* jshint node:true */
 /*
  * Orion-V2 REST API
  */
+
+// jshint node: true
+
 'use strict';
+
 var authRequest = require('../authrequest');
 var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
@@ -135,20 +138,20 @@ exports.getUserRestaurants = function(req, res) {
 
 };
 
-exports.getOrganizationRestaurants = function (req, res) {
+exports.getOrganizationRestaurants = function(req, res) {
   var organizationRestaurants = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Restaurant','limit': '1000'})
-  .then(function (data){
+  .then(function(data) {
     organizationRestaurants = utils.getOrgRestaurants(
       req.params.org,
       data.body);
     res.statusCode = data.statusCode;
     res.json(utils.dataToSchema(organizationRestaurants));
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
@@ -254,54 +257,54 @@ exports.getReviews = function(req, res) {
     });
 };
 
-exports.getUserReviews = function (req, res) {
+exports.getUserReviews = function(req, res) {
   var userReviews = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Review','limit': '1000'})
-  .then(function (data){
+  .then(function(data) {
     userReviews = utils.getUserReviews(req.params.user, data.body);
     res.statusCode = data.statusCode;
     res.json(utils.dataToSchema(userReviews));
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
 };
 
-exports.getRestaurantReviews = function (req, res) {
+exports.getRestaurantReviews = function(req, res) {
   var restaurantReviews = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Review','limit': '1000'})
-  .then(function (data){
+  .then(function(data) {
     restaurantReviews = utils.getRestaurantReviews(
       req.params.restaurant,
       data.body);
     res.statusCode = data.statusCode;
     res.json(utils.dataToSchema(restaurantReviews));
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
 };
 
-exports.getOrganizationReviews = function (req, res) {
+exports.getOrganizationReviews = function(req, res) {
   var organizationReviews = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'Review','limit': '1000'})
-  .then(function (reviews){
+  .then(function(reviews) {
     authRequest(
       '/v2/entities',
       'GET',
       {'type': 'Restaurant','limit': '1000'})
-    .then(function (restaurants){
+    .then(function(restaurants) {
       organizationReviews = utils.getOrgReviews(
         req.params.org,
         restaurants.body,
@@ -309,12 +312,12 @@ exports.getOrganizationReviews = function (req, res) {
       res.statusCode = restaurants.statusCode;
       res.json(utils.dataToSchema(organizationReviews));
     })
-    .catch(function (err){
+    .catch(function(err) {
       res.statusCode = err.statusCode;
       res.end();
     });
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
@@ -420,39 +423,39 @@ exports.getReservations = function(req, res) {
     });
 };
 
-exports.getUserReservations = function (req, res) {
+exports.getUserReservations = function(req, res) {
   var userReservations = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'FoodEstablishmentReservation','limit': '1000'})
-  .then(function (data){
+  .then(function(data) {
     userReservations = utils.getUserReservations(
       req.params.user,
       data.body);
     res.statusCode = data.statusCode;
     res.json(utils.dataToSchema(userReservations));
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
 };
 
-exports.getRestaurantReservations = function (req, res) {
+exports.getRestaurantReservations = function(req, res) {
   var restaurantReservations = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'FoodEstablishmentReservation','limit': '1000'})
-  .then(function (data){
+  .then(function(data) {
     restaurantReservations = utils.getRestaurantReservations(
       req.params.restaurant,
       data.body);
     res.statusCode = data.statusCode;
     res.json(utils.dataToSchema(restaurantReservations));
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });
@@ -464,12 +467,12 @@ exports.getOrganizationReservations = function(req, res) {
     '/v2/entities',
     'GET',
     {'type': 'FoodEstablishmentReservation','limit': '1000'})
-  .then(function (reservations){
+  .then(function(reservations) {
     authRequest(
       '/v2/entities',
       'GET',
       {'type': 'Restaurant','limit': '1000'})
-    .then(function (restaurants){
+    .then(function(restaurants) {
       organizationsReservations = utils.getOrgReservations(
         req.params.org,
         restaurants.body,
@@ -477,12 +480,12 @@ exports.getOrganizationReservations = function(req, res) {
       res.statusCode = restaurants.statusCode;
       res.json(utils.dataToSchema(organizationsReservations));
     })
-    .catch(function (err){
+    .catch(function(err) {
       res.statusCode = err.statusCode;
       res.end();
     });
   })
-  .catch(function (err){
+  .catch(function(err) {
     res.statusCode = err.statusCode;
     res.end();
   });

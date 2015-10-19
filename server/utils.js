@@ -1,8 +1,11 @@
-/* jshint node: true, nonstandard: true */
 /*
  * DevGuide Utils
  */
+
+// jshint node: true, nonstandard: true
+
 'use strict';
+
 var http = require('http');
 var https = require('https');
 var util = require('util');
@@ -265,7 +268,7 @@ function restaurantToSchema(element) {
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
-    
+
     val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
@@ -525,7 +528,7 @@ function getOrgRestaurants(org, listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     if (listOfElements[pos].department == org) {
 
@@ -543,7 +546,7 @@ function getUserReviews(user, listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     if (listOfElements[pos].author.name == user) {
 
@@ -561,7 +564,7 @@ function getRestaurantReviews(restaurant, listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     if (listOfElements[pos].itemReviewed.name == restaurant) {
 
@@ -582,7 +585,7 @@ function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
   listOfRestaurants = objectToArray(listOfRestaurants);
   listOfReviews = objectToArray(listOfReviews);
 
-  Object.keys(listOfRestaurants).forEach(function (element, pos) {
+  Object.keys(listOfRestaurants).forEach(function(element, pos) {
 
     if (listOfRestaurants[pos].department == franchise) {
 
@@ -591,7 +594,7 @@ function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
     }
   });
 
-  Object.keys(listOfReviews).forEach(function (element, pos) {
+  Object.keys(listOfReviews).forEach(function(element, pos) {
 
     if (newListOfRestaurants.indexOf(
       listOfReviews[pos].itemReviewed.name) !== -1) {
@@ -610,7 +613,7 @@ function getUserReservations(user, listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     if (listOfElements[pos].underName.name == user) {
 
@@ -628,7 +631,7 @@ function getRestaurantReservations(restaurant, listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function (element, pos) {
+  Object.keys(listOfElements).forEach(function(element, pos) {
 
     if (listOfElements[pos].reservationFor.name == restaurant) {
 
@@ -649,7 +652,7 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   listOfRestaurants = objectToArray(listOfRestaurants);
   listOfReservations = objectToArray(listOfReservations);
 
-  Object.keys(listOfRestaurants).forEach(function (element, pos) {
+  Object.keys(listOfRestaurants).forEach(function(element, pos) {
 
     if (listOfRestaurants[pos].department == franchise) {
 
@@ -658,7 +661,7 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
     }
   });
 
-  Object.keys(listOfReservations).forEach(function (element, pos) {
+  Object.keys(listOfReservations).forEach(function(element, pos) {
 
     if (newListOfRestaurants.indexOf(
       listOfReservations[pos].reservationFor.name) !== -1) {
