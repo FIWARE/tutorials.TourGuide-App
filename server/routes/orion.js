@@ -158,11 +158,17 @@ exports.getOrganizationRestaurants = function (req, res) {
 
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
-  elementToOrion = utils.reviewToOrion(elementToOrion);
+  // -- We first get information regarding the restaurant
   authRequest(
-    '/v2/entities',
-    'POST',
-    elementToOrion)
+    '/v2/entities/' + encodeURIComponent(elementToOrion.itemReviewed.name),
+    'GET',
+    {'type': 'Restaurant'})
+  .then(function(data) {
+    elementToOrion = utils.reviewToOrion(elementToOrion);
+    authRequest(
+      '/v2/entities',
+      'POST',
+      elementToOrion)
     .then(function(data) {
       res.headers = data.headers;
       res.location('/api/orion/review/' + elementToOrion.id);
@@ -170,11 +176,16 @@ exports.createReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
       res.end();
     });
+  })
+  .catch(function(err) {
+    res.error = err.error;
+    res.statusCode = err.statusCode;
+    res.json(res.error);
+    res.end();
+  });
 };
 
 exports.readReview = function(req, res) {
