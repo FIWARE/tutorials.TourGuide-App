@@ -61,7 +61,9 @@ exports.readRestaurant = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -76,7 +78,9 @@ exports.updateRestaurant = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -91,7 +95,9 @@ exports.deleteRestaurant = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -164,7 +170,9 @@ exports.createReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -179,7 +187,9 @@ exports.readReview = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -194,7 +204,9 @@ exports.updateReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -209,7 +221,9 @@ exports.deleteReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -324,7 +338,9 @@ exports.createReservation = function(req, res) {
         });
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -339,7 +355,9 @@ exports.readReservation = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -354,7 +372,9 @@ exports.updateReservation = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
@@ -368,7 +388,9 @@ exports.deleteReservation = function(req, res) {
       res.end();
     })
     .catch(function(err) {
+      res.error = err.error;
       res.statusCode = err.statusCode;
+      res.json(res.error);
       res.end();
     });
 };
