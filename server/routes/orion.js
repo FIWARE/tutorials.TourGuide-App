@@ -401,6 +401,25 @@ exports.getUserReservations = function (req, res) {
   });
 };
 
+exports.getRestaurantReservations = function (req, res) {
+  var restaurantReservations = [];
+  authRequest(
+    '/v2/entities',
+    'GET',
+    {'type': 'FoodEstablishmentReservation','limit': '1000'})
+  .then(function (data){
+    restaurantReservations = utils.getRestaurantReservations(
+      req.params.restaurant,
+      data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(restaurantReservations));
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
+};
+
 exports.getOrganizationsReservations = function(req, res) {
   authRequest(
     '/v2/entities',

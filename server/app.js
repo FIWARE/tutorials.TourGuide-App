@@ -67,6 +67,8 @@ app.patch('/api/orion/reservation/:id', orion.updateReservation);
 app.delete('/api/orion/reservation/:id', orion.deleteReservation);
 app.get('/api/orion/reservations', orion.getReservations);
 app.get('/api/orion/reservations/user/:user', orion.getUserReservations);
+app.get('/api/orion/reservations/restaurant/:restaurant',
+  orion.getRestaurantReservations);
 
 // Sensors
 

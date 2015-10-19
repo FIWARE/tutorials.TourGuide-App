@@ -622,6 +622,24 @@ function getUserReservations(user, listOfElements) {
   return newListOfElements;
 }
 
+function getRestaurantReservations(restaurant, listOfElements) {
+
+  var newListOfElements = [];
+
+  listOfElements = objectToArray(listOfElements);
+
+  Object.keys(listOfElements).forEach(function (element, pos) {
+
+    if (listOfElements[pos].reservationFor.name == restaurant) {
+
+      newListOfElements.push(listOfElements[pos]);
+
+    }
+  });
+
+  return newListOfElements;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -647,5 +665,6 @@ module.exports = {
   getUserReviews: getUserReviews,
   getRestaurantReviews: getRestaurantReviews,
   getOrgReviews: getOrgReviews,
-  getUserReservations: getUserReservations
+  getUserReservations: getUserReservations,
+  getRestaurantReservations: getRestaurantReservations
 };
