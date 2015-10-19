@@ -382,19 +382,23 @@ exports.getReservations = function(req, res) {
     });
 };
 
-exports.getUserReservations = function(req, res) {
+exports.getUserReservations = function (req, res) {
+  var userReservations = [];
   authRequest(
     '/v2/entities',
     'GET',
     {'type': 'FoodEstablishmentReservation','limit': '1000'})
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  .then(function (data){
+    userReservations = utils.getUserReservations(
+      req.params.user,
+      data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(userReservations));
+  })
+  .catch(function (err){
+    res.statusCode = err.statusCode;
+    res.end();
+  });
 };
 
 exports.getOrganizationsReservations = function(req, res) {
