@@ -24,6 +24,8 @@ exports.createRestaurant = function(req, res) {
         'POST',
         elementToOrion)
         .then(function(data) {
+          res.headers = data.headers;
+          res.location('/api/orion/restaurant/' + elementToOrion.id);
           res.statusCode = data.statusCode;
           res.end();
         })
@@ -156,6 +158,8 @@ exports.createReview = function(req, res) {
     'POST',
     elementToOrion)
     .then(function(data) {
+      res.headers = data.headers;
+      res.location('/api/orion/review/' + elementToOrion.id);
       res.statusCode = data.statusCode;
       res.end();
     })
@@ -309,6 +313,8 @@ exports.createReservation = function(req, res) {
         'POST',
         elementToOrion)
         .then(function(data) {
+          res.headers = data.headers;
+          res.location('/api/orion/reservation/' + elementToOrion.id);
           res.statusCode = data.statusCode;
           res.end();
         })
