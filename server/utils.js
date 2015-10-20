@@ -523,7 +523,8 @@ function reservationToOrion(schemaObject) {
   schemaObject.id = rname;
   schemaObject.underName = {};
   schemaObject.underName['@type'] = 'Person';
-  return schemaObject;
+  schemaObject.reservationStatus = 'Pending';
+  return sortObject(schemaObject);
 }
 
 function getOrgRestaurants(org, listOfElements) {
