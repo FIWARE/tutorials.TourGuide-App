@@ -7,7 +7,7 @@ module.exports = function(grunt) {
   // configuration
   grunt.initConfig({
 
-    srcfiles: ['*.js', 'routes/*.js','feeders/*.js', 'idas/*.js'],
+    srcfiles: ['spec/*.js', '*.js', 'routes/*.js','feeders/*.js', 'idas/*.js'],
 
     jshint: {
       src: '<%= srcfiles %>',
