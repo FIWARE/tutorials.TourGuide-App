@@ -364,9 +364,11 @@ function reservationToSchema(element) {
       }
     }
   });
+
   newElement.reservationId = unescape(element.id);
   newElement.reservationFor.name = unescape(
     newElement.reservationFor.name);
+
   newElement.reservationFor.address['@type'] = 'postalAddress';
 
   return newElement;
@@ -499,6 +501,7 @@ function reviewToOrion(schemaObject) {
   // -- - We need that way cause we cannot display 'ids'
 
   schemaObject.type = schemaObject['@type'];
+  delete schemaObject['@type'];
   var rname = schemaObject.itemReviewed.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
@@ -514,6 +517,7 @@ function reservationToOrion(schemaObject) {
   // -- TODO: add user from session
 
   schemaObject.type = schemaObject['@type'];
+  delete schemaObject['@type'];
   var rname = schemaObject.reservationFor.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
