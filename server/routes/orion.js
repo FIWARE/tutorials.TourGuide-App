@@ -335,7 +335,7 @@ exports.createReservation = function(req, res) {
     .then(function(data) {
       elementToOrion = req.body;
       elementToOrion = utils.reservationToOrion(elementToOrion);
-      elementToOrion.reservationFor.address = data.address;
+      elementToOrion.reservationFor.address = data.body.address;
       authRequest(
         '/v2/entities',
         'POST',
