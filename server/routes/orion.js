@@ -64,10 +64,8 @@ exports.readRestaurant = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -81,10 +79,8 @@ exports.updateRestaurant = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -98,10 +94,8 @@ exports.deleteRestaurant = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -168,10 +162,8 @@ exports.createReview = function(req, res) {
     });
   })
   .catch(function(err) {
-    res.error = err.error;
     res.statusCode = err.statusCode;
-    res.json(res.error);
-    res.end();
+    res.json(err.error);
   });
 };
 
@@ -185,10 +177,8 @@ exports.readReview = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -202,10 +192,8 @@ exports.updateReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -219,10 +207,8 @@ exports.deleteReview = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -336,10 +322,8 @@ exports.createReservation = function(req, res) {
         });
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -353,10 +337,8 @@ exports.readReservation = function(req, res) {
       res.json(utils.dataToSchema(data.body));
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 
@@ -370,10 +352,8 @@ exports.updateReservation = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 exports.deleteReservation = function(req, res) {
@@ -386,10 +366,8 @@ exports.deleteReservation = function(req, res) {
       res.end();
     })
     .catch(function(err) {
-      res.error = err.error;
       res.statusCode = err.statusCode;
-      res.json(res.error);
-      res.end();
+      res.json(err.error);
     });
 };
 exports.getReservations = function(req, res) {
