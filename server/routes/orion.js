@@ -22,10 +22,7 @@ exports.createRestaurant = function(req, res) {
       if (geoRes !== '[]') {
         elementToOrion = utils.restaurantToOrion(elementToOrion, geoRes[0]);
       }
-      authRequest(
-        '/v2/entities',
-        'POST',
-        elementToOrion)
+      utils.sendRequest('POST', elementToOrion)
         .then(function(data) {
           res.headers = data.headers;
           res.location('/api/orion/restaurant/' + elementToOrion.id);
@@ -39,10 +36,7 @@ exports.createRestaurant = function(req, res) {
     })
     .catch(function(err) {
       console.log('Geo-location could not be processed. Error: ' + err);
-      authRequest(
-        '/v2/entities',
-        'POST',
-        elementToOrion)
+      utils.sendRequest('POST', elementToOrion)
         .then(function(data) {
           res.statusCode = data.statusCode;
           res.end();
@@ -55,10 +49,7 @@ exports.createRestaurant = function(req, res) {
 };
 
 exports.readRestaurant = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'GET',
-    {'type': 'Restaurant'})
+  utils.getListByType('Restaurant', req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -70,10 +61,7 @@ exports.readRestaurant = function(req, res) {
 };
 
 exports.updateRestaurant = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'PATCH',
-    req.body)
+  utils.sendRequest('PATCH', req.body, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -85,10 +73,7 @@ exports.updateRestaurant = function(req, res) {
 };
 
 exports.deleteRestaurant = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'DELETE',
-    {})
+  utils.sendRequest('DELETE', null, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -102,10 +87,7 @@ exports.deleteRestaurant = function(req, res) {
 // -- TODO: handle pagination over the whole set of restaurants
 
 exports.getRestaurants = function(req, res) {
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Restaurant','limit': '1000'})
+  utils.getListByType('Restaurant')
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -118,10 +100,7 @@ exports.getRestaurants = function(req, res) {
 
 exports.getOrganizationRestaurants = function(req, res) {
   var organizationRestaurants = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Restaurant','limit': '1000'})
+  utils.getListByType('Restaurant')
   .then(function(data) {
     organizationRestaurants = utils.getOrgRestaurants(
       req.params.org,
@@ -139,17 +118,12 @@ exports.getOrganizationRestaurants = function(req, res) {
 
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
+  var reviewsList;
   // -- We first get information regarding the restaurant
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(elementToOrion.itemReviewed.name),
-    'GET',
-    {'type': 'Restaurant'})
+  utils.getListByType('Restaurant',elementToOrion.itemReviewed.name)
   .then(function(data) {
     elementToOrion = utils.reviewToOrion(elementToOrion);
-    authRequest(
-      '/v2/entities',
-      'POST',
-      elementToOrion)
+    utils.sendRequest('POST', elementToOrion)
     .then(function(data) {
       res.headers = data.headers;
       res.location('/api/orion/review/' + elementToOrion.id);
@@ -168,10 +142,7 @@ exports.createReview = function(req, res) {
 };
 
 exports.readReview = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'GET',
-    {'type': 'Review'})
+  utils.getListByType('Review', req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -183,10 +154,7 @@ exports.readReview = function(req, res) {
 };
 
 exports.updateReview = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'PATCH',
-    req.body)
+  utils.sendRequest('PATCH', req.body, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -198,10 +166,7 @@ exports.updateReview = function(req, res) {
 };
 
 exports.deleteReview = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'DELETE',
-    {})
+  utils.sendRequest('DELETE', null, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -213,10 +178,7 @@ exports.deleteReview = function(req, res) {
 };
 
 exports.getReviews = function(req, res) {
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Review','limit': '1000'})
+  utils.getListByType('Review')
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -229,10 +191,7 @@ exports.getReviews = function(req, res) {
 
 exports.getUserReviews = function(req, res) {
   var userReviews = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Review','limit': '1000'})
+  utils.getListByType('Review')
   .then(function(data) {
     userReviews = utils.getUserReviews(req.params.user, data.body);
     res.statusCode = data.statusCode;
@@ -246,10 +205,7 @@ exports.getUserReviews = function(req, res) {
 
 exports.getRestaurantReviews = function(req, res) {
   var restaurantReviews = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Review','limit': '1000'})
+  utils.getListByType('Review')
   .then(function(data) {
     restaurantReviews = utils.getRestaurantReviews(
       req.params.restaurant,
@@ -265,15 +221,9 @@ exports.getRestaurantReviews = function(req, res) {
 
 exports.getOrganizationReviews = function(req, res) {
   var organizationReviews = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Review','limit': '1000'})
+  utils.getListByType('Review')
   .then(function(reviews) {
-    authRequest(
-      '/v2/entities',
-      'GET',
-      {'type': 'Restaurant','limit': '1000'})
+    utils.getListByType('Restaurant')
     .then(function(restaurants) {
       organizationReviews = utils.getOrgReviews(
         req.params.org,
@@ -298,18 +248,12 @@ exports.getOrganizationReviews = function(req, res) {
 exports.createReservation = function(req, res) {
   var elementToOrion;
   // -- We first get information regarding the restaurant
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.body.reservationFor.name),
-    'GET',
-    {'type': 'Restaurant'})
+  utils.getListByType('Restaurant', req.body.reservationFor.name)
     .then(function(data) {
       elementToOrion = req.body;
       elementToOrion = utils.reservationToOrion(elementToOrion);
       elementToOrion.reservationFor.address = data.body.address;
-      authRequest(
-        '/v2/entities',
-        'POST',
-        elementToOrion)
+      utils.sendRequest('POST', elementToOrion)
         .then(function(data) {
           res.headers = data.headers;
           res.location('/api/orion/reservation/' + elementToOrion.id);
@@ -328,10 +272,7 @@ exports.createReservation = function(req, res) {
 };
 
 exports.readReservation = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'GET',
-    {'type': 'FoodEstablishmentReservation'})
+  utils.getListByType('FoodEstablishmentReservation', req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -343,10 +284,7 @@ exports.readReservation = function(req, res) {
 };
 
 exports.updateReservation = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'PATCH',
-    req.body)
+  utils.sendRequest('PATCH', req.body, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -357,10 +295,7 @@ exports.updateReservation = function(req, res) {
     });
 };
 exports.deleteReservation = function(req, res) {
-  authRequest(
-    '/v2/entities/' + encodeURIComponent(req.params.id),
-    'DELETE',
-    {})
+  utils.sendRequest('DELETE', null, req.params.id)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -371,10 +306,7 @@ exports.deleteReservation = function(req, res) {
     });
 };
 exports.getReservations = function(req, res) {
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'FoodEstablishmentReservation','limit': '1000'})
+  utils.getListByType('FoodEstablishmentReservation')
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -387,10 +319,7 @@ exports.getReservations = function(req, res) {
 
 exports.getUserReservations = function(req, res) {
   var userReservations = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'FoodEstablishmentReservation','limit': '1000'})
+  utils.getListByType('FoodEstablishmentReservation')
   .then(function(data) {
     userReservations = utils.getUserReservations(
       req.params.user,
@@ -406,10 +335,7 @@ exports.getUserReservations = function(req, res) {
 
 exports.getRestaurantReservations = function(req, res) {
   var restaurantReservations = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'FoodEstablishmentReservation','limit': '1000'})
+  utils.getListByType('FoodEstablishmentReservation')
   .then(function(data) {
     restaurantReservations = utils.getRestaurantReservations(
       req.params.restaurant,
@@ -425,15 +351,9 @@ exports.getRestaurantReservations = function(req, res) {
 
 exports.getOrganizationReservations = function(req, res) {
   var organizationsReservations = [];
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'FoodEstablishmentReservation','limit': '1000'})
+  utils.getListByType('FoodEstablishmentReservation')
   .then(function(reservations) {
-    authRequest(
-      '/v2/entities',
-      'GET',
-      {'type': 'Restaurant','limit': '1000'})
+    utils.getListByType('Restaurant')
     .then(function(restaurants) {
       organizationsReservations = utils.getOrgReservations(
         req.params.org,

@@ -679,6 +679,28 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   return newListOfElements;
 }
 
+function getListByType(type, element) {
+  var uri = '/v2/entities/';
+  if (element) {
+    uri += encodeURIComponent(element);
+  }
+  return authRequest(
+    uri,
+    'GET',
+    {'type': type,'limit': '1000'});
+}
+
+function sendRequest(method, body, identifier) {
+  var uri = '/v2/entities/';
+  if (identifier) {
+    uri += encodeURIComponent(identifier);
+  }
+  return authRequest(
+    uri,
+    method,
+    body);
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -706,5 +728,7 @@ module.exports = {
   getOrgReviews: getOrgReviews,
   getUserReservations: getUserReservations,
   getRestaurantReservations: getRestaurantReservations,
-  getOrgReservations: getOrgReservations
+  getOrgReservations: getOrgReservations,
+  getListByType: getListByType,
+  sendRequest: sendRequest
 };
