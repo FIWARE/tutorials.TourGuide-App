@@ -11,6 +11,7 @@
 'use strict';
 
 var frisby = require('frisby');
+var utils = require('../utils');
 
 frisby.create('Post JSON to /api/orion/review')
   .post('http://compose_devguide_1/api/orion/review', {
@@ -64,6 +65,34 @@ frisby.create('Post JSON to /api/orion/review')
       .delete('http://compose_devguide_1' + location)
       .expectStatus(204)
       .toss();
+
+    frisby.create(
+        'Check that the reviews counter are well added to a restaurant')
+      .get('http://compose_devguide_1/api/orion/restaurant/Araba')
+      .expectStatus(200)
+      .expectHeaderContains('content-type', 'application/json')
+      .waits(1000)
+      .after(function(err, res, body) {
+        var element = JSON.parse(res.body);
+        var counter = element[0].aggregateRating.reviewCount;
+        var rating = element[0].aggregateRating.ratingValue;
+        frisby.create('Get all Reviews of a Restaurant')
+          .get(
+            'http://compose_devguide_1/api/orion/reviews/restaurant/Araba')
+          .expectStatus(200)
+          .expectHeaderContains('content-type', 'application/json')
+          .after(function(err, res, body) {
+            var ratingValues = [];
+            var listOfElements = JSON.parse(res.body);
+            for (var x = 0; x < listOfElements.length; x++) {
+              ratingValues.push(listOfElements[x].reviewRating.ratingValue);
+            }
+            expect(listOfElements.length).toEqual(counter);
+            expect(rating).toEqual(utils.getAverage(ratingValues));
+          })
+          .toss();
+      })
+      .toss();
   })
   .toss();
 
@@ -106,7 +135,7 @@ frisby.create('Patch a Review that does not exist')
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
     error: 'NotFound',
-    description: 'No context element found'
+    description: 'The requested entity has not been found. Check type and id'
   })
   .toss();
 
