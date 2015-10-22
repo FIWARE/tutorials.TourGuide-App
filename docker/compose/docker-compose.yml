@@ -1,5 +1,6 @@
 mongodbdata:
     image: bitergia/fiware-devguide-restaurant-data:20151014
+    hostname: mongodbdata
     volumes:
         - /data/db
     restart: no
@@ -7,6 +8,7 @@ mongodbdata:
 
 mongodb:
     image: mongo:2.6
+    hostname: mongodb
     volumes_from:
         - mongodbdata
     expose:
@@ -15,6 +17,7 @@ mongodb:
 
 orion:
     image: fiware/orion:latest
+    hostname: orion
     links:
         - mongodb
     expose:
@@ -25,11 +28,13 @@ orion:
 
 authzforce:
     image: bitergia/authzforce:4.2.0
+    hostname: authzforce
     expose:
         - "8080"
 
 idm:
     image: bitergia/idm-keyrock:4.3.0
+    hostname: idm
     links:
         - authzforce
     volumes:
@@ -41,6 +46,7 @@ idm:
 
 pepwilma:
     image: bitergia/pep-wilma:4.3.0
+    hostname: pepwilma
     links:
         - orion
         - idm
@@ -55,6 +61,7 @@ pepwilma:
 
 idasiotacpp:
     image: bitergia/idas-iota-cpp:1.2.0
+    hostname: idasiotacpp
     links:
         - mongodb
         - orion
@@ -64,6 +71,7 @@ idasiotacpp:
 
 ul20client:
     image: bitergia/ul20-client:latest
+    hostname: ul20client
     links:
         - orion
         - idasiotacpp:iota
@@ -73,6 +81,7 @@ ul20client:
 
 devguide:
     image: bitergia/fiware-devguide-app
+    hostname: devguide
     links:
         - orion
         - idm
