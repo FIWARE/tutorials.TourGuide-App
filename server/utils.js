@@ -701,6 +701,40 @@ function sendRequest(method, body, identifier) {
     body);
 }
 
+function getAverage(data) {
+  var sum = data.reduce(function(sum, value) {
+    return sum + value;
+  }, 0);
+
+  var avg = sum / data.length;
+  return avg;
+}
+
+function getAggregateRating(listOfReviews) {
+
+  var counter = 0;
+  var ratingValues = [];
+  var newElement = {
+    'aggregateRating': {}
+  };
+
+  listOfReviews = objectToArray(listOfReviews);
+
+  Object.keys(listOfReviews).forEach(function(element, pos) {
+
+    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+
+      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      counter++;
+    }
+  });
+
+  newElement.aggregateRating.reviewCount = counter;
+  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+
+  return newElement;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -730,5 +764,7 @@ module.exports = {
   getRestaurantReservations: getRestaurantReservations,
   getOrgReservations: getOrgReservations,
   getListByType: getListByType,
-  sendRequest: sendRequest
+  sendRequest: sendRequest,
+  getAverage: getAverage,
+  getAggregateRating: getAggregateRating
 };
