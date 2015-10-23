@@ -473,7 +473,6 @@ exports.updateSensors = function(req, res) {
     if (item.id.search(restaurant.Pattern) == -1) {
       // not a restaurant sensor
       console.log('Ignored notification:', item.id);
-      res.end();
       return callback(null);
     }
 
@@ -520,6 +519,7 @@ exports.updateSensors = function(req, res) {
         })
       .catch(
         function(err) {
+          // restaurant does not exist
           console.log(err);
           callback(err);
         }
