@@ -11,6 +11,7 @@
 'use strict';
 
 var frisby = require('frisby');
+var delay = 200; //miliseconds
 
 frisby.create('Post JSON to /api/orion/restaurant')
   .post('http://devguide/api/orion/restaurant', {
@@ -31,12 +32,14 @@ frisby.create('Post JSON to /api/orion/restaurant')
   }, {
     json: true
   })
+  .waits(delay)
   .expectStatus(201)
   .expectHeaderContains('location', '/api/orion/restaurant/example')
   .toss();
 
 frisby.create('List all the restaurants')
   .get('http://devguide/api/orion/restaurants')
+  .waits(delay)
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
@@ -50,6 +53,7 @@ frisby.create('List all the restaurants')
 
 frisby.create('Get a Restaurant')
   .get('http://devguide/api/orion/restaurant/example')
+  .waits(delay)
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
@@ -63,6 +67,7 @@ frisby.create('Get a Restaurant')
 
 frisby.create('Get a Restaurant that does not exist')
   .get('http://devguide/api/orion/restaurant/fail')
+  .waits(delay)
   .expectStatus(404)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
@@ -77,6 +82,7 @@ frisby.create('Patch a Restaurant')
   }, {
     json: true
   })
+  .waits(delay)
   .expectStatus(204)
   .toss();
 
@@ -86,6 +92,7 @@ frisby.create('Patch a Restaurant that does not exist')
   }, {
     json: true
   })
+  .waits(delay)
   .expectStatus(404)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
@@ -96,11 +103,13 @@ frisby.create('Patch a Restaurant that does not exist')
 
 frisby.create('Delete a Restaurant')
   .delete('http://devguide/api/orion/restaurant/example')
+  .waits(delay)
   .expectStatus(204)
   .toss();
 
 frisby.create('Delete a Restaurant that does not exist')
   .delete('http://devguide/api/orion/restaurant/fail')
+  .waits(delay)
   .expectStatus(404)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
@@ -112,6 +121,7 @@ frisby.create('Delete a Restaurant that does not exist')
 frisby.create('List all the restaurants of Franchise1')
   .get(
     'http://devguide/api/orion/restaurants/organization/Franchise1')
+  .waits(delay)
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
