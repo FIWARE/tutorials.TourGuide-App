@@ -47,6 +47,9 @@ COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 RUN a2enmod ssl && a2enmod passenger && \
     a2dissite 000-default
 
+# install grunt-cli to be able to run the tasks inside the container
+RUN npm install --loglevel warn -g grunt-cli
+
 USER ${DEPLOY_USER}
 WORKDIR ${DEPLOY_USER_DIR}
 
