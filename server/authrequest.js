@@ -6,7 +6,7 @@ var rp = require('request-promise');
 var querystring = require('querystring');
 var Q = require('q');
 var config = require('./config');
-var host = 'http://compose_orion_1'; // To be changed to PEP for auth
+var host = 'http://orion'; // To be changed to PEP for auth
 var port = 1026;
 
 module.exports = performRequest;

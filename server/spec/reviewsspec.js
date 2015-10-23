@@ -14,7 +14,7 @@ var frisby = require('frisby');
 var utils = require('../utils');
 
 frisby.create('Post JSON to /api/orion/review')
-  .post('http://compose_devguide_1/api/orion/review', {
+  .post('http://devguide/api/orion/review', {
     '@type': 'Review',
     'itemReviewed': {
       '@type': 'Restaurant',
@@ -34,7 +34,7 @@ frisby.create('Post JSON to /api/orion/review')
     var location = res.headers.location;
 
     frisby.create('Get a Review')
-      .get('http://compose_devguide_1' + location)
+      .get('http://devguide' + location)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
@@ -53,7 +53,7 @@ frisby.create('Post JSON to /api/orion/review')
       .toss();
 
     frisby.create('Patch a Review')
-      .patch('http://compose_devguide_1' + location, {
+      .patch('http://devguide' + location, {
         'name': 'Patch done!'
       }, {
         json: true
@@ -62,13 +62,13 @@ frisby.create('Post JSON to /api/orion/review')
       .toss();
 
     frisby.create('Delete a Review')
-      .delete('http://compose_devguide_1' + location)
+      .delete('http://devguide' + location)
       .expectStatus(204)
       .toss();
 
     frisby.create(
         'Check that the reviews counter are well added to a restaurant')
-      .get('http://compose_devguide_1/api/orion/restaurant/Araba')
+      .get('http://devguide/api/orion/restaurant/Araba')
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
       .waits(1000)
@@ -78,7 +78,7 @@ frisby.create('Post JSON to /api/orion/review')
         var rating = element[0].aggregateRating.ratingValue;
         frisby.create('Get all Reviews of a Restaurant')
           .get(
-            'http://compose_devguide_1/api/orion/reviews/restaurant/Araba')
+            'http://devguide/api/orion/reviews/restaurant/Araba')
           .expectStatus(200)
           .expectHeaderContains('content-type', 'application/json')
           .after(function(err, res, body) {
@@ -97,7 +97,7 @@ frisby.create('Post JSON to /api/orion/review')
   .toss();
 
 frisby.create('List all the reviews')
-  .get('http://compose_devguide_1/api/orion/reviews')
+  .get('http://devguide/api/orion/reviews')
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
@@ -116,7 +116,7 @@ frisby.create('List all the reviews')
   .toss();
 
 frisby.create('Get a Review that does not exist')
-  .get('http://compose_devguide_1/api/orion/review/fail')
+  .get('http://devguide/api/orion/review/fail')
   .expectStatus(404)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
@@ -126,7 +126,7 @@ frisby.create('Get a Review that does not exist')
   .toss();
 
 frisby.create('Patch a Review that does not exist')
-  .patch('http://compose_devguide_1/api/orion/review/fail', {
+  .patch('http://devguide/api/orion/review/fail', {
     'name': 'Patch fail!'
   }, {
     json: true
@@ -140,7 +140,7 @@ frisby.create('Patch a Review that does not exist')
   .toss();
 
 frisby.create('Delete a Review that does not exist')
-  .delete('http://compose_devguide_1/api/orion/review/fail')
+  .delete('http://devguide/api/orion/review/fail')
   .expectStatus(404)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON({
@@ -151,7 +151,7 @@ frisby.create('Delete a Review that does not exist')
 
 frisby.create('List all the reviews of a user')
   .get(
-    'http://compose_devguide_1/api/orion/reviews/user/user1')
+    'http://devguide/api/orion/reviews/user/user1')
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
@@ -164,7 +164,7 @@ frisby.create('List all the reviews of a user')
 
 frisby.create('List all the reviews of a restaurant')
   .get(
-    'http://compose_devguide_1/api/orion/reviews/restaurant/Araba')
+    'http://devguide/api/orion/reviews/restaurant/Araba')
   .expectStatus(200)
   .expectHeaderContains('content-type', 'application/json')
   .expectJSON('*', {
