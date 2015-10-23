@@ -3,7 +3,8 @@
 ret=0
 
 # stash any unstaged changes to avoid testing unwanted code
-git stash -q --keep-index pre-commit-stash
+stash_name="pre-commit-stash-$( date +%s )"
+git stash save -q --keep-index ${stash_name}
 
 # check if any of the files in server/ is modified
 if git diff --cached --name-only | grep -qE "^server/" ; then
@@ -21,7 +22,9 @@ fi
 if [ $ret -ne 0 ]; then
     echo "Commit rejected."
 fi
-# restore stashed changes
-git stash pop -q
+# restore stashed changes if any
+if git stash list | grep -q ${stash_name} ; then
+    git stash pop -q
+fi
 
 exit $ret

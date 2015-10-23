@@ -1,9 +1,13 @@
 #!/bin/bash
 
-_compose_path="../docker/compose"
-_yml="${_compose_path}/docker-compose.yml"
 _volume_path=/home/bitergia/fiware-devguide-app
-_local_path=$(dirname $(pwd))
+pushd $( dirname $0 ) > /dev/null
+_local_path=$( dirname $(pwd) )
+popd > /dev/null
+cd ${_local_path}
+
+_compose_path="docker/compose"
+_yml="${_compose_path}/docker-compose.yml"
 
 function start_test_env() {
 
@@ -50,7 +54,7 @@ function stop_test_env() {
     docker-compose -f "${_yml}" -p tests rm -f -v
     # restore configuration files
     git checkout "${_yml}"
-    git checkout "config.js"
+    git checkout "server/config.js"
     exit 0
 }
 

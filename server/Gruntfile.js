@@ -13,7 +13,7 @@ module.exports = function(grunt) {
 
       hooks: {
         // setup pre-commit git hook
-        command: 'ln -sf ../git-hooks/pre-commit ../.git/hooks/'
+        command: 'ln -sf ../../git-hooks/pre-commit ../.git/hooks/'
       },
 
       test_env_on: {
