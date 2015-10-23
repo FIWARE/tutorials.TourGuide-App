@@ -33,14 +33,15 @@ module.exports = function(grunt) {
 
     },
 
-    srcfiles: ['spec/*.js', '*.js', 'routes/*.js','feeders/*.js', 'idas/*.js'],
+    srcfiles: ['*.js', 'routes/*.js','feeders/*.js', 'idas/*.js'],
+    testfiles: ['spec/*.js'],
 
     jshint: {
-      src: '<%= srcfiles %>',
+      src: ['<%= srcfiles %>','<%= testfiles %>']
     },
 
     jscs: {
-      src: '<%= srcfiles %>',
+      src: ['<%= srcfiles %>','<%= testfiles %>']
     },
 
     jasmine_node: {
@@ -49,9 +50,10 @@ module.exports = function(grunt) {
         match: '.',
         matchall: false,
         extensions: 'js',
-        specNameMatcher: 'spec'
+        specNameMatcher: 'spec',
+        specFolders: ['spec']
       },
-      all: ['spec/']
+      all: ['<%= srcfiles %>']
     }
 
   });
