@@ -31,6 +31,7 @@
     "grunt-continue": "~0.1.0"
   },
   "scripts": {
+    "test": "grunt",
     "postinstall": "grunt setup-git-hooks"
   }
 }

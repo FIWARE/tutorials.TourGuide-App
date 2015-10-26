@@ -1,0 +1,25 @@
+language: node_js
+
+node_js:
+  - "0.12"
+  - "0.11"
+  - "0.10"
+  - "iojs"
+
+sudo: required
+
+services:
+  - docker
+  - docker-compose
+
+env:
+  - TEST_DIR=server
+
+before_install:
+  - npm install -g npm
+
+before_script:
+  - npm install -g grunt-cli
+
+script:
+  - cd $TEST_DIR && npm install && npm test
