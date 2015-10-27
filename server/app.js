@@ -27,15 +27,14 @@ app.configure(function() {
 app.use('/client', express.static(__dirname + '/client'));
 
 // main page
-app.get('/', site.index);
-//app.get('/', function(req, res) {
-//    res.redirect('/client');
-//});
+app.get('/', function(req, res) {
+  res.redirect('/client');
+});
 
 // Auth support
 app.get('/login', auth.login);
 app.get('/auth', auth.auth);
-app.get('/get_user_data', auth.getUserData);
+app.get('/client/user', auth.getUserData);
 app.get('/get_username', auth.getUsername);
 app.get('/logout', auth.logout);
 

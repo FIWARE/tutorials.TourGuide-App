@@ -61,7 +61,7 @@ exports.logout = function(req, res) {
   res.redirect('/');
 };
 
-exports.getUserData = function(req, res, callback) {
+exports.getUserData = function(req, res) {
   var url = idmURL + '/user/';
   var user = null;
   // jshint camelcase: false
@@ -70,8 +70,13 @@ exports.getUserData = function(req, res, callback) {
   // jshint camelcase: true
   // jscs:enable
     function(e, response) {
-      user = JSON.parse(response);
-      callback(user);
+      if (e) {
+        res.statusCode = e.statusCode;
+        res.json(JSON.parse(e.data));
+      } else {
+        user = JSON.parse(response);
+        res.json(user);
+      }
     }
   );
 };
