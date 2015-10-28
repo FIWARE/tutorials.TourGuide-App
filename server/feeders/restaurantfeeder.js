@@ -34,8 +34,13 @@ var restaurantsData; // All data for the restaurants
 var apiCount = 0; // 2500 requests per day, be careful
 
 var getAddress = function(restaurant) {
-  var address = restaurant.address + ' ';
-  address += restaurant.municipality;
+  var address = restaurant.address.streetAddress + ' ';
+  if (restaurant.address.addressLocality) {
+    address += restaurant.address.addressLocality + ' ';
+  }
+  if (restaurant.address.addressRegion) {
+    address += restaurant.address.addressRegion;
+  }
   return address;
 };
 
@@ -53,11 +58,10 @@ var feedOrionRestaurants = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-    var address = attributes.address.streetAddress + ' ' +
-    attributes.address.addressRegion;
+    var address = getAddress(attributes);
 
     setTimeout(function() {
-     geocoder.geocode(address)
+     geocoder.geocode({address: address, country: 'Spain'})
      .then(function(geoRes) {
       attributes = utils.addGeolocation(attributes, geoRes[0]);
       attributes = utils.fixAddress(attributes, geoRes[0]);
