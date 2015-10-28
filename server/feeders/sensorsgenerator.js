@@ -55,7 +55,7 @@ var feedIDASSensors = function() {
         function(response) {
           sensorsAdded++;
           return idas.initializeSensor(task.name, task.type)
-            .delay(100) // This is to avoid clogging iotagent with requests.
+            .delay(1000) // This is to avoid clogging iotagent with requests.
             .then(
               function(response) {
                 sensorsInitialized++;
