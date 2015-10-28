@@ -292,11 +292,23 @@ function initializeSensor(name, type) {
   }
 }
 
+function updateSensor(name, type, value) {
+  switch (type) {
+  case 'SENSOR_TEMP':
+    return updateTemperatureSensor(name, value);
+  case 'SENSOR_HUM':
+    return updateHumiditySensor(name, value);
+  default:
+    return Q.reject('Unsupported sensor type: ' + type);
+  }
+}
+
 module.exports = {
   createService: createService,
   registerSensor: registerSensor,
   sendObservation: sendObservation,
   initializeSensor: initializeSensor,
   updateTemperatureSensor: updateTemperatureSensor,
-  updateHumiditySensor: updateHumiditySensor
+  updateHumiditySensor: updateHumiditySensor,
+  updateSensor: updateSensor
 };
