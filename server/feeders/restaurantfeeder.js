@@ -45,9 +45,13 @@ var getAddress = function(restaurant) {
 };
 
 var feedOrionRestaurants = function() {
-  var returnPost = function(data) {
-    restaurantsAdded++;
-    console.log(restaurantsAdded + '/' + restaurantsData.length);
+  var returnPost = function(restaurantIdentifier) {
+    if (restaurantIdentifier) {
+      console.log('The restaurant', restaurantIdentifier, 'exists');
+    } else {
+      restaurantsAdded++;
+      console.log(restaurantsAdded + '/' + restaurantsData.length);
+    }
   };
 
   //restaurantsData = restaurantsData.slice(0,5); // debug with few items
@@ -58,28 +62,35 @@ var feedOrionRestaurants = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-    var address = getAddress(attributes);
-
-    setTimeout(function() {
-     geocoder.geocode({address: address, country: 'Spain'})
-     .then(function(geoRes) {
-      attributes = utils.addGeolocation(attributes, geoRes[0]);
-      attributes = utils.fixAddress(attributes, geoRes[0]);
-      authRequest('/v2/entities', 'POST', attributes)
-      .then(callback)
-      .catch(function(err) {
-        console.log(err);
-      });
+    utils.getListByType('Restaurant', attributes.id)
+    .then(function(data) {
+      callback(attributes.id);
     })
-     .catch(function(err) {
-      console.log(err);
-      authRequest('/v2/entities', 'POST', attributes)
-      .then(callback)
-      .catch(function(err) {
-        console.log(err);
-      });
+    .catch(function(err) {
+      if (err.statusCode == '404') {
+        var address = getAddress(attributes);
+        setTimeout(function() {
+         geocoder.geocode({address: address, country: 'Spain'})
+         .then(function(geoRes) {
+          attributes = utils.addGeolocation(attributes, geoRes[0]);
+          attributes = utils.fixAddress(attributes, geoRes[0]);
+          authRequest('/v2/entities', 'POST', attributes)
+          .then(callback(null))
+          .catch(function(err) {
+            console.log(err);
+          });
+        })
+         .catch(function(err) {
+          console.log(err);
+          authRequest('/v2/entities', 'POST', attributes)
+          .then(callback(null))
+          .catch(function(err) {
+            console.log(err);
+          });
+        });
+       }, geoWaitTimeMs);
+      }
     });
-   }, geoWaitTimeMs);
   }, apiRestSimtasks);
 
   q.drain = function() {
