@@ -498,7 +498,6 @@ exports.updateSensors = function(req, res) {
             'name': restaurant.Room,
             'value': item.attributes[0].value
           };
-          console.log('Schema:', schema);
           // update restaurant
           return authRequest(
             '/v2/entities/' + restaurant.Name,
