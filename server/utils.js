@@ -232,6 +232,7 @@ function objectToArray(element) {
 
 function restaurantToSchema(element) {
 
+  //-- List elements matching
   var restaurantSchemaElements = [
     'address',
     'aggregateRating',
@@ -258,13 +259,10 @@ function restaurantToSchema(element) {
     '@type': element.type
   };
 
-  //-- List elements matching
-
   // array for sensors
   var additionalProperty = [];
 
   // -- Element value
-
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
@@ -291,7 +289,8 @@ function restaurantToSchema(element) {
   }
 
   newElement.name = unescape(element.id);
-  newElement.address['@type'] = 'postalAddress';
+
+  newElement = replaceTypeForSchema(newElement);
 
   // -- Display geo-location schema.org like
 
@@ -304,7 +303,6 @@ function restaurantToSchema(element) {
     newElement.geo.latitude = geoCoords[0];
     newElement.geo.longitude = geoCoords[1];
   }
-
   return newElement;
 }
 
@@ -335,6 +333,9 @@ function reviewToSchema(element) {
         }
       }
     });
+
+  newElement = replaceTypeForSchema(newElement);
+
   return newElement;
 }
 
@@ -369,7 +370,7 @@ function reservationToSchema(element) {
   newElement.reservationFor.name = unescape(
     newElement.reservationFor.name);
 
-  newElement.reservationFor.address['@type'] = 'postalAddress';
+  newElement = replaceTypeForSchema(newElement);
 
   return newElement;
 }
@@ -490,9 +491,8 @@ function addGeolocation(schemaObject, geoObject) {
 
 function restaurantToOrion(schemaObject, geoObject) {
 
-  schemaObject.type = schemaObject['@type'];
+  schemaObject = replaceTypeForOrion(schemaObject);
   schemaObject.id = schemaObject.name;
-  delete schemaObject['@type'];
   delete schemaObject.name;
 
   schemaObject = addGeolocation(schemaObject, geoObject);
@@ -510,14 +510,12 @@ function reviewToOrion(schemaObject) {
   // -- - a restaurant, the review position increase;
   // -- - but the only one able to modify it is the user
   // -- - We need that way cause we cannot display 'ids'
-
-  schemaObject.type = schemaObject['@type'];
-  delete schemaObject['@type'];
+  schemaObject = replaceTypeForOrion(schemaObject);
   var rname = schemaObject.itemReviewed.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
   schemaObject.author = {};
-  schemaObject.author['@type'] = 'Person';
+  schemaObject.author.type = 'Person';
   schemaObject.dateCreated = Date.now();
   return sortObject(schemaObject);
 
@@ -527,13 +525,12 @@ function reservationToOrion(schemaObject) {
 
   // -- TODO: add user from session
 
-  schemaObject.type = schemaObject['@type'];
-  delete schemaObject['@type'];
+  schemaObject = replaceTypeForOrion(schemaObject);
   var rname = schemaObject.reservationFor.name;
   rname += '-' + shortid.generate();
   schemaObject.id = rname;
   schemaObject.underName = {};
-  schemaObject.underName['@type'] = 'Person';
+  schemaObject.underName.type = 'Person';
   schemaObject.reservationStatus = 'Pending';
   return sortObject(schemaObject);
 }
@@ -746,6 +743,28 @@ function getAggregateRating(listOfReviews) {
   return newElement;
 }
 
+function replaceTypeForOrion(schemaObject) {
+  var parsed = JSON.parse(JSON.stringify(schemaObject), function(key, value) {
+    if (key === '@type') {
+      this.type = value;
+    } else {
+      return value;
+    }
+  });
+  return parsed;
+}
+
+function replaceTypeForSchema(element) {
+  var parsed = JSON.parse(JSON.stringify(element), function(key, value) {
+    if (key === 'type') {
+      this['@type'] = value;
+    } else {
+      return value;
+    }
+  });
+  return parsed;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -777,5 +796,7 @@ module.exports = {
   getListByType: getListByType,
   sendRequest: sendRequest,
   getAverage: getAverage,
-  getAggregateRating: getAggregateRating
+  getAggregateRating: getAggregateRating,
+  replaceTypeForOrion: replaceTypeForOrion,
+  replaceTypeForSchema: replaceTypeForSchema
 };

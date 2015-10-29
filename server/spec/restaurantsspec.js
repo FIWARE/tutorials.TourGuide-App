@@ -45,7 +45,7 @@ frisby.create('OAuth2 login')
         '@type': 'Restaurant',
         'name': 'example',
         'address': {
-          '@type': 'PostalAddress',
+          '@type': 'postalAddress',
           'streetAddress': 'Av. de la Universidad 30',
           'addressLocality': 'Leganes',
           'addressRegion': 'Madrid',

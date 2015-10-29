@@ -60,7 +60,6 @@ var feedOrionReviews = function() {
     // Time to add first attribute to orion as first approach
 
     var attr = {
-      '@context': 'http://schema.org',
       'type': 'Review',
       'id': rname,
       'itemReviewed': {},
@@ -71,16 +70,16 @@ var feedOrionReviews = function() {
       'publisher': {}
     };
 
-    attr.itemReviewed['@type'] = 'Restaurant';
+    attr.itemReviewed.type = 'Restaurant';
     attr.itemReviewed.name = restaurantsData[pos].id;
 
-    attr.reviewRating['@type'] = 'Rating';
+    attr.reviewRating.type = 'Rating';
     attr.reviewRating.ratingValue = utils.randomIntInc(1, 5);
 
-    attr.author['@type'] = 'Person';
+    attr.author.type = 'Person';
     attr.author.name = 'user' + utils.randomIntInc(1, 10);
 
-    attr.publisher['@type'] = 'Organization';
+    attr.publisher.type = 'Organization';
     attr.publisher.name = 'Bitergia';
 
     q.push({

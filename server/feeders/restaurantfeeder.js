@@ -124,7 +124,9 @@ var feedOrionRestaurants = function() {
     var attr = {
       'type': 'Restaurant',
       'id': utils.fixedEncodeURIComponent(rname),
-      'address': {},
+      'address': {
+        'type': 'postalAddress'
+      },
       'department': utils.randomElement(organization),
       'aggregateRating': {}
     };

@@ -58,7 +58,6 @@ var feedOrionReservations = function() {
     var reservations = ['Cancelled', 'Confirmed', 'Hold', 'Pending'];
 
     var attr = {
-      '@context': 'http://schema.org',
       'type': 'FoodEstablishmentReservation',
       'id': restaurantName,
       'reservationStatus': utils.randomElement(reservations),
@@ -69,10 +68,10 @@ var feedOrionReservations = function() {
     };
 
     // Time to add first attribute to orion as first approach
-    attr.underName['@type'] = 'Person';
+    attr.underName.type = 'Person';
     attr.underName.name = 'user' + utils.randomIntInc(1, 10);
 
-    attr.reservationFor['@type'] = 'FoodEstablishment';
+    attr.reservationFor.type = 'FoodEstablishment';
     attr.reservationFor.name = restaurantsData[pos].id;
     attr.reservationFor.address = restaurantsData[pos].address;
 
