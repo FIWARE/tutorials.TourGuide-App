@@ -125,7 +125,6 @@ var feedOrionRestaurants = function() {
       'type': 'Restaurant',
       'id': utils.fixedEncodeURIComponent(rname),
       'address': {},
-      'location': {},
       'department': utils.randomElement(organization),
       'aggregateRating': {}
     };
