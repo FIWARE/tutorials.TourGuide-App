@@ -95,3 +95,28 @@ exports.getUsername = function(req, res, callback) {
     }
   );
 };
+
+exports.validateRequest = function(req, res, next) {
+  var url = idmURL + '/user/';
+  var user = null;
+  // jshint camelcase: false
+  // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+  var token = req.session.access_token ||
+  (req.params.access_token) ||
+  req.headers['X-Auth-Token'] ||
+  req.headers['x-auth-token'];
+  oauth.get(url, token,
+  // jshint camelcase: true
+  // jscs:enable
+    function(e, response) {
+      if (e) {
+        console.log(e);
+        res.statusCode = e.statusCode;
+        res.json(JSON.parse(e.data));
+      } else {
+        console.log(JSON.parse(response));
+        next();
+      }
+    }
+  );
+};

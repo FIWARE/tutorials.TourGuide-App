@@ -38,6 +38,10 @@ app.get('/client/user', auth.getUserData);
 app.get('/get_username', auth.getUsername);
 app.get('/logout', auth.logout);
 
+// Auth Middleware - This will check if the token exists and is valid
+// Only the requests that start with /api/orion/* will be checked
+app.all('/api/orion/*', auth.validateRequest);
+
 // API REST definition
 
 // Restaurants, reservations and reviews: CRUD, listing and searches
