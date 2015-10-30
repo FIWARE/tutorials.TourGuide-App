@@ -3,7 +3,7 @@ mongodbdata:
     hostname: mongodbdata
     volumes:
         - /data/db
-    restart: no
+    restart: "no"
     command: /bin/echo "Data-only container for mongodb."
 
 mongodb:
