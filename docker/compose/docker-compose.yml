@@ -1,5 +1,5 @@
 mongodbdata:
-    image: bitergia/fiware-devguide-restaurant-data:20151029
+    image: bitergia/fiware-devguide-restaurant-data:20151030
     hostname: mongodbdata
     volumes:
         - /data/db

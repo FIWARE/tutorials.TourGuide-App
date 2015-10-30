@@ -294,10 +294,10 @@ function restaurantToSchema(element) {
 
   // -- Display geo-location schema.org like
 
-  if (element.attributes[0] &&
-      element.attributes[0].value &&
-      typeof element.attributes[0].value === 'string') {
-    var geoCoords = element.attributes[0].value.split(',');
+  if (element.position &&
+      element.position.value &&
+      typeof element.position.value === 'string') {
+    var geoCoords = element.position.value.split(',');
     newElement.geo = {};
     newElement.geo['@type'] = 'GeoCoordinates';
     newElement.geo.latitude = geoCoords[0];
@@ -469,22 +469,11 @@ function fixAddress(schemaObject, geoObject) {
 
 function addGeolocation(schemaObject, geoObject) {
   if (geoObject) {
-    schemaObject.attributes = [];
-
-    var locationObject = {};
-    locationObject.name = 'position';
-    locationObject.type = 'coords';
-    locationObject.value = geoObject.latitude + ', ' +
+    schemaObject.position = {};
+    schemaObject.position.type = 'coords';
+    schemaObject.position.location = 'WGS84';
+    schemaObject.position.value = geoObject.latitude + ', ' +
       geoObject.longitude;
-    locationObject.metadatas = [];
-
-    var metaObject = {};
-    metaObject.name = 'location';
-    metaObject.type = 'string';
-    metaObject.value = 'WGS84';
-
-    locationObject.metadatas.push(metaObject);
-    schemaObject.attributes.push(locationObject);
   }
   return schemaObject;
 }
