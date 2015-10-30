@@ -153,6 +153,7 @@ var feedOrionRestaurants = function() {
 
       } else {
         if (element in dictionary) {
+
           if (val !== 'undefined' && val !== '') {
 
             element = utils.replaceOnceUsingDictionary(
@@ -160,9 +161,14 @@ var feedOrionRestaurants = function() {
               function(key, dictionary) {
                 return dictionary[key];
               });
-            attr[utils.fixedEncodeURIComponent(element)] =
-            utils.fixedEncodeURIComponent(
+            if (element == 'priceRange') {
+              attr[utils.fixedEncodeURIComponent(element)] =
+              parseFloat(val);
+            } else {
+              attr[utils.fixedEncodeURIComponent(element)] =
+              utils.fixedEncodeURIComponent(
               utils.convertHtmlToText(val));
+            }
           }
         }
       }
