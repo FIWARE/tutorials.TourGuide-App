@@ -24,7 +24,8 @@ if [ $ret -ne 0 ]; then
 fi
 # restore stashed changes if any
 if git stash list | grep -q ${stash_name} ; then
-    git stash pop -q
+    stash_id=$( git stash list | grep ${stash_name} | cut -d ':' -f 1 )
+    git stash pop -q ${stash_id}
 fi
 
 exit $ret
