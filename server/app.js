@@ -35,7 +35,6 @@ app.get('/', function(req, res) {
 app.get('/login', auth.login);
 app.get('/auth', auth.auth);
 app.get('/client/user', auth.getUserData);
-app.get('/get_username', auth.getUsername);
 app.get('/logout', auth.logout);
 
 // Auth Middleware - This will check if the token exists and is valid

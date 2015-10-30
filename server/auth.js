@@ -81,21 +81,6 @@ exports.getUserData = function(req, res) {
   );
 };
 
-exports.getUsername = function(req, res, callback) {
-  var url = idmURL + '/user/';
-  var user = null;
-  // jshint camelcase: false
-  // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-  oauth.get(url, req.session.access_token,
-  // jshint camelcase: true
-  // jscs:enable
-    function(e, response) {
-      user = JSON.parse(response);
-      callback(user.displayName);
-    }
-  );
-};
-
 exports.validateRequest = function(req, res, next) {
   var url = idmURL + '/user/';
   var user = null;
