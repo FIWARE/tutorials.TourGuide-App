@@ -22,6 +22,9 @@ config.callbackUrl = 'http://compose_devguide_1/login';
 
 config.responseType = 'code';
 
+// Fiware service for the app
+config.fiwareService = 'FIWARE_SERVICE';
+
 // Orion
 config.orionPort = 'ORION_PORT';
 config.orionHostname = 'ORION_HOSTNAME';

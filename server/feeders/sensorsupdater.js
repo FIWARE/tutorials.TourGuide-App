@@ -15,9 +15,14 @@
 
 'use strict';
 
+var utils = require('../utils');
 var async = require('async');
-var authRequest = require('../authrequest');
 var idas = require('../idas/ul20');
+
+var config = require('../config');
+var fiwareHeaders = {
+  'fiware-service': config.fiwareService
+};
 
 var apiRestSimtasks = 10;
 var restaurantsData;
@@ -135,10 +140,7 @@ var loadRestaurantData = function() {
     feedIDASSensors();
   };
 
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Restaurant','limit': '1000'})
+  utils.getListByType('Restaurant', null, fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
     console.log(err);

@@ -11,20 +11,26 @@ var port = 1026;
 
 module.exports = performRequest;
 
-function performRequest(endpoint, method, data) {
+function performRequest(endpoint, method, data, fiwareHeaders) {
 
   var deferred = Q.defer();
-  var headers;
+  var headers = {};
   var options;
-
+  if (typeof fiwareHeaders !== 'undefined') {
+    if (typeof fiwareHeaders['fiware-service'] !== 'undefined') {
+      headers['fiware-service'] = fiwareHeaders['fiware-service'];
+    }
+    if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
+      headers['fiware-servicepath'] = fiwareHeaders['fiware-servicepath'];
+    }
+  }
   switch (method) {
   case 'GET':
     endpoint += '?' + querystring.stringify(data);
+    headers['User-Agent'] = 'Request-Promise';
     options = {
       uri: host + ':' + port + endpoint,
-      headers: {
-        'User-Agent': 'Request-Promise'
-      },
+      headers: headers,
       resolveWithFullResponse: true,
       json: true // Automatically parses the JSON string in the response
     };
@@ -33,6 +39,7 @@ function performRequest(endpoint, method, data) {
     options = {
       method: 'POST',
       uri: host + ':' + port + endpoint,
+      headers: headers,
       body: data,
       resolveWithFullResponse: true,
       json: true // Automatically stringifies the body to JSON
@@ -43,6 +50,7 @@ function performRequest(endpoint, method, data) {
     options = {
       method: 'PATCH',
       uri: host + ':' + port + endpoint,
+      headers: headers,
       body: data,
       resolveWithFullResponse: true,
       json: true
@@ -53,6 +61,7 @@ function performRequest(endpoint, method, data) {
     options = {
       method: 'DELETE',
       uri: host + ':' + port + endpoint,
+      headers: headers,
       resolveWithFullResponse: true,
       json: true
     };

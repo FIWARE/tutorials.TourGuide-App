@@ -6,6 +6,8 @@ check_var IDM_HOSTNAME idm
 check_var IDM_PORT 5000
 check_var CONFIG_FILE /config/idm2chanchan.json
 
+check_var FIWARE_SERVICE devguide
+
 check_var ORION_HOSTNAME orion
 check_var ORION_PORT 1026
 check_var ORION_PEP_ENABLED false
@@ -58,6 +60,7 @@ function _configure_params () {
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
+        -e "s|FIWARE_SERVICE|${FIWARE_SERVICE}|g" \
         -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
         -e "s|ORION_PORT|${ORION_PORT}|g" \
         -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g" \

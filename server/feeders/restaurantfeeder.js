@@ -17,7 +17,6 @@
 'use strict';
 
 var utils = require('../utils');
-var authRequest = require('../authrequest');
 var fs = require('fs');
 var async = require('async');
 var geocoder = require('node-geocoder')('google', 'http');
@@ -32,6 +31,11 @@ var restaurantsAdded = 0;
 var geoWaitTimeMs = 200; // Wait ms between calls to Google API
 var restaurantsData; // All data for the restaurants
 var apiCount = 0; // 2500 requests per day, be careful
+
+var config = require('../config');
+var fiwareHeaders = {
+  'fiware-service': config.fiwareService
+};
 
 var getAddress = function(restaurant) {
   var address = restaurant.address.streetAddress + ' ';
@@ -62,19 +66,23 @@ var feedOrionRestaurants = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-    utils.getListByType('Restaurant', attributes.id)
+    var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
+    utils.getListByType('Restaurant', attributes.id, fwHeaders)
     .then(function(data) {
       callback(attributes.id);
     })
     .catch(function(err) {
       if (err.statusCode == '404') {
         var address = getAddress(attributes);
+        if (typeof attributes.department !== 'undefined') {
+          fwHeaders['fiware-servicepath'] = '/' + attributes.department;
+        }
         setTimeout(function() {
          geocoder.geocode({address: address, country: 'Spain'})
          .then(function(geoRes) {
           attributes = utils.addGeolocation(attributes, geoRes[0]);
           attributes = utils.fixAddress(attributes, geoRes[0]);
-          authRequest('/v2/entities', 'POST', attributes)
+          utils.sendRequest('POST', attributes, null, fwHeaders)
           .then(callback(null))
           .catch(function(err) {
             console.log(err);
@@ -82,7 +90,7 @@ var feedOrionRestaurants = function() {
         })
          .catch(function(err) {
           console.log(err);
-          authRequest('/v2/entities', 'POST', attributes)
+          utils.sendRequest('POST', attributes, null, fwHeaders)
           .then(callback(null))
           .catch(function(err) {
             console.log(err);

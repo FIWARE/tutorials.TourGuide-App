@@ -22,12 +22,16 @@
 var utils = require('../utils');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
-var authRequest = require('../authrequest');
 var apiRestSimtasks = 1; // number of simultaneous calls to API REST
 var reviewsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reviewed
 var delay = 200; //time in ms
 var restaurantsModified = 0;
+
+var config = require('../config');
+var fiwareHeaders = {
+  'fiware-service': config.fiwareService
+};
 
 var feedOrionReviews = function() {
   var returnPost = function(data) {
@@ -44,7 +48,7 @@ var feedOrionReviews = function() {
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
 
-    authRequest('/v2/entities', 'POST', attributes)
+    utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
       console.log(err);
@@ -104,7 +108,8 @@ var triggerRestaurantsRatings = function() {
   var q = async.queue(function(task, callback) {
 
     setTimeout(function() {
-      utils.sendRequest('PATCH', task.aggregateRatings, task.restaurantName)
+      utils.sendRequest('PATCH', task.aggregateRatings,
+                        task.restaurantName, fiwareHeaders)
       .then(callback)
       .catch(function(err) {
         console.log(err.error);
@@ -117,7 +122,7 @@ var triggerRestaurantsRatings = function() {
     console.log('Total restaurants modified: ' + restaurantsModified);
   };
 
-  utils.getListByType('Review')
+  utils.getListByType('Review', null, fiwareHeaders)
   .then(function(data) {
     reviews = data.body;
     Object.keys(restaurantsData).forEach(function(element, pos) {
@@ -144,10 +149,7 @@ var loadRestaurantData = function() {
     feedOrionReviews();
   };
 
-  authRequest(
-    '/v2/entities',
-    'GET',
-    {'type': 'Restaurant', 'limit': '1000'})
+  utils.getListByType('Restaurant', null, fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
     console.log(err);

@@ -682,7 +682,7 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   return newListOfElements;
 }
 
-function getListByType(type, element) {
+function getListByType(type, element, headers) {
   var uri = '/v2/entities';
   if (element) {
     uri += '/' + encodeURIComponent(element);
@@ -690,10 +690,12 @@ function getListByType(type, element) {
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'});
+    {'type': type,'limit': '1000'},
+    headers
+  );
 }
 
-function sendRequest(method, body, identifier) {
+function sendRequest(method, body, identifier, headers) {
   var uri = '/v2/entities';
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
@@ -701,7 +703,9 @@ function sendRequest(method, body, identifier) {
   return authRequest(
     uri,
     method,
-    body);
+    body,
+    headers
+  );
 }
 
 function getAverage(data) {

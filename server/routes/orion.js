@@ -12,6 +12,11 @@ var geocoder = require('node-geocoder')('google', 'http');
 var async = require('async');
 var auth = require('../auth');
 
+var config = require('../config');
+var fiwareHeaders = {
+  'fiware-service': config.fiwareService
+};
+
 // Restaurants
 
 exports.createRestaurant = function(req, res) {
@@ -23,7 +28,7 @@ exports.createRestaurant = function(req, res) {
       if (geoRes !== '[]') {
         elementToOrion = utils.restaurantToOrion(elementToOrion, geoRes[0]);
       }
-      utils.sendRequest('POST', elementToOrion)
+      utils.sendRequest('POST', elementToOrion, null, req.headers)
         .then(function(data) {
           res.headers = data.headers;
           res.location('/api/orion/restaurant/' + elementToOrion.id);
@@ -37,7 +42,7 @@ exports.createRestaurant = function(req, res) {
     })
     .catch(function(err) {
       console.log('Geo-location could not be processed. Error: ' + err);
-      utils.sendRequest('POST', elementToOrion)
+      utils.sendRequest('POST', elementToOrion, null, req.headers)
         .then(function(data) {
           res.statusCode = data.statusCode;
           res.end();
@@ -50,7 +55,7 @@ exports.createRestaurant = function(req, res) {
 };
 
 exports.readRestaurant = function(req, res) {
-  utils.getListByType('Restaurant', req.params.id)
+  utils.getListByType('Restaurant', req.params.id, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -62,7 +67,7 @@ exports.readRestaurant = function(req, res) {
 };
 
 exports.updateRestaurant = function(req, res) {
-  utils.sendRequest('PATCH', req.body, req.params.id)
+  utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -74,7 +79,7 @@ exports.updateRestaurant = function(req, res) {
 };
 
 exports.deleteRestaurant = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id)
+  utils.sendRequest('DELETE', null, req.params.id, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -88,7 +93,7 @@ exports.deleteRestaurant = function(req, res) {
 // -- TODO: handle pagination over the whole set of restaurants
 
 exports.getRestaurants = function(req, res) {
-  utils.getListByType('Restaurant')
+  utils.getListByType('Restaurant', null, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -101,7 +106,7 @@ exports.getRestaurants = function(req, res) {
 
 exports.getOrganizationRestaurants = function(req, res) {
   var organizationRestaurants = [];
-  utils.getListByType('Restaurant')
+  utils.getListByType('Restaurant', null, req.headers)
   .then(function(data) {
     organizationRestaurants = utils.getOrgRestaurants(
       req.params.org,
@@ -123,15 +128,19 @@ exports.createReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
   // -- We first get information regarding the restaurant
-  utils.getListByType('Restaurant', restaurantName)
+  var fwHeaders = JSON.parse(JSON.stringify(req.headers));
+  if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
+    delete fwHeaders['fiware-servicepath'];
+  }
+  utils.getListByType('Restaurant', restaurantName, fwHeaders)
     .then(function(data) {
       auth.getUserDataPromise(req)
         .then(function(data) {
           elementToOrion = utils.reviewToOrion(data, elementToOrion);
           console.log(elementToOrion);
-          utils.sendRequest('POST', elementToOrion)
+          utils.sendRequest('POST', elementToOrion, null, req.headers)
             .then(function(data) {
-              utils.getListByType('Review')
+              utils.getListByType('Review', null, fwHeaders)
                 .then(function(data) {
                   restaurantReviews = utils.getRestaurantReviews(
                     restaurantName,
@@ -139,7 +148,7 @@ exports.createReview = function(req, res) {
                   aggregateRatings = utils.getAggregateRating(
                     restaurantReviews);
                   utils.sendRequest('PATCH', aggregateRatings,
-                      restaurantName)
+                                    restaurantName, req.headers)
                     .then(function(data) {
                       res.end();
                     })
@@ -174,7 +183,7 @@ exports.createReview = function(req, res) {
 };
 
 exports.readReview = function(req, res) {
-  utils.getListByType('Review', req.params.id)
+  utils.getListByType('Review', req.params.id, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -190,7 +199,7 @@ exports.updateReview = function(req, res) {
   var aggregateRatings;
   var restaurantName;
   var userId;
-  utils.getListByType('Review', req.params.id)
+  utils.getListByType('Review', req.params.id, req.headers)
     .then(function(data) {
       restaurantName = data.body.itemReviewed.name;
       userId = data.body.author.name;
@@ -206,9 +215,13 @@ exports.updateReview = function(req, res) {
               }
             });
           } else {
-            utils.sendRequest('PATCH', req.body, req.params.id)
+            utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
               .then(function(data) {
-                utils.getListByType('Review')
+                var fwHeaders = JSON.parse(JSON.stringify(req.headers));
+                if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
+                  delete fwHeaders['fiware-servicepath'];
+                }
+                utils.getListByType('Review', null, fwHeaders)
                   .then(function(data) {
                     restaurantReviews = utils.getRestaurantReviews(
                       restaurantName,
@@ -216,7 +229,7 @@ exports.updateReview = function(req, res) {
                     aggregateRatings = utils.getAggregateRating(
                       restaurantReviews);
                     utils.sendRequest('PATCH', aggregateRatings,
-                        restaurantName)
+                                      restaurantName, req.headers)
                       .then(function(data) {
                         res.end();
                       })
@@ -253,19 +266,24 @@ exports.deleteReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
   var restaurantName;
-  utils.getListByType('Review', req.params.id)
+  utils.getListByType('Review', req.params.id, req.headers)
   .then(function(data) {
     restaurantName = data.body.itemReviewed.name;
-    utils.sendRequest('DELETE', null, req.params.id)
+    utils.sendRequest('DELETE', null, req.params.id, req.headers)
     .then(function(data) {
-      utils.getListByType('Review')
+      var fwHeaders = JSON.parse(JSON.stringify(req.headers));
+      if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
+        delete fwHeaders['fiware-servicepath'];
+      }
+      utils.getListByType('Review', null, fwHeaders)
       .then(function(data) {
         restaurantReviews = utils.getRestaurantReviews(
           restaurantName,
           data.body);
         aggregateRatings = utils.getAggregateRating(
           restaurantReviews);
-        utils.sendRequest('PATCH', aggregateRatings, restaurantName)
+        utils.sendRequest('PATCH', aggregateRatings,
+                          restaurantName, req.headers)
         .then(function(data) {
           res.end();
         })
@@ -293,7 +311,7 @@ exports.deleteReview = function(req, res) {
 };
 
 exports.getReviews = function(req, res) {
-  utils.getListByType('Review')
+  utils.getListByType('Review', null, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -306,7 +324,7 @@ exports.getReviews = function(req, res) {
 
 exports.getUserReviews = function(req, res) {
   var userReviews = [];
-  utils.getListByType('Review')
+  utils.getListByType('Review', null, req.headers)
   .then(function(data) {
     userReviews = utils.getUserReviews(req.params.user, data.body);
     res.statusCode = data.statusCode;
@@ -320,7 +338,7 @@ exports.getUserReviews = function(req, res) {
 
 exports.getRestaurantReviews = function(req, res) {
   var restaurantReviews = [];
-  utils.getListByType('Review')
+  utils.getListByType('Review', null, req.headers)
   .then(function(data) {
     restaurantReviews = utils.getRestaurantReviews(
       req.params.restaurant,
@@ -336,9 +354,9 @@ exports.getRestaurantReviews = function(req, res) {
 
 exports.getOrganizationReviews = function(req, res) {
   var organizationReviews = [];
-  utils.getListByType('Review')
+  utils.getListByType('Review', null, req.headers)
   .then(function(reviews) {
-    utils.getListByType('Restaurant')
+    utils.getListByType('Restaurant', null, req.headers)
     .then(function(restaurants) {
       organizationReviews = utils.getOrgReviews(
         req.params.org,
@@ -363,14 +381,16 @@ exports.getOrganizationReviews = function(req, res) {
 exports.createReservation = function(req, res) {
   var elementToOrion;
   // -- We first get information regarding the restaurant
-  utils.getListByType('Restaurant', req.body.reservationFor.name)
+  utils.getListByType('Restaurant',
+                      req.body.reservationFor.name,
+                      req.headers)
   .then(function(data) {
     elementToOrion = req.body;
     elementToOrion.reservationFor.address = data.body.address;
     auth.getUserDataPromise(req)
     .then(function(data) {
       elementToOrion = utils.reservationToOrion(data, elementToOrion);
-      utils.sendRequest('POST', elementToOrion)
+      utils.sendRequest('POST', elementToOrion, null, req.headers)
       .then(function(data) {
         res.headers = data.headers;
         res.location('/api/orion/reservation/' + elementToOrion.id);
@@ -394,7 +414,9 @@ exports.createReservation = function(req, res) {
 };
 
 exports.readReservation = function(req, res) {
-  utils.getListByType('FoodEstablishmentReservation', req.params.id)
+  utils.getListByType('FoodEstablishmentReservation',
+                      req.params.id,
+                      req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -408,7 +430,9 @@ exports.readReservation = function(req, res) {
 exports.updateReservation = function(req, res) {
   var restaurantName;
   var userId;
-  utils.getListByType('FoodEstablishmentReservation', req.params.id)
+  utils.getListByType('FoodEstablishmentReservation',
+                      req.params.id,
+                      req.headers)
   .then(function(data) {
     userId = data.body.underName.name;
     auth.getUserDataPromise(req)
@@ -423,7 +447,7 @@ exports.updateReservation = function(req, res) {
           }
         });
       } else {
-        utils.sendRequest('PATCH', req.body, req.params.id)
+        utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
         .then(function(data) {
           res.statusCode = data.statusCode;
           res.end();
@@ -446,7 +470,7 @@ exports.updateReservation = function(req, res) {
 };
 
 exports.deleteReservation = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id)
+  utils.sendRequest('DELETE', null, req.params.id, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -457,7 +481,7 @@ exports.deleteReservation = function(req, res) {
     });
 };
 exports.getReservations = function(req, res) {
-  utils.getListByType('FoodEstablishmentReservation')
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -470,7 +494,7 @@ exports.getReservations = function(req, res) {
 
 exports.getUserReservations = function(req, res) {
   var userReservations = [];
-  utils.getListByType('FoodEstablishmentReservation')
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
   .then(function(data) {
     userReservations = utils.getUserReservations(
       req.params.user,
@@ -486,7 +510,7 @@ exports.getUserReservations = function(req, res) {
 
 exports.getRestaurantReservations = function(req, res) {
   var restaurantReservations = [];
-  utils.getListByType('FoodEstablishmentReservation')
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
   .then(function(data) {
     restaurantReservations = utils.getRestaurantReservations(
       req.params.restaurant,
@@ -502,9 +526,9 @@ exports.getRestaurantReservations = function(req, res) {
 
 exports.getOrganizationReservations = function(req, res) {
   var organizationsReservations = [];
-  utils.getListByType('FoodEstablishmentReservation')
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
   .then(function(reservations) {
-    utils.getListByType('Restaurant')
+    utils.getListByType('Restaurant', null, req.headers)
     .then(function(restaurants) {
       organizationsReservations = utils.getOrgReservations(
         req.params.org,
@@ -552,7 +576,8 @@ exports.updateSensors = function(req, res) {
     authRequest(
       '/v2/entities/' + restaurant.Name,
       'GET',
-      {'type': 'Restaurant'})
+      {'type': 'Restaurant'},
+      fiwareHeaders)
       .then(
         function(data) {
           // restaurant exists
@@ -565,11 +590,16 @@ exports.updateSensors = function(req, res) {
             'name': restaurant.Room,
             'value': item.attributes[0].value
           };
+          var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
+          if (typeof data.department.value !== 'undefined') {
+            fwHeaders['fiware-servicepath'] = '/' + data.department.value;
+          }
           // update restaurant
           return authRequest(
             '/v2/entities/' + restaurant.Name,
             'POST',
-            schema)
+            schema,
+            fwHeaders)
             .then(
               function(data) {
                 // restaurant updated
