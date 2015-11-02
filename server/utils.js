@@ -491,7 +491,7 @@ function restaurantToOrion(schemaObject, geoObject) {
 
 }
 
-function reviewToOrion(schemaObject) {
+function reviewToOrion(userObject, schemaObject) {
 
   // -- TODO: add user from session
   // -- TODO: check how to implement 'position field'
@@ -499,15 +499,18 @@ function reviewToOrion(schemaObject) {
   // -- - a restaurant, the review position increase;
   // -- - but the only one able to modify it is the user
   // -- - We need that way cause we cannot display 'ids'
-  schemaObject = replaceTypeForOrion(schemaObject);
-  var rname = schemaObject.itemReviewed.name;
-  rname += '-' + shortid.generate();
-  schemaObject.id = rname;
-  schemaObject.author = {};
-  schemaObject.author.type = 'Person';
-  schemaObject.dateCreated = Date.now();
-  return sortObject(schemaObject);
 
+  if (userObject) {
+    schemaObject = replaceTypeForOrion(schemaObject);
+    var rname = schemaObject.itemReviewed.name;
+    rname += '-' + shortid.generate();
+    schemaObject.id = rname;
+    schemaObject.author = {};
+    schemaObject.author.type = 'Person';
+    schemaObject.author.name = userObject.id;
+    schemaObject.dateCreated = new Date().toISOString();
+  }
+  return sortObject(schemaObject);
 }
 
 function reservationToOrion(schemaObject) {

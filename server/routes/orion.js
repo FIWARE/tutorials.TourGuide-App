@@ -10,6 +10,7 @@ var authRequest = require('../authrequest');
 var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
 var async = require('async');
+var auth = require('../auth');
 
 // Restaurants
 
@@ -123,44 +124,53 @@ exports.createReview = function(req, res) {
   var aggregateRatings;
   // -- We first get information regarding the restaurant
   utils.getListByType('Restaurant', restaurantName)
-  .then(function(data) {
-    elementToOrion = utils.reviewToOrion(elementToOrion);
-    utils.sendRequest('POST', elementToOrion)
     .then(function(data) {
-      utils.getListByType('Review')
-      .then(function(data) {
-        restaurantReviews = utils.getRestaurantReviews(
-          restaurantName,
-          data.body);
-        aggregateRatings = utils.getAggregateRating(
-          restaurantReviews);
-        utils.sendRequest('PATCH', aggregateRatings, restaurantName)
+      auth.getUserDataPromise(req)
         .then(function(data) {
-          res.end();
+          elementToOrion = utils.reviewToOrion(data, elementToOrion);
+          console.log(elementToOrion);
+          utils.sendRequest('POST', elementToOrion)
+            .then(function(data) {
+              utils.getListByType('Review')
+                .then(function(data) {
+                  restaurantReviews = utils.getRestaurantReviews(
+                    restaurantName,
+                    data.body);
+                  aggregateRatings = utils.getAggregateRating(
+                    restaurantReviews);
+                  utils.sendRequest('PATCH', aggregateRatings,
+                      restaurantName)
+                    .then(function(data) {
+                      res.end();
+                    })
+                    .catch(function(err) {
+                      res.statusCode = err.statusCode;
+                      res.json(err.error);
+                    });
+                })
+                .catch(function(err) {
+                  res.statusCode = err.statusCode;
+                  res.json(err.error);
+                });
+              res.headers = data.headers;
+              res.location('/api/orion/review/' + elementToOrion.id);
+              res.statusCode = data.statusCode;
+              res.end();
+            })
+            .catch(function(err) {
+              res.statusCode = err.statusCode;
+              res.end();
+            });
         })
         .catch(function(err) {
           res.statusCode = err.statusCode;
-          res.json(err.error);
+          res.json(JSON.parse(err.data));
         });
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.json(err.error);
-      });
-      res.headers = data.headers;
-      res.location('/api/orion/review/' + elementToOrion.id);
-      res.statusCode = data.statusCode;
-      res.end();
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
-      res.end();
+      res.json(err.error);
     });
-  })
-  .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.json(err.error);
-  });
 };
 
 exports.readReview = function(req, res) {
@@ -179,43 +189,64 @@ exports.updateReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
   var restaurantName;
+  var userId;
   utils.getListByType('Review', req.params.id)
-  .then(function(data) {
-    restaurantName = data.body.itemReviewed.name;
-    utils.sendRequest('PATCH', req.body, req.params.id)
     .then(function(data) {
-      utils.getListByType('Review')
-      .then(function(data) {
-        restaurantReviews = utils.getRestaurantReviews(
-          restaurantName,
-          data.body);
-        aggregateRatings = utils.getAggregateRating(
-          restaurantReviews);
-        utils.sendRequest('PATCH', aggregateRatings, restaurantName)
+      restaurantName = data.body.itemReviewed.name;
+      userId = data.body.author.name;
+      auth.getUserDataPromise(req)
         .then(function(data) {
-          res.end();
+          if (userId !== data.id) {
+            res.statusCode = 403;
+            res.json({
+              error: {
+                message: 'The resource you are trying to access is forbidden',
+                code: 403,
+                title: 'Forbidden'
+              }
+            });
+          } else {
+            utils.sendRequest('PATCH', req.body, req.params.id)
+              .then(function(data) {
+                utils.getListByType('Review')
+                  .then(function(data) {
+                    restaurantReviews = utils.getRestaurantReviews(
+                      restaurantName,
+                      data.body);
+                    aggregateRatings = utils.getAggregateRating(
+                      restaurantReviews);
+                    utils.sendRequest('PATCH', aggregateRatings,
+                        restaurantName)
+                      .then(function(data) {
+                        res.end();
+                      })
+                      .catch(function(err) {
+                        res.statusCode = err.statusCode;
+                        res.json(err.error);
+                      });
+                  })
+                  .catch(function(err) {
+                    res.statusCode = err.statusCode;
+                    res.json(err.error);
+                  });
+                res.statusCode = data.statusCode;
+                res.end();
+              })
+              .catch(function(err) {
+                res.statusCode = err.statusCode;
+                res.json(err.error);
+              });
+          }
         })
         .catch(function(err) {
           res.statusCode = err.statusCode;
-          res.json(err.error);
+          res.json(JSON.parse(err.data));
         });
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.json(err.error);
-      });
-      res.statusCode = data.statusCode;
-      res.end();
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
       res.json(err.error);
     });
-  })
-  .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.json(err.error);
-  });
 };
 
 exports.deleteReview = function(req, res) {

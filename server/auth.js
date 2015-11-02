@@ -8,6 +8,7 @@
 
 var OAuth2 = require('./oauth2').OAuth2;
 var config = require('./config');
+var Q = require('q');
 
 // Config data from config.js file
 var clientId = config.clientId;
@@ -74,7 +75,6 @@ exports.getUserData = function(req, res) {
         res.statusCode = e.statusCode;
         res.json(JSON.parse(e.data));
       } else {
-        user = JSON.parse(response);
         res.json(user);
       }
     }
@@ -104,4 +104,29 @@ exports.validateRequest = function(req, res, next) {
       }
     }
   );
+};
+
+exports.getUserDataPromise = function(req) {
+  var url = idmURL + '/user/';
+  var user = null;
+  // jshint camelcase: false
+  // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+  var token = req.session.access_token ||
+  (req.params.access_token) ||
+  req.headers['X-Auth-Token'] ||
+  req.headers['x-auth-token'];
+  var deferred = Q.defer();
+  oauth.get(url, token,
+  // jshint camelcase: true
+  // jscs:enable
+    function(e, response) {
+      if (e) {
+        deferred.reject(JSON.parse(e.data));
+      } else {
+        user = JSON.parse(response);
+        deferred.resolve(user);
+      }
+    }
+  );
+  return deferred.promise;
 };
