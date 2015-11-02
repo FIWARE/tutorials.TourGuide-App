@@ -364,26 +364,33 @@ exports.createReservation = function(req, res) {
   var elementToOrion;
   // -- We first get information regarding the restaurant
   utils.getListByType('Restaurant', req.body.reservationFor.name)
+  .then(function(data) {
+    elementToOrion = req.body;
+    elementToOrion.reservationFor.address = data.body.address;
+    auth.getUserDataPromise(req)
     .then(function(data) {
-      elementToOrion = req.body;
-      elementToOrion = utils.reservationToOrion(elementToOrion);
-      elementToOrion.reservationFor.address = data.body.address;
+      elementToOrion = utils.reservationToOrion(data, elementToOrion);
       utils.sendRequest('POST', elementToOrion)
-        .then(function(data) {
-          res.headers = data.headers;
-          res.location('/api/orion/reservation/' + elementToOrion.id);
-          res.statusCode = data.statusCode;
-          res.end();
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.end();
-        });
+      .then(function(data) {
+        res.headers = data.headers;
+        res.location('/api/orion/reservation/' + elementToOrion.id);
+        res.statusCode = data.statusCode;
+        res.end();
+      })
+      .catch(function(err) {
+        res.statusCode = err.statusCode;
+        res.end();
+      });
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
-      res.json(err.error);
+      res.json(JSON.parse(err.data));
     });
+  })
+  .catch(function(err) {
+    res.statusCode = err.statusCode;
+    res.json(err.error);
+  });
 };
 
 exports.readReservation = function(req, res) {
@@ -399,16 +406,45 @@ exports.readReservation = function(req, res) {
 };
 
 exports.updateReservation = function(req, res) {
-  utils.sendRequest('PATCH', req.body, req.params.id)
+  var restaurantName;
+  var userId;
+  utils.getListByType('FoodEstablishmentReservation', req.params.id)
+  .then(function(data) {
+    userId = data.body.underName.name;
+    auth.getUserDataPromise(req)
     .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.end();
+      if (userId !== data.id) {
+        res.statusCode = 403;
+        res.json({
+          error: {
+            message: 'The resource you are trying to access is forbidden',
+            code: 403,
+            title: 'Forbidden'
+          }
+        });
+      } else {
+        utils.sendRequest('PATCH', req.body, req.params.id)
+        .then(function(data) {
+          res.statusCode = data.statusCode;
+          res.end();
+        })
+        .catch(function(err) {
+          res.statusCode = err.statusCode;
+          res.json(err.error);
+        });
+      }
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
-      res.json(err.error);
+      res.json(JSON.parse(err.data));
     });
+  })
+  .catch(function(err) {
+    res.statusCode = err.statusCode;
+    res.json(err.error);
+  });
 };
+
 exports.deleteReservation = function(req, res) {
   utils.sendRequest('DELETE', null, req.params.id)
     .then(function(data) {

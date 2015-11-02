@@ -493,7 +493,6 @@ function restaurantToOrion(schemaObject, geoObject) {
 
 function reviewToOrion(userObject, schemaObject) {
 
-  // -- TODO: add user from session
   // -- TODO: check how to implement 'position field'
   // -- - idea is, whenever a new review is created into
   // -- - a restaurant, the review position increase;
@@ -513,17 +512,21 @@ function reviewToOrion(userObject, schemaObject) {
   return sortObject(schemaObject);
 }
 
-function reservationToOrion(schemaObject) {
+function reservationToOrion(userObject, schemaObject) {
 
-  // -- TODO: add user from session
+  // -- TODO: check automatically if there's enough space at
+  // -- the restaurant, so reservation is accepted automatically
 
-  schemaObject = replaceTypeForOrion(schemaObject);
-  var rname = schemaObject.reservationFor.name;
-  rname += '-' + shortid.generate();
-  schemaObject.id = rname;
-  schemaObject.underName = {};
-  schemaObject.underName.type = 'Person';
-  schemaObject.reservationStatus = 'Pending';
+  if (userObject) {
+    schemaObject = replaceTypeForOrion(schemaObject);
+    var rname = schemaObject.reservationFor.name;
+    rname += '-' + shortid.generate();
+    schemaObject.id = rname;
+    schemaObject.underName = {};
+    schemaObject.underName.type = 'Person';
+    schemaObject.underName.name = userObject.id;
+    schemaObject.reservationStatus = 'Pending';
+  }
   return sortObject(schemaObject);
 }
 
