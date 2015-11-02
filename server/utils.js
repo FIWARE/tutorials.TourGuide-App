@@ -683,9 +683,9 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
 }
 
 function getListByType(type, element) {
-  var uri = '/v2/entities/';
+  var uri = '/v2/entities';
   if (element) {
-    uri += encodeURIComponent(element);
+    uri += '/' + encodeURIComponent(element);
   }
   return authRequest(
     uri,
@@ -694,9 +694,9 @@ function getListByType(type, element) {
 }
 
 function sendRequest(method, body, identifier) {
-  var uri = '/v2/entities/';
+  var uri = '/v2/entities';
   if (identifier) {
-    uri += encodeURIComponent(identifier);
+    uri += '/' + encodeURIComponent(identifier);
   }
   return authRequest(
     uri,
