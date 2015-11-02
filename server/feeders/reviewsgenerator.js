@@ -23,9 +23,11 @@ var utils = require('../utils');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
 var authRequest = require('../authrequest');
-var apiRestSimtasks = 2; // number of simultaneous calls to API REST
+var apiRestSimtasks = 1; // number of simultaneous calls to API REST
 var reviewsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reviewed
+var delay = 200; //time in ms
+var restaurantsModified = 0;
 
 var feedOrionReviews = function() {
   var returnPost = function(data) {
@@ -51,6 +53,7 @@ var feedOrionReviews = function() {
 
   q.drain = function() {
     console.log('Total reviews added: ' + reviewsAdded);
+    triggerRestaurantsRatings();
   };
 
   Object.keys(restaurantsData).forEach(function(element, pos) {
@@ -85,6 +88,51 @@ var feedOrionReviews = function() {
     q.push({
       'attributes': attr
     }, returnPost);
+  });
+};
+
+var triggerRestaurantsRatings = function() {
+
+  var returnPost = function(data) {
+    restaurantsModified++;
+    console.log(restaurantsModified + '/' + restaurantsData.length);
+  };
+
+  var reviews;
+  var restaurantReviews;
+
+  var q = async.queue(function(task, callback) {
+
+    setTimeout(function() {
+      utils.sendRequest('PATCH', task.aggregateRatings, task.restaurantName)
+      .then(callback)
+      .catch(function(err) {
+        console.log(err.error);
+      });
+    }, delay);
+
+  }, apiRestSimtasks);
+
+  q.drain = function() {
+    console.log('Total restaurants modified: ' + restaurantsModified);
+  };
+
+  utils.getListByType('Review')
+  .then(function(data) {
+    reviews = data.body;
+    Object.keys(restaurantsData).forEach(function(element, pos) {
+      var restaurantName = restaurantsData[pos].id;
+      restaurantReviews = utils.getRestaurantReviews(
+        restaurantName,
+        reviews);
+      var ratings = utils.getAggregateRating(
+        restaurantReviews);
+      q.push({'aggregateRatings': ratings,
+        'restaurantName': restaurantName}, returnPost);
+    });
+  })
+  .catch(function(err) {
+    console.log(err);
   });
 };
 
