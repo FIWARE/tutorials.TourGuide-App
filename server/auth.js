@@ -75,6 +75,7 @@ exports.getUserData = function(req, res) {
         res.statusCode = e.statusCode;
         res.json(JSON.parse(e.data));
       } else {
+        user = JSON.parse(response);
         res.json(user);
       }
     }
