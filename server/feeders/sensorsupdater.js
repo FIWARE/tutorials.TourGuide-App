@@ -84,29 +84,40 @@ var feedIDASSensors = function() {
         var newValue = generateRandomValue(
           getOldValue(restaurantsData[pos], place, type),0,100
         );
-        q.push({
-          'name': sensorBaseName + '_' + place,
-          'type': type,
-          'value': newValue
-        }, cbShowProgress);
+        if (typeof newValue !== 'undefined') {
+          q.push({
+            'name': sensorBaseName + '_' + place,
+            'type': type,
+            'value': newValue
+          }, cbShowProgress);
+        } else {
+          console.log('No', type, 'sensor data found for',
+                      sensorBaseName + '_' + place);
+        }
       });
     });
   });
 };
 
 function generateRandomValue(oldValue, min, max) {
-  // generate a new value using the old value as base
-  var sign = Date.now() % 2;
-  var variance = Date.now() % 3;
-  var newValue;
-  if (sign === 0) {
-    newValue = parseInt(oldValue) + variance;
-    newValue = newValue > max ? max : newValue;
+
+  if (typeof oldValue !== 'undefined') {
+    // generate a new value using the old value as base
+    var sign = Date.now() % 2;
+    var variance = Date.now() % 3;
+    var newValue;
+    if (sign === 0) {
+      newValue = parseInt(oldValue) + variance;
+      newValue = newValue > max ? max : newValue;
+    } else {
+      newValue = parseInt(oldValue) - variance;
+      newValue = newValue < min ? min : newValue;
+    }
+    return newValue;
   } else {
-    newValue = parseInt(oldValue) - variance;
-    newValue = newValue < min ? min : newValue;
+    return undefined;
   }
-  return newValue;
+
 }
 
 function getOldValue(data, place, type) {
@@ -124,11 +135,11 @@ function getOldValue(data, place, type) {
     console.log('Unsupported sensor type:', type);
     return undefined;
   }
-  var val = 10;
   if (typeof data[attr] !== 'undefined') {
-    val = data[attr].value;
+    return data[attr].value;
+  } else {
+    return undefined;
   }
-  return val;
 }
 
 // Load restaurant data from Orion
