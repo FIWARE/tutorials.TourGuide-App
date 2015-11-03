@@ -24,7 +24,7 @@ var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 
-var apiRestSimtasks = 10;
+var apiRestSimtasks = 5;
 var restaurantsData;
 var sensorsUpdated = 0;
 
