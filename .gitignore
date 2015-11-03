@@ -1,0 +1,5 @@
+nbactions.xml
+target/
+node_modules/
+.idea/
+npm-debug.log
