@@ -21,7 +21,5 @@ In order to run the client, just execute the `hiveserver2-client` script:
     $ python hiveserver2-client <hive_host> <hive_port> <db_name> <hadoop_user> <hadoop_password>
 
 ##Contact
-
 Francisco Romero Bueno (francisco.romerobueno@telefonica.com)
-<br>
-Fermín Galán Márquez (fermin.galanmarquez@telefonica.com)
+
