@@ -60,7 +60,6 @@ function _configure_params () {
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
-        -e "s|FIWARE_SERVICE|${FIWARE_SERVICE}|g" \
         -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
         -e "s|ORION_PORT|${ORION_PORT}|g" \
         -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g" \
@@ -68,6 +67,7 @@ function _configure_params () {
         -e "s|IDAS_PORT|${IDAS_PORT}|g" \
         -e "s|IDAS_FIWARE_SERVICE_PATH|${IDAS_FIWARE_SERVICE_PATH}|g" \
         -e "s|IDAS_FIWARE_SERVICE|${IDAS_FIWARE_SERVICE}|g" \
+        -e "s|FIWARE_SERVICE|${FIWARE_SERVICE}|g" \
         -e "s|IDAS_API_KEY|${IDAS_API_KEY}|g" \
         -e "s|ORION_NO_PROXY_HOSTNAME|${ORION_NO_PROXY_HOSTNAME}|g"
 
