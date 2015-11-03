@@ -199,6 +199,7 @@ exports.updateReview = function(req, res) {
   var aggregateRatings;
   var restaurantName;
   var userId;
+  var servicePath;
   utils.getListByType('Review', req.params.id, req.headers)
     .then(function(data) {
       restaurantName = data.body.itemReviewed.name;
@@ -218,7 +219,8 @@ exports.updateReview = function(req, res) {
             utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
               .then(function(data) {
                 var fwHeaders = JSON.parse(JSON.stringify(req.headers));
-                if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
+                if (typeof fwHeaders['fiware-servicepath'] !==
+                  'undefined') {
                   delete fwHeaders['fiware-servicepath'];
                 }
                 utils.getListByType('Review', null, fwHeaders)
@@ -228,12 +230,23 @@ exports.updateReview = function(req, res) {
                       data.body);
                     aggregateRatings = utils.getAggregateRating(
                       restaurantReviews);
-                    utils.sendRequest('PATCH', aggregateRatings,
-                                      restaurantName, req.headers)
+                    utils.getListByType('Restaurant', restaurantName,
+                        req.headers)
                       .then(function(data) {
-                        res.end();
+                        servicePath = data.body.department;
+                        req.headers['fiware-servicepath'] = '/' +
+                          servicePath;
+                        utils.sendRequest('PATCH', aggregateRatings,
+                            restaurantName, req.headers)
+                          .then(function(data) {
+                            res.end();
+                          })
+                          .catch(function(err) {
+                            res.statusCode = err.statusCode;
+                            res.json(err.error);
+                          });
                       })
-                      .catch(function(err) {
+                      .patch(function(err) {
                         res.statusCode = err.statusCode;
                         res.json(err.error);
                       });
@@ -266,48 +279,55 @@ exports.deleteReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
   var restaurantName;
+  var servicePath;
   utils.getListByType('Review', req.params.id, req.headers)
-  .then(function(data) {
-    restaurantName = data.body.itemReviewed.name;
-    utils.sendRequest('DELETE', null, req.params.id, req.headers)
     .then(function(data) {
-      var fwHeaders = JSON.parse(JSON.stringify(req.headers));
-      if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
-        delete fwHeaders['fiware-servicepath'];
-      }
-      utils.getListByType('Review', null, fwHeaders)
-      .then(function(data) {
-        restaurantReviews = utils.getRestaurantReviews(
-          restaurantName,
-          data.body);
-        aggregateRatings = utils.getAggregateRating(
-          restaurantReviews);
-        utils.sendRequest('PATCH', aggregateRatings,
-                          restaurantName, req.headers)
+      restaurantName = data.body.itemReviewed.name;
+      utils.getListByType('Restaurant', restaurantName, req.headers)
         .then(function(data) {
-          res.end();
+          servicePath = data.body.department;
+          utils.sendRequest('DELETE', null, req.params.id, req.headers)
+            .then(function(data) {
+              utils.getListByType('Review', null, req.headers)
+                .then(function(data) {
+                  restaurantReviews = utils.getRestaurantReviews(
+                    restaurantName,
+                    data.body);
+                  aggregateRatings = utils.getAggregateRating(
+                    restaurantReviews);
+                  req.headers['fiware-servicepath'] = '/' + servicePath;
+                  utils.sendRequest('PATCH', aggregateRatings,
+                      restaurantName, req.headers)
+                    .then(function(data) {
+                      console.log(data);
+                      res.end();
+                    })
+                    .catch(function(err) {
+                      res.statusCode = err.statusCode;
+                      res.json(err.error);
+                    });
+                })
+                .catch(function(err) {
+                  res.statusCode = err.statusCode;
+                  res.json(err.error);
+                });
+              res.statusCode = data.statusCode;
+              res.end();
+            })
+            .catch(function(err) {
+              res.statusCode = err.statusCode;
+              res.json(err.error);
+            });
         })
         .catch(function(err) {
           res.statusCode = err.statusCode;
           res.json(err.error);
         });
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.json(err.error);
-      });
-      res.statusCode = data.statusCode;
-      res.end();
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
       res.json(err.error);
     });
-  })
-  .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.json(err.error);
-  });
 };
 
 exports.getReviews = function(req, res) {
