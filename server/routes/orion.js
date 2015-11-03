@@ -591,8 +591,8 @@ exports.updateSensors = function(req, res) {
             'value': item.attributes[0].value
           };
           var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
-          if (typeof data.department.value !== 'undefined') {
-            fwHeaders['fiware-servicepath'] = '/' + data.department.value;
+          if (typeof data.body.department !== 'undefined') {
+            fwHeaders['fiware-servicepath'] = '/' + data.body.department;
           }
           // update restaurant
           return authRequest(
