@@ -41,7 +41,7 @@ RUN mkdir fix-node-passenger && \
     mkdir ${SUBSCRIPTIONS_PATH}
 # fi
 
-COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
+COPY subscription-humidity-sensors.sh subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 
 # enable modules, disable default site, restart service
 RUN a2enmod ssl && a2enmod passenger && \
