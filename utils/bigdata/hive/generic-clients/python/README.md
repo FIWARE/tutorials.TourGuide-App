@@ -9,7 +9,7 @@ Thus, start by installing `python_hive_utils`:
     
 In order to run the client, just execute the `hiveserver1-client` script:
 
-    $ python hiveserver1-client <hive_host> <hive_port> <db_name> <hadoop_user> <hadoop_password>
+    $ python hiveserver1-client.py <hive_host> <hive_port> <db_name> <hadoop_user> <hadoop_password>
 
 ##HiveServer2 client
 This sample code works with [`pyhs2`](https://github.com/BradRuderman/pyhs2), thus start by installing it:
@@ -18,7 +18,7 @@ This sample code works with [`pyhs2`](https://github.com/BradRuderman/pyhs2), th
     
 In order to run the client, just execute the `hiveserver2-client` script:
 
-    $ python hiveserver2-client <hive_host> <hive_port> <db_name> <hadoop_user> <hadoop_password>
+    $ python hiveserver2-client.py <hive_host> <hive_port> <db_name> <hadoop_user> <hadoop_password>
 
 ##Contact
 Francisco Romero Bueno (francisco.romerobueno@telefonica.com)
