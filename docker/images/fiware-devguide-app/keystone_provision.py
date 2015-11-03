@@ -28,6 +28,18 @@ def _register_user(keystone, name, activate=True):
             activation_key=user.activation_key)
     return user
 
+def _create_organization(keystone, org_name):
+    org = keystone.projects.create(
+        name=org_name,
+        description=('Test '+org_name),
+        domain=settings.KEYSTONE_DEFAULT_DOMAIN,
+        enabled=True,
+        img='/static/dashboard/img/logos/small/group.png',
+        city='',
+        email='',
+        website='')
+    return org
+
 @task
 def test_data(keystone_path=settings.KEYSTONE_ROOT):
     """Populate the database with some users, organizations and applications
@@ -71,33 +83,18 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     pep_user = _register_user(keystone, 'pepproxy')
 
-    # Create Org A and Org B
+    # Create Franchises
 
-    org_a = keystone.projects.create(
-        name='Organization A',
-        description='Test Organization A',
-        domain=settings.KEYSTONE_DEFAULT_DOMAIN,
-        enabled=True,
-        img='/static/dashboard/img/logos/small/group.png',
-        city='',
-        email='',
-        website='')
-    keystone.roles.grant(user=pep_user.id,
-                         role=owner_role.id,
-                         project=org_a.id)
+    franchises = []
 
-    org_b = keystone.projects.create(
-        name='Organization B',
-        description='Test Organization B',
-        domain=settings.KEYSTONE_DEFAULT_DOMAIN,
-        enabled=True,
-        img='/static/dashboard/img/logos/small/group.png',
-        city='',
-        email='',
-        website='')
-    keystone.roles.grant(user=pep_user.id,
+    for i in range(4):
+        franchises.append(_create_organization(keystone, 'Franchise' + str(i+1)))
+
+
+    for franchise in franchises:
+        keystone.roles.grant(user=pep_user.id,
                          role=owner_role.id,
-                         project=org_b.id)
+                         project=franchise.id)
 
     # Create Devguide APP and give provider role to the pepProxy
     # TODO: modify the url + callback when the app is ready
@@ -113,55 +110,84 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
     provider_role = next(r for r
                          in keystone.fiware_roles.roles.list()
                          if r.name == 'provider')
+
     keystone.fiware_roles.roles.add_to_user(
         role=provider_role.id,
         user=pep_user.id,
         application=devguide_app.id,
         organization=pep_user.default_project_id)
 
-    # Create a role 'manager' for the application
-    role_manager = keystone.fiware_roles.roles.create(
-        name='manager Operations',
+    # Creating roles
+
+    # End user
+    end_user = keystone.fiware_roles.roles.create(
+        name='End user',
         is_internal=False,
         application=devguide_app.id)
 
-    # Create a role 'restaurant_viewer' for the application
-    restaurant_viewer = keystone.fiware_roles.roles.create(
-        name='Restaurant Viewer',
+    # Franchise manager
+    franchise_manager = keystone.fiware_roles.roles.create(
+        name='Franchise manager',
         is_internal=False,
         application=devguide_app.id)
 
-    # Make user 0 owner of the organization A and give manager role
-    user0 = users[0]
-    
-    keystone.roles.grant(user=user0.id,
-                         role=owner_role.id,
-                         project=org_a.id)
+    # Global manager
+    global_manager = keystone.fiware_roles.roles.create(
+        name='Global manager',
+        is_internal=False,
+        application=devguide_app.id)
 
-    # Make user 1 owner of the organization B and give manager role
-    user1 = users[1]
-
-    keystone.roles.grant(user=user1.id,
-                         role=owner_role.id,
-                         project=org_b.id)
 
     # Make all users Restaurant viewers
+
     for user in users:
         keystone.fiware_roles.roles.add_to_user(
-            role=restaurant_viewer.id,
+            role=end_user.id,
             user=user.id,
             application=devguide_app.id,
             organization=user.default_project_id)
 
-    # Make user0 Role Manager
+    # Make user0 Global Manager
 
     keystone.fiware_roles.roles.add_to_user(
-        role=role_manager.id,
-        user=user0.id,
+        role=global_manager.id,
+        user=users[0].id,
         application=devguide_app.id,
-        organization=user0.default_project_id)
+        organization=users[0].default_project_id)
 
-    # Adding permissions for manager and restaurants
+    keystone.fiware_roles.roles.add_to_user(
+        role=franchise_manager.id,
+        user=users[1].id,
+        application=devguide_app.id,
+        organization=franchises[0].id)
+
+    keystone.fiware_roles.roles.add_to_user(
+        role=franchise_manager.id,
+        user=users[2].id,
+        application=devguide_app.id,
+        organization=franchises[1].id)
+
+    keystone.fiware_roles.roles.add_to_user(
+        role=franchise_manager.id,
+        user=users[3].id,
+        application=devguide_app.id,
+        organization=franchises[2].id)
+
+    keystone.fiware_roles.roles.add_to_user(
+        role=franchise_manager.id,
+        user=users[4].id,
+        application=devguide_app.id,
+        organization=franchises[3].id)
+
+    for i in range(4):
+        keystone.roles.grant(user=users[i+1].id,
+            role=owner_role.id,
+            project=franchises[i].id)
+
+
+    # Make user1-4 Frnanchise Manager
+
+    # Adding permissions for manager and restaurants (TODO)
 
     perm0 = keystone.fiware_roles.permissions.create(
                 name='reservations', 
@@ -171,7 +197,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    role_manager, perm0)
+                    global_manager, perm0)
 
     perm1 = keystone.fiware_roles.permissions.create(
                 name='reviews', 
@@ -181,7 +207,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    role_manager, perm1)
+                    global_manager, perm1)
 
     perm2 = keystone.fiware_roles.permissions.create(
                 name='restaurants', 
@@ -191,7 +217,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                 is_internal=False)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    role_manager, perm2)
+                    global_manager, perm2)
 
     keystone.fiware_roles.permissions.add_to_role(
-                    restaurant_viewer, perm2)
+                    global_manager, perm2)
