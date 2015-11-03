@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DEVGUIDE_HOST=$( hostname -i )
-DEVGUIDE_URL=http://${DEVGUIDE_HOST}/api/orion/sensors/
+DEVGUIDE_URL=http://${DEVGUIDE_HOST}/api/sensors/
 ORION_URL=http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/v1/subscribeContext
 
 # IDAS temperature sensors used in restaurants

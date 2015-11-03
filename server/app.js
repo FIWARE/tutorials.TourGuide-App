@@ -77,7 +77,7 @@ app.get('/api/orion/reservations/organization/:org',
 
 // Sensors
 
-app.post('/api/orion/sensors', orion.updateSensors);
+app.post('/api/sensors', orion.updateSensors);
 
 // END API REST
 
