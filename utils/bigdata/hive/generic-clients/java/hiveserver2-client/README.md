@@ -22,7 +22,5 @@ You can write any set of HiveQL senteces separated by `;`, for instance:
 Type `exit;` for closing the client.
 
 ##Contact
-
 Francisco Romero Bueno (francisco.romerobueno@telefonica.com)
-<br>
-Fermin Galán Márquez (fermin.galanmarquez@telefonica.com)
+
