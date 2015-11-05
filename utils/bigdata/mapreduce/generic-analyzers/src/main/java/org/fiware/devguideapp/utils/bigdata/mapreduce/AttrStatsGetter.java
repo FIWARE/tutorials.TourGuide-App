@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -14,29 +15,38 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 /**
  *
  * @author frb
  */
-public final class AttrStatsGetter {
+public final class AttrStatsGetter extends Configured implements Tool {
     
     private static Configuration conf;
     private static FileSystem fs;
     private static Path baseInputFolder;
     private static Path baseOutputFolder;
-    
-    /**
-     * Constructor. It is private since utility classes should not have a pulbic or default constructor.
-     */
-    private AttrStatsGetter() {
-    } // AttrStatsGetter
-    
+
     /**
      * Main method.
      * @param args
+     * @throws java.lang.Exception
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(), new AttrStatsGetter(), args);
+        System.exit(res);
+    } // main
+    
+    @Override
+    public int run(String[] args) throws Exception {
+        // check the number of arguments, show the usage if it is wrong
+        if (args.length != 3) {
+            showUsage();
+            return -1;
+        } // if
+        
         try {
             // Get the arguments
             baseInputFolder = new Path(args[0]);
@@ -48,29 +58,45 @@ public final class AttrStatsGetter {
             fs = FileSystem.get(conf);
 
             // Iterate the input folder
-            process(baseInputFolder);
+            return process(baseInputFolder);
         } catch (IOException ex) {
             Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
-        } // try catch // try catch // try catch // try catch
-    } // main
+            return 0;
+        } // try catch
+    } // run
     
-    private static void process(Path baseInputFolderName) {
+    private void showUsage() {
+        System.out.println("Usage:");
+        System.out.println();
+        System.out.println("hadoop jar \\");
+        System.out.println("   target/generic-analyzers-0.0.0-SNAPSHOT.jar \\");
+        System.out.println("   org.fiware.devguideapp.utils.mapreduce.AttrStatsGetter \\");
+        System.out.println("   -libjars target/generic-analyzers-0.0.0-SNAPSHOT.jar \\");
+        System.out.println("   <HDFS input> \\");
+        System.out.println("   <HDFS output>");
+    } // showUsage
+    
+    private static int process(Path baseInputFolderName) {
         try {
+            int res = 0;
             FileStatus[] fileStatus = fs.listStatus(baseInputFolderName);
             
             for (FileStatus fileStat : fileStatus) {
                 if (fileStat.isDir()) {
-                    process(fileStat.getPath());
+                    res = process(fileStat.getPath());
                 } else {
-                    analyze(baseInputFolderName);
+                    res = analyze(baseInputFolderName);
                 } // if else
             } // for
+            
+            return res;
         } catch (IOException ex) {
             Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
-        } // try catch // try catch // try catch // try catch
+            return 1;
+        } // try catch
     } // process
     
-    private static boolean analyze(Path input) {
+    private static int analyze(Path input) {
         try {
             Job job = Job.getInstance(conf, "mr-temperature");
             job.setNumReduceTasks(0);
@@ -85,11 +111,17 @@ public final class AttrStatsGetter {
             FileOutputFormat.setOutputPath(job, new Path(baseOutputFolder.getName() + input.getName()));
             
             // run the MapReduce job
-            return job.waitForCompletion(true);
-        } catch (IOException | InterruptedException | ClassNotFoundException ex) {
+            return job.waitForCompletion(true) ? 0 : 1;
+        } catch (IOException ex) {
             Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } // try catch // try catch
+            return 1;
+        } catch (InterruptedException ex) {
+            Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
+            return 1;
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
+            return 1;
+        } // try catch
     } // analyze
     
 } // AttrStatsGetter
