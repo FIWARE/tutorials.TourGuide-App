@@ -1,0 +1,402 @@
+{
+  "0. Get version": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/version",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ]
+    ]
+  },
+  "1. Get types": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextTypes",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "1. Get reservation": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntityTypes\/FoodEstablishmentReservation",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "1. Get restaurant": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntityTypes\/Restaurant",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "1. Get review": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntityTypes\/Review",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "1. Get entities": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntities",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "2. Eibar (circle)": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"Restaurant\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::Location\",\n                \"value\": {\n                    \"circle\": {\n                        \"centerLatitude\": \"43.185335\",\n                        \"centerLongitude\": \"-2.471404\",\n                        \"radius\": \"20000\"\n                    }\n                }\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "2. Eibar (polygon)": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"Restaurant\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::Location\",\n                \"value\": {\n                    \"polygon\": {\n                        \"vertices\": [\n                            {\n                                \"latitude\": \"43.178057\",\n                                \"longitude\": \"-2.494188\"\n                            },\n                            {\n                                \"latitude\": \"43.193343\",\n                                \"longitude\": \"-2.472194\"\n                            },\n                            {\n                                \"latitude\": \"43.198821\",\n                                \"longitude\": \"-2.428804\"\n                            },\n\t\t\t\t\t\t\t{\n                                \"latitude\": \"43.169997\",\n                                \"longitude\": \"-2.468715\"\n                            }\n                        ]\n                    }\n                }\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "3. Arzak": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntities\/Arzak",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "3. Create Arzak": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntities",
+    "body": "{\n    \"type\": \"Restaurant\",\n    \"isPattern\": \"false\",\n    \"id\": \"Arzak\",\n    \"attributes\": [\n        {\n            \"name\": \"address\",\n            \"type\": \"\",\n            \"value\": {\n                \"type\": \"postalAddress\",\n                \"streetAddress\": \"Alcala 121\",\n                \"addressRegion\": \"Madrid\",\n                \"addressLocality\": \"Madrid\",\n                \"postalCode\": \"28043\"\n            }\n        }\n    ]\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "ecfi"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "4. Subscribe restaurants": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/subscribeContext",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"Restaurant\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"attributes\": [ ],\n    \"reference\": \"http:\/\/172.17.42.1:5050\/notify\",\n    \"duration\": \"P1M\",\n    \"notifyConditions\": [\n        {\n            \"type\": \"ONCHANGE\",\n            \"condValues\": [\n                \"aggregateRating\"\n            ]\n        }\n    ]\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "4. Update aggregateRating": {
+    "method": "PUT",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntities\/Ziaboga\/attributes\/aggregateRating",
+    "body": "{\n    \"value\": \"4.0\"\n} ",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ],
+      [
+        "Fiware-ServicePath",
+        "\/Franchise1"
+      ]
+    ]
+  },
+  "5. Filter priceRange": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"Restaurant\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::StringQuery\",\n                \"value\": \"priceRange<20\"\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "5. Filter partySize": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"FoodEstablishmentReservation\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::StringQuery\",\n                \"value\": \"partySize<5\"\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "5. Filter reservationStatus": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"FoodEstablishmentReservation\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::StringQuery\",\n                \"value\": \"reservationStatus==Pending\"\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "5. Filter geo-query + priceRange": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/queryContext?details=on",
+    "body": "{\n    \"entities\": [\n        {\n            \"type\": \"Restaurant\",\n            \"isPattern\": \"true\",\n            \"id\": \".*\"\n        }\n    ],\n    \"restriction\": {\n        \"scopes\": [\n            {\n                \"type\": \"FIWARE::Location\",\n                \"value\": {\n                    \"circle\": {\n                        \"centerLatitude\": \"43.185335\",\n                        \"centerLongitude\": \"-2.471404\",\n                        \"radius\": \"20000\"\n                    }\n                }\n            },\n            {\n                \"type\": \"FIWARE::StringQuery\",\n                \"value\": \"priceRange<20\"\n            }\n        ]\n    }\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "5. FIlter NGSIv2 priceRange": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v2\/entities?type=Restaurant&q=priceRange>70&options=count",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "5. Filter NGSIv2 reservationStatus": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v2\/entities?type=FoodEstablishmentReservation&q=reservationStatus==Pending&options=count",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "5. Filter NGSIv2 geo-query": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v2\/entities?type=Restaurant&geometry=circle;radius=15000&coords=43.185335,-2.471404&options=count",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "6. Get temperature": {
+    "method": "GET",
+    "url": "http:\/\/localhost:1026\/v1\/contextEntities\/Kandela\/attributes\/temperature",
+    "body": "",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ]
+    ]
+  },
+  "7. Register CPr": {
+    "method": "POST",
+    "url": "http:\/\/localhost:1026\/v1\/registry\/registerContext",
+    "body": "{\n    \"contextRegistrations\": [\n        {\n            \"entities\": [\n                {\n                    \"type\": \"Restaurant\",\n                    \"isPattern\": \"false\",\n                    \"id\": \"Kandela\"\n                }\n            ],\n            \"attributes\": [\n                {\n                    \"name\": \"temperature\",\n                    \"type\": \"\",\n                    \"isDomain\": \"false\"\n                }\n            ],\n            \"providingApplication\": \"http:\/\/172.17.42.1:9000\/v1\"\n        }\n    ],\n    \"duration\": \"P1M\"\n}",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ]
+    ]
+  },
+  "7. Set temperature (CPr)": {
+    "method": "PUT",
+    "url": "http:\/\/localhost:9000\/v1\/contextEntities\/Kandela\/attributes\/temperature",
+    "body": "{\n    \"value\": \"25.6C\"\n}\n",
+    "overrideMimeType": false,
+    "headers": [
+      [
+        "Accept",
+        "application\/json"
+      ],
+      [
+        "Fiware-Service",
+        "devguide"
+      ],
+      [
+        "Content-Type",
+        "application\/json"
+      ],
+      [
+        "Fiware-ServicePath",
+        "\/Franchise1"
+      ]
+    ]
+  }
+}
