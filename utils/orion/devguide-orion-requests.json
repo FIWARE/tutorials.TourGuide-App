@@ -188,7 +188,7 @@
     ]
   },
   "4. Update aggregateRating": {
-    "method": "POST",
+    "method": "PUT",
     "url": "http:\/\/localhost:1026\/v1\/contextEntities\/Ziaboga\/attributes\/aggregateRating",
     "body": "{\n    \"value\": \"4.0\"\n} ",
     "overrideMimeType": false,
@@ -376,7 +376,7 @@
     ]
   },
   "7. Set temperature (CPr)": {
-    "method": "POST",
+    "method": "PUT",
     "url": "http:\/\/localhost:9000\/v1\/contextEntities\/Kandela\/attributes\/temperature",
     "body": "{\n    \"value\": \"25.6C\"\n}\n",
     "overrideMimeType": false,
