@@ -3,3 +3,5 @@ target/
 node_modules/
 .idea/
 npm-debug.log
+/utils/bigdata/mapreduce/mr-temperature/nbproject/private/
+.DS_Store
