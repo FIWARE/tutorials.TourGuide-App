@@ -75,9 +75,9 @@ public final class AttrStatsGetter extends Configured implements Tool {
         System.out.println("Usage:");
         System.out.println();
         System.out.println("hadoop jar \\");
-        System.out.println("   target/generic-analyzers-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
+        System.out.println("   target/generic-jobs-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
         System.out.println("   org.fiware.devguideapp.utils.bigdata.mapreduce.AttrStatsGetter \\");
-        System.out.println("   -libjars target/generic-analyzers-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
+        System.out.println("   -libjars target/generic-jobs-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
         System.out.println("   <file system host> \\");
         System.out.println("   <file system port> \\");
         System.out.println("   <HDFS input> \\");
