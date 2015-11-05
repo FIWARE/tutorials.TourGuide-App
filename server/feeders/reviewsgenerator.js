@@ -104,13 +104,24 @@ var triggerRestaurantsRatings = function() {
 
   var reviews;
   var restaurantReviews;
+  var servicePath;
 
   var q = async.queue(function(task, callback) {
 
     setTimeout(function() {
-      utils.sendRequest('PATCH', task.aggregateRatings,
-                        task.restaurantName, fiwareHeaders)
-      .then(callback)
+      utils.getListByType('Restaurant', task.restaurantName, fiwareHeaders)
+      .then(function(data) {
+        var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
+        if (typeof data.body.department !== 'undefined') {
+          fwHeaders['fiware-servicepath'] = '/' + data.body.department;
+        }
+        utils.sendRequest('PATCH', task.aggregateRatings,
+          task.restaurantName, fwHeaders)
+        .then(callback)
+        .catch(function(err) {
+          console.log(err.error);
+        });
+      })
       .catch(function(err) {
         console.log(err.error);
       });
