@@ -26,6 +26,8 @@ public final class AttrStatsGetter extends Configured implements Tool {
     
     private static Configuration conf;
     private static FileSystem fs;
+    private static String fsHost;
+    private static String fsPort;
     private static Path baseInputFolder;
     private static Path baseOutputFolder;
 
@@ -41,20 +43,22 @@ public final class AttrStatsGetter extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
-        // check the number of arguments, show the usage if it is wrong
-        if (args.length != 3) {
+        // Check the number of arguments, show the usage if it is wrong
+        if (args.length != 4) {
             showUsage();
             return -1;
         } // if
         
         try {
             // Get the arguments
-            baseInputFolder = new Path(args[0]);
-            baseOutputFolder = new Path(args[1]);
+            fsHost = args[0];
+            fsPort = args[1];
+            baseInputFolder = new Path(args[2]);
+            baseOutputFolder = new Path(args[3]);
             
             // Get a HDFS file system object
             conf = new Configuration();
-            conf.set("fs.default.name", "hdfs://localhost:8020");
+            conf.set("fs.default.name", "hdfs://" + fsHost + ":" + fsPort);
             fs = FileSystem.get(conf);
 
             // Iterate the input folder
@@ -62,16 +66,18 @@ public final class AttrStatsGetter extends Configured implements Tool {
         } catch (IOException ex) {
             Logger.getLogger(AttrStatsGetter.class.getName()).log(Level.SEVERE, null, ex);
             return 0;
-        } // try catch
+        } // try catch // try catch // try catch // try catch
     } // run
     
     private void showUsage() {
         System.out.println("Usage:");
         System.out.println();
         System.out.println("hadoop jar \\");
-        System.out.println("   target/generic-analyzers-0.0.0-SNAPSHOT.jar \\");
-        System.out.println("   org.fiware.devguideapp.utils.mapreduce.AttrStatsGetter \\");
-        System.out.println("   -libjars target/generic-analyzers-0.0.0-SNAPSHOT.jar \\");
+        System.out.println("   target/generic-analyzers-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
+        System.out.println("   org.fiware.devguideapp.utils.bigdata.mapreduce.AttrStatsGetter \\");
+        System.out.println("   -libjars target/generic-analyzers-0.0.0-SNAPSHOT-jar-with-dependencies.jar \\");
+        System.out.println("   <file system host> \\");
+        System.out.println("   <file system port> \\");
         System.out.println("   <HDFS input> \\");
         System.out.println("   <HDFS output>");
     } // showUsage
@@ -98,8 +104,7 @@ public final class AttrStatsGetter extends Configured implements Tool {
     
     private static int analyze(Path input) {
         try {
-            Job job = Job.getInstance(conf, "mr-temperature");
-            job.setNumReduceTasks(0);
+            Job job = Job.getInstance(conf, "attr-stats-getter");
             job.setJarByClass(AttrStatsGetter.class);
             job.setMapperClass(AttrValueEmitter.class);
             job.setReducerClass(AttrValuesJoiner.class);
@@ -108,7 +113,7 @@ public final class AttrStatsGetter extends Configured implements Tool {
             job.setOutputKeyClass(NullWritable.class);
             job.setOutputValueClass(Text.class);
             FileInputFormat.addInputPath(job, input);
-            FileOutputFormat.setOutputPath(job, new Path(baseOutputFolder.getName() + input.getName()));
+            FileOutputFormat.setOutputPath(job, new Path(baseOutputFolder.toString() + "/" + input.getName()));
             
             // run the MapReduce job
             return job.waitForCompletion(true) ? 0 : 1;
