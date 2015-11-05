@@ -14,7 +14,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Francisco Romero francisco.romerobueno@telefonica.com
  */
-public class AttrValueEmitter extends Mapper<Object, Text, Text, Text> {
+public class AttrValueEmitterJsonColumn extends Mapper<Object, Text, Text, Text> {
     
     @Override
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -31,7 +31,7 @@ public class AttrValueEmitter extends Mapper<Object, Text, Text, Text> {
                 String jsonKey = (String) it.next();
                 
                 if (jsonKey.equals("recvTime") || jsonKey.equals("fiware-servicepath")
-                        || jsonKey.equals("entityId") || jsonKey.equals("enetityTYpe")
+                        || jsonKey.equals("entityId") || jsonKey.equals("entityType")
                         || jsonKey.contains("_md")) {
                     continue;
                 } // if
@@ -39,8 +39,8 @@ public class AttrValueEmitter extends Mapper<Object, Text, Text, Text> {
                 context.write(new Text(jsonKey), new Text((String) document.get(jsonKey)));
             } // while
         } catch (ParseException ex) {
-            Logger.getLogger(AttrValueEmitter.class.getName()).log(Level.SEVERE, null, ex);
-        } // try catch // try catch
+            Logger.getLogger(AttrValueEmitterJsonColumn.class.getName()).log(Level.SEVERE, null, ex);
+        } // try catch // try catch // try catch // try catch
     } // map
     
-} // AttrValueEmitter
+} // AttrValueEmitterJsonColumn

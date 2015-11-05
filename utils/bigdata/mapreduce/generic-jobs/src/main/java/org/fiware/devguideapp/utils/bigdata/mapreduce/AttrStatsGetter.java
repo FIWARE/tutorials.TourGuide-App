@@ -1,7 +1,7 @@
 package org.fiware.devguideapp.utils.bigdata.mapreduce;
 
 import org.fiware.devguideapp.utils.bigdata.mapreduce.reducers.AttrValuesJoiner;
-import org.fiware.devguideapp.utils.bigdata.mapreduce.mappers.AttrValueEmitter;
+import org.fiware.devguideapp.utils.bigdata.mapreduce.mappers.AttrValueEmitterJsonColumn;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +30,7 @@ public final class AttrStatsGetter extends Configured implements Tool {
     private static String fsPort;
     private static Path baseInputFolder;
     private static Path baseOutputFolder;
+    private static String fileFormat;
 
     /**
      * Main method.
@@ -44,7 +45,7 @@ public final class AttrStatsGetter extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
         // Check the number of arguments, show the usage if it is wrong
-        if (args.length != 4) {
+        if (args.length != 5) {
             showUsage();
             return -1;
         } // if
@@ -55,6 +56,7 @@ public final class AttrStatsGetter extends Configured implements Tool {
             fsPort = args[1];
             baseInputFolder = new Path(args[2]);
             baseOutputFolder = new Path(args[3]);
+            fileFormat = args[4];
             
             // Get a HDFS file system object
             conf = new Configuration();
@@ -79,10 +81,11 @@ public final class AttrStatsGetter extends Configured implements Tool {
         System.out.println("   <file system host> \\");
         System.out.println("   <file system port> \\");
         System.out.println("   <HDFS input> \\");
-        System.out.println("   <HDFS output>");
+        System.out.println("   <HDFS output> \\");
+        System.out.println("   <file format>");
     } // showUsage
     
-    private static int process(Path baseInputFolderName) {
+    private static int process(Path baseInputFolderName) throws Exception {
         try {
             int res = 0;
             FileStatus[] fileStatus = fs.listStatus(baseInputFolderName);
@@ -102,11 +105,23 @@ public final class AttrStatsGetter extends Configured implements Tool {
         } // try catch
     } // process
     
-    private static int analyze(Path input) {
+    private static int analyze(Path input) throws Exception {
         try {
             Job job = Job.getInstance(conf, "attr-stats-getter");
             job.setJarByClass(AttrStatsGetter.class);
-            job.setMapperClass(AttrValueEmitter.class);
+            
+            if (fileFormat.equals("json-row")) {
+                throw new Exception("Not supported yet");
+            } else if (fileFormat.equals("json-column")) {
+                job.setMapperClass(AttrValueEmitterJsonColumn.class);
+            } else if (fileFormat.equals("json-column")) {
+                throw new Exception("Not supported yet");
+            } else if (fileFormat.equals("json-column")) {
+                throw new Exception("Not supported yet");
+            } else {
+                throw new Exception("Not supported yet");
+            } // if else
+            
             job.setReducerClass(AttrValuesJoiner.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);

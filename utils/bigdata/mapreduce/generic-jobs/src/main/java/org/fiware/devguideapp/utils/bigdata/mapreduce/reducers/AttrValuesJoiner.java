@@ -35,7 +35,7 @@ public class AttrValuesJoiner extends Reducer<Text, Text, NullWritable, Text> {
             n++;
         } // for
         
-        Text output = new Text(max + " " + min + " " + (sum / n) + " " + ((sum2 / n) - (sum / n)));
+        Text output = new Text(max + " " + min + " " + (sum / n) + " " + ((sum2 / n) - ((sum / n) * (sum / n))));
         context.write(NullWritable.get(), output);
     } // reduce
     
