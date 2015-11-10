@@ -508,6 +508,11 @@ function reviewToOrion(userObject, schemaObject) {
     schemaObject.author.type = 'Person';
     schemaObject.author.name = userObject.id;
     schemaObject.dateCreated = new Date().toISOString();
+    if (userObject.organizations[0]) {
+      schemaObject.publisher = {};
+      schemaObject.publisher.type = 'Organization';
+      schemaObject.publisher.name = userObject.organizations[0].name;
+    }
   }
   return sortObject(schemaObject);
 }
