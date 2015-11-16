@@ -20,7 +20,7 @@
 var utils = require('../utils');
 var async = require('async');
 var shortid = require('shortid'); // unique ids generator
-var apiRestSimtasks = 10; // number of simultaneous calls to API REST
+var apiRestSimtasks = 5; // number of simultaneous calls to API REST
 var reservationsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reserved
 
