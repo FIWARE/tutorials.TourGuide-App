@@ -2,6 +2,9 @@
 
 source /entrypoint-common.sh
 
+check_var DEVGUIDE_USER
+check_var DEVGUIDE_USER_DIR
+
 check_var IDM_HOSTNAME idm
 check_var IDM_PORT 5000
 check_var CONFIG_FILE /config/idm2chanchan.json
@@ -44,7 +47,6 @@ case "${ORION_PEP_ENABLED}" in
         ;;
 esac
 
-CC_SERVER_PATH="/home/bitergia/fiware-devguide-app/server"
 DOCROOT="${CC_APP_SERVER_PATH}/public"
 VHOST_HTTP="/etc/apache2/sites-available/devguide-app.conf"
 APACHE_LOG_DIR=/var/log/apache2
@@ -56,7 +58,7 @@ function _configure_params () {
     CLIENT_SECRET=$( grep -Po '(?<="secret": ")[^"]*' ${CONFIG_FILE} )
 
     # parse it into the config.js file
-    sed -i ${CC_SERVER_PATH}/config.js \
+    sed -i ${CC_APP_SERVER_PATH}/config.js \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
@@ -98,9 +100,14 @@ function _setup_vhost_http () {
 EOF
 }
 
+function tail_logs () {
+    apache_logs='/var/log/apache2/*.log'
+    tail -F ${apache_logs}
+}
+
 # Move the provision file to /config to make it available for IdM
 
-mv /home/bitergia/keystone_provision.py /config/keystone_provision.py
+mv ${DEVGUIDE_USER_DIR}/keystone_provision.py /config/keystone_provision.py
 
 # Call checks
 check_host_port ${IDM_HOSTNAME} ${IDM_PORT}
@@ -123,6 +130,10 @@ if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then
     done
 fi
 
-# Start container back
+# Start apache server
 
-exec /sbin/init
+echo "Starting devguide"
+service apache2 start
+
+tail_logs & _waitpid=$!
+wait "${_waitpid}"

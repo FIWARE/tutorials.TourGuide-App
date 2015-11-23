@@ -1,15 +1,21 @@
 # Copyright (C) 2015 Bitergia
 # GPLv3 License
 
-FROM bitergia/ubuntu-trusty:latest
-MAINTAINER Alvaro del Castillo <acs@bitergia.com>
+FROM ubuntu:14.04
+MAINTAINER Bitergia <fiware-testing@bitergia.com>
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV DEPLOY_USER bitergia
-ENV DEPLOY_USER_DIR /home/${DEPLOY_USER}
-ENV SUBSCRIPTIONS_PATH /opt/subscribe
+ENV INITRD no
 
-ENV CC_APP_SERVER_PATH ${DEPLOY_USER_DIR}/fiware-devguide-app/server
+ENV DEVGUIDE_USER devguide
+ENV DEVGUIDE_USER_DIR /home/${DEVGUIDE_USER}
+ENV GIT_URL_DEVGUIDE https://github.com/Bitergia/fiware-devguide-app.git
+ENV GIT_REV_DEVGUIDE master
+ENV SUBSCRIPTIONS_PATH /opt/subscribe
+ENV CC_APP_SERVER_PATH ${DEVGUIDE_USER_DIR}/fiware-devguide-app/server
+
+# create devguide user
+RUN adduser --disabled-password --gecos "${DEVGUIDE_USER}" ${DEVGUIDE_USER}
 
 # install dependencies
 RUN apt-get update && \
@@ -22,12 +28,8 @@ RUN apt-get update && \
         apache2 libapache2-mod-passenger \
         mysql-client \
         && \
-    apt-get clean && \
-    find /var/lib/apt/lists -type f -delete
-
-# hack to fix nodejs support on ubuntu/debian passenger package
-# if [ ! -d "/usr/share/passenger/node_lib" ] ; then
-RUN mkdir fix-node-passenger && \
+    # hack to fix nodejs support on ubuntu/debian passenger package
+    mkdir fix-node-passenger && \
     cd fix-node-passenger && \
     apt-get update && \
     apt-get install -qy dpkg-dev && \
@@ -38,35 +40,38 @@ RUN mkdir fix-node-passenger && \
     cp -r ${PWD}/ruby-passenger-${version}/node_lib /usr/share/passenger/ && \
     cd .. && \
     rm -rf fix-node-passenger && \
-    mkdir ${SUBSCRIPTIONS_PATH}
-# fi
+    mkdir ${SUBSCRIPTIONS_PATH} && \
+    # enable apache modules and disable default site
+    a2enmod ssl && \
+    a2enmod passenger && \
+    a2dissite 000-default && \
+    # install grunt-cli to be able to run the tasks inside the container
+    npm install --loglevel warn -g grunt-cli && \
+    # cleanup to thin the final image
+    apt-get clean && \
+    find /var/lib/apt/lists -type f -delete && \
+    rm -fr /root/.npm
 
-COPY subscription-humidity-sensors.sh subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
+# setup devguide app as $DEVGUIDE_USER
+USER ${DEVGUIDE_USER}
+WORKDIR ${DEVGUIDE_USER_DIR}
 
-# enable modules, disable default site, restart service
-RUN a2enmod ssl && a2enmod passenger && \
-    a2dissite 000-default
+# get the repository from git and install node dependencies
+RUN git clone ${GIT_URL_DEVGUIDE} && \
+    cd ${CC_APP_SERVER_PATH} && \
+    npm install --loglevel warn && \
+    rm -fr ${DEVGUIDE_USER_DIR}/.npm
 
-# install grunt-cli to be able to run the tasks inside the container
-RUN npm install --loglevel warn -g grunt-cli
+# copy default subscriptions
+COPY subscription-humidity-sensors.sh ${SUBSCRIPTIONS_PATH}/
+COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 
-USER ${DEPLOY_USER}
-WORKDIR ${DEPLOY_USER_DIR}
+# Add provision script for IdM
+COPY keystone_provision.py ${DEVGUIDE_USER_DIR}/keystone_provision.py
 
-# get repository
-RUN git clone https://github.com/Bitergia/fiware-devguide-app.git fiware-devguide-app
-
-# server
-RUN cd ${CC_APP_SERVER_PATH} && \
-    npm install --loglevel warn
-
-# Add the IdM provision
-
-COPY keystone_provision.py ${DEPLOY_USER_DIR}/keystone_provision.py
-
+# Switch back to root for docker-entrypoint.sh
 USER root
-
 ADD docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod 755 /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 ADD https://raw.githubusercontent.com/Bitergia/docker/master/utils/entrypoint-common.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
