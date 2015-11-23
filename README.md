@@ -24,7 +24,7 @@ This application is a smart, context-aware application which allows to manage la
 
 ## Architecture
 
-![Architecture diagram](/doc/img/archDiagram.png?raw=true "Architecture diagram")
+![Architecture diagram](https://github.com/Bitergia/fiware-devguide-app/blob/master/doc/img/archDiagram.png?raw=true "Architecture diagram")
 
 It includes (for the moment) the following components:
 
@@ -41,7 +41,7 @@ This project integrates a set of Generic Enablers using those enablers inside [d
 
 For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required. 
 
-![Compose Diagram](/doc/img/composeDiagram.png?raw=true "Compose Diagram")
+![Compose Diagram](https://github.com/Bitergia/fiware-devguide-app/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
 
 Detailed information of how to start this environment can be found [here](https://github.com/Bitergia/fiware-devguide-app/tree/master/docker/images/fiware-devguide-app).
 
