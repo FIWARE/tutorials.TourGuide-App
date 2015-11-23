@@ -20,7 +20,7 @@ RUN adduser --disabled-password --gecos "${DEVGUIDE_USER}" ${DEVGUIDE_USER}
 # install dependencies
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
-        bash \
+        bash curl ca-certificates \
         git git-core \
         tree ccze \
         psmisc \
