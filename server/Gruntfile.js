@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 
       tests: {
         // execute jasmine_node tests inside testing container
-        command: 'docker exec -u bitergia tests_devguide_1 bash -c "cd ~/fiware-devguide-app/server ; grunt do-test"'
+        command: 'docker exec -u devguide tests_devguide_1 bash -c "cd ~/fiware-devguide-app/server ; grunt do-test"'
       }
 
     },
