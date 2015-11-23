@@ -12,7 +12,8 @@
     "q": "~1.4.1",
     "querystring": "0.2.0",
     "request-promise": "^1.0.1",
-    "shortid": "2.2.2"
+    "shortid": "2.2.2",
+    "minimist": "~1.2.0"
   },
   "repository": {
     "type": "git",
