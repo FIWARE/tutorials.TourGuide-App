@@ -74,6 +74,7 @@ var feedOrionReviews = function() {
       'name': 'Rating description',
       'author': {},
       'reviewBody': 'Body review',
+      'dateCreated': new Date().getTime(),
       'publisher': {}
     };
 

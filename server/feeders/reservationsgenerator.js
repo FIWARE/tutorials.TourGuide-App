@@ -67,7 +67,7 @@ var feedOrionReservations = function() {
       'reservationStatus': utils.randomElement(reservations),
       'underName': {},
       'reservationFor': {},
-      'startTime': utils.getRandomDate(),
+      'startTime': utils.getRandomDate().getTime(),
       'partySize': utils.randomIntInc(1, 20)
     };
 

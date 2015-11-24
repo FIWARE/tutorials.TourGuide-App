@@ -365,7 +365,8 @@ function reservationToSchema(element) {
       }
     }
   });
-
+  var newDate = new Date(newElement.startTime).toISOString();
+  newElement.startTime = newDate;
   newElement.reservationId = unescape(element.id);
   newElement.reservationFor.name = unescape(
     newElement.reservationFor.name);
@@ -507,7 +508,7 @@ function reviewToOrion(userObject, schemaObject) {
     schemaObject.author = {};
     schemaObject.author.type = 'Person';
     schemaObject.author.name = userObject.id;
-    schemaObject.dateCreated = new Date().toISOString();
+    schemaObject.dateCreated = new Date().getTime();
     if (userObject.organizations[0]) {
       schemaObject.publisher = {};
       schemaObject.publisher.type = 'Organization';
@@ -527,6 +528,9 @@ function reservationToOrion(userObject, schemaObject) {
     var rname = schemaObject.reservationFor.name;
     rname += '-' + shortid.generate();
     schemaObject.id = rname;
+    var newDate = new Date(schemaObject.startTime).getTime();
+    //Time in miliseconds to Orion
+    schemaObject.startTime = newDate;
     schemaObject.underName = {};
     schemaObject.underName.type = 'Person';
     schemaObject.underName.name = userObject.id;
