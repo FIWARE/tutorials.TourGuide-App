@@ -128,6 +128,7 @@ var feedOrionRestaurants = function() {
     var organization = ['Franchise1', 'Franchise2',
     'Franchise3', 'Franchise4'
     ];
+    var occupancyLevels = ['50', '80', '100', '120', '160', '200'];
 
     var attr = {
       'type': 'Restaurant',
@@ -136,6 +137,7 @@ var feedOrionRestaurants = function() {
         'type': 'postalAddress'
       },
       'department': utils.randomElement(organization),
+      'occupancyLevels': utils.randomElement(occupancyLevels),
       'aggregateRating': {}
     };
 
