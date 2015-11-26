@@ -773,6 +773,33 @@ function replaceTypeForSchema(element) {
   return parsed;
 }
 
+function getTimeframe(isoTimeString) {
+  var newDate = new Date(isoTimeString).getTime();
+  var frame = newDate - 7200;
+  var frameTime = 'startTime==' + frame + '..' + newDate;
+  return frameTime;
+}
+
+function getOccupancyLevels(listOfReservations, restaurant) {
+
+  var occupancyLevels = 0;
+  listOfReservations = objectToArray(listOfReservations);
+
+  Object.keys(listOfReservations).forEach(function(element, pos) {
+
+    if (listOfReservations[pos].reservationFor.name == restaurant) {
+
+      if (listOfReservations[pos].reservationStatus == 'Confirmed') {
+
+        occupancyLevels += listOfReservations[pos].partySize;
+
+      }
+    }
+  });
+
+  return occupancyLevels;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -806,5 +833,7 @@ module.exports = {
   getAverage: getAverage,
   getAggregateRating: getAggregateRating,
   replaceTypeForOrion: replaceTypeForOrion,
-  replaceTypeForSchema: replaceTypeForSchema
+  replaceTypeForSchema: replaceTypeForSchema,
+  getTimeframe: getTimeframe,
+  getOccupancyLevels: getOccupancyLevels
 };

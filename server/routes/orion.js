@@ -400,6 +400,10 @@ exports.getOrganizationReviews = function(req, res) {
 
 exports.createReservation = function(req, res) {
   var elementToOrion;
+  var restaurantReservations;
+  var occupancyLevels;
+  var actualOccupancyLevels;
+  var timeframeQuery;
   // -- We first get information regarding the restaurant
   utils.getListByType('Restaurant',
                       req.body.reservationFor.name,
@@ -407,24 +411,53 @@ exports.createReservation = function(req, res) {
   .then(function(data) {
     elementToOrion = req.body;
     elementToOrion.reservationFor.address = data.body.address;
-    auth.getUserDataPromise(req)
+    occupancyLevels = data.body.occupancyLevels;
+    timeframeQuery = utils.getTimeframe(req.body.startTime);
+    utils.sendRequest('GET',
+      {'type': 'FoodEstablishmentReservation',
+      'q': timeframeQuery,
+      'limit': 1000},
+      null,
+      req.headers)
     .then(function(data) {
-      elementToOrion = utils.reservationToOrion(data, elementToOrion);
-      utils.sendRequest('POST', elementToOrion, null, req.headers)
-      .then(function(data) {
-        res.headers = data.headers;
-        res.location('/api/orion/reservation/' + elementToOrion.id);
-        res.statusCode = data.statusCode;
-        res.end();
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.end();
-      });
+      restaurantReservations = data.body;
+      actualOccupancyLevels = utils.getOccupancyLevels(
+        restaurantReservations,
+        req.body.reservationFor.name);
+
+      if (actualOccupancyLevels + req.body.partySize > occupancyLevels) {
+        res.statusCode = 422;
+        res.json({
+          error: {
+            message: 'The ocuppancy levels have reached its limit',
+            code: 422,
+            title: 'Unprocessable Entity'
+          }
+        });
+      } else {
+        auth.getUserDataPromise(req)
+        .then(function(data) {
+          elementToOrion = utils.reservationToOrion(data, elementToOrion);
+          utils.sendRequest('POST', elementToOrion, null, req.headers)
+          .then(function(data) {
+            res.headers = data.headers;
+            res.location('/api/orion/reservation/' + elementToOrion.id);
+            res.statusCode = data.statusCode;
+            res.end();
+          })
+          .catch(function(err) {
+            res.statusCode = err.statusCode;
+            res.end();
+          });
+        })
+        .catch(function(err) {
+          res.statusCode = err.statusCode;
+          res.json(JSON.parse(err.data));
+        });
+      }
     })
     .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(JSON.parse(err.data));
+
     });
   })
   .catch(function(err) {
