@@ -775,7 +775,7 @@ function replaceTypeForSchema(element) {
 
 function getTimeframe(isoTimeString) {
   var newDate = new Date(isoTimeString).getTime();
-  var frame = newDate - 60*60*2*1000;
+  var frame = newDate - 60 * 60 * 2 * 1000;
   var frameTime = 'startTime==' + frame + '..' + newDate;
   return frameTime;
 }
