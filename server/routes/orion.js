@@ -426,12 +426,12 @@ exports.createReservation = function(req, res) {
         req.body.reservationFor.name);
 
       if (actualOccupancyLevels + req.body.partySize > occupancyLevels) {
-        res.statusCode = 422;
+        res.statusCode = 409;
         res.json({
           error: {
             message: 'The ocuppancy levels have reached its limit',
-            code: 422,
-            title: 'Unprocessable Entity'
+            code: 409,
+            title: 'Conflict'
           }
         });
       } else {
