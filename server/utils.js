@@ -534,7 +534,7 @@ function reservationToOrion(userObject, schemaObject) {
     schemaObject.underName = {};
     schemaObject.underName.type = 'Person';
     schemaObject.underName.name = userObject.id;
-    schemaObject.reservationStatus = 'Pending';
+    schemaObject.reservationStatus = 'Confirmed';
   }
   return sortObject(schemaObject);
 }
