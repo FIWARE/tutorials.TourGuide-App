@@ -401,7 +401,7 @@ exports.getOrganizationReviews = function(req, res) {
 exports.createReservation = function(req, res) {
   var elementToOrion;
   var restaurantReservations;
-  var occupancyLevels;
+  var capacity;
   var actualOccupancyLevels;
   var timeframeQuery;
   // -- We first get information regarding the restaurant
@@ -411,7 +411,7 @@ exports.createReservation = function(req, res) {
   .then(function(data) {
     elementToOrion = req.body;
     elementToOrion.reservationFor.address = data.body.address;
-    occupancyLevels = data.body.occupancyLevels;
+    capacity = data.body.capacity;
     timeframeQuery = utils.getTimeframe(req.body.startTime);
     utils.sendRequest('GET',
       {'type': 'FoodEstablishmentReservation',
@@ -425,7 +425,7 @@ exports.createReservation = function(req, res) {
         restaurantReservations,
         req.body.reservationFor.name);
 
-      if (actualOccupancyLevels + req.body.partySize > occupancyLevels) {
+      if (actualOccupancyLevels + req.body.partySize > capacity) {
         res.statusCode = 409;
         res.json({
           error: {
