@@ -540,156 +540,74 @@ function reservationToOrion(userObject, schemaObject) {
   return sortObject(schemaObject);
 }
 
+// filter restaurants by organization
 function getOrgRestaurants(org, listOfElements) {
-
-  var newListOfElements = [];
-
-  listOfElements = objectToArray(listOfElements);
-
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    if (listOfElements[pos].department == org) {
-
-      newListOfElements.push(listOfElements[pos]);
-
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.department === org;
     }
-  });
-
-  return newListOfElements;
+  );
 }
 
+// filter reviews by author
 function getUserReviews(user, listOfElements) {
-
-  var newListOfElements = [];
-
-  listOfElements = objectToArray(listOfElements);
-
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    if (listOfElements[pos].author.name == user) {
-
-      newListOfElements.push(listOfElements[pos]);
-
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.author.name === user;
     }
-  });
-
-  return newListOfElements;
+  );
 }
 
+// filter reviews by restaurant
 function getRestaurantReviews(restaurant, listOfElements) {
-
-  var newListOfElements = [];
-
-  listOfElements = objectToArray(listOfElements);
-
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    if (listOfElements[pos].itemReviewed.name == restaurant) {
-
-      newListOfElements.push(listOfElements[pos]);
-
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.itemReviewed.name === restaurant;
     }
-  });
-
-  return newListOfElements;
+  );
 }
 
+// filter reviews by organization
 function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
+  // list of restaurants of the franchise
+  listOfRestaurants = getOrgRestaurants(listOfRestaurants);
 
-  var newListOfElements = [];
-  var franchiseReviews = [];
-  var newListOfRestaurants = [];
-
-  listOfRestaurants = objectToArray(listOfRestaurants);
-  listOfReviews = objectToArray(listOfReviews);
-
-  Object.keys(listOfRestaurants).forEach(function(element, pos) {
-
-    if (listOfRestaurants[pos].department == franchise) {
-
-      newListOfRestaurants.push(listOfRestaurants[pos].id);
-
+  // filter reviews of the restaurants of the franchise
+  return objectToArray(listOfReviews).filter(
+    function(element) {
+      return listOfRestaurants.indexOf(element.itemReviewed.name) !== -1;
     }
-  });
-
-  Object.keys(listOfReviews).forEach(function(element, pos) {
-
-    if (newListOfRestaurants.indexOf(
-      listOfReviews[pos].itemReviewed.name) !== -1) {
-
-      newListOfElements.push(listOfReviews[pos]);
-
-    }
-  });
-
-  return newListOfElements;
+  );
 }
 
+// filter list of reservations by user
 function getUserReservations(user, listOfElements) {
-
-  var newListOfElements = [];
-
-  listOfElements = objectToArray(listOfElements);
-
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    if (listOfElements[pos].underName.name == user) {
-
-      newListOfElements.push(listOfElements[pos]);
-
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.underName.name === user;
     }
-  });
-
-  return newListOfElements;
+  );
 }
 
+// filter list of reservations by restaurant name
 function getRestaurantReservations(restaurant, listOfElements) {
-
-  var newListOfElements = [];
-
-  listOfElements = objectToArray(listOfElements);
-
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    if (listOfElements[pos].reservationFor.name == restaurant) {
-
-      newListOfElements.push(listOfElements[pos]);
-
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.reservationFor.name === restaurant;
     }
-  });
-
-  return newListOfElements;
+  );
 }
 
 function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
+  // list of restaurants of the franchise
+  listOfRestaurants = getOrgRestaurants(listOfRestaurants);
 
-  var newListOfElements = [];
-  var franchiseReservations = [];
-  var newListOfRestaurants = [];
-
-  listOfRestaurants = objectToArray(listOfRestaurants);
-  listOfReservations = objectToArray(listOfReservations);
-
-  Object.keys(listOfRestaurants).forEach(function(element, pos) {
-
-    if (listOfRestaurants[pos].department == franchise) {
-
-      newListOfRestaurants.push(listOfRestaurants[pos].id);
-
+  // filter reservations of the restaurants of the franchise
+  return objectToArray(listOfReservations).filter(
+    function(element) {
+      return listOfRestaurants.indexOf(element.reservationFor.name) !== -1;
     }
-  });
-
-  Object.keys(listOfReservations).forEach(function(element, pos) {
-
-    if (newListOfRestaurants.indexOf(
-      listOfReservations[pos].reservationFor.name) !== -1) {
-
-      newListOfElements.push(listOfReservations[pos]);
-
-    }
-  });
-
-  return newListOfElements;
+  );
 }
 
 function getListByType(type, element, headers) {
@@ -784,17 +702,12 @@ function getTimeframe(isoTimeString) {
 function getOccupancyLevels(listOfReservations, restaurant) {
 
   var occupancyLevels = 0;
-  listOfReservations = objectToArray(listOfReservations);
 
   Object.keys(listOfReservations).forEach(function(element, pos) {
 
-    if (listOfReservations[pos].reservationFor.name == restaurant) {
-
-      if (listOfReservations[pos].reservationStatus == 'Confirmed') {
-
-        occupancyLevels += listOfReservations[pos].partySize;
-
-      }
+    if (listOfReservations[pos].reservationFor.name == restaurant &&
+        listOfReservations[pos].reservationStatus == 'Confirmed') {
+      occupancyLevels += listOfReservations[pos].partySize;
     }
   });
 
