@@ -19,7 +19,7 @@ function start_test_env() {
     # setup compose.yml to enable volume on devguide if not enabled
     sed -i "${_yml}" \
         -e "/^devguide:/,$ s|.*:${_volume_path}|        - ${_local_path}:${_volume_path}|" \
-        -e "s|#[ ]*volumes:|volumes:|"
+        -e "/^devguide:/,$ s|#[ ]*volumes:|volumes:|"
 
     # start containers with docker-compose
     docker-compose -f "${_yml}" -p tests up -d
