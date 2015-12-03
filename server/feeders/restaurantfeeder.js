@@ -143,6 +143,7 @@ var feedOrionRestaurants = function() {
         'type': 'PropertyValue',
         // timestamp in ms
         'timestamp': new Date().getTime(),
+        'name': 'occupancyLevels',
         'value': 0
       }
     };
