@@ -28,6 +28,15 @@ RUN apt-get update && \
         apache2 libapache2-mod-passenger \
         mysql-client \
         && \
+    # update node to latest stable
+    npm install -g n && \
+    n stable && \
+    # remove ubuntu node packages, as they're not needed anymore
+    apt-get -y purge nodejs nodejs-legacy npm && \
+    # clean shell command hash table
+    hash -r && \
+    # update npm
+    npm install -g npm && \
     # hack to fix nodejs support on ubuntu/debian passenger package
     mkdir fix-node-passenger && \
     cd fix-node-passenger && \
@@ -49,6 +58,8 @@ RUN apt-get update && \
     npm install --loglevel warn -g grunt-cli && \
     # cleanup to thin the final image
     apt-get clean && \
+    apt-get purge -y dpkg-dev && \
+    apt-get autoremove --purge -y && \
     find /var/lib/apt/lists -type f -delete && \
     rm -fr /root/.npm
 
