@@ -117,6 +117,8 @@ devguide:
         - ORION_PEP_ENABLED=true
         - IDAS_PORT=8080
         - ORION_SUBSCRIPTIONS_ENABLED=false
+        - SENSORS_GENERATION_ENABLED=false
+        - SENSORS_FORCED_UPDATE_ENABLED=false
     volumes_from:
         - idm
     # volumes:

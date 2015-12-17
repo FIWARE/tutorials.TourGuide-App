@@ -135,5 +135,17 @@ fi
 echo "Starting devguide"
 service apache2 start
 
+# Sensors generation
+if [ "${SENSORS_GENERATION_ENABLED}" = "true" ] ; then
+    cd ${CC_APP_SERVER_PATH}/feeders
+    node sensorsgenerator.js
+fi
+
+# Force an update of the sensors data
+if [ "${SENSORS_FORCED_UPDATE_ENABLED}" = "true" ] ; then
+    cd ${CC_APP_SERVER_PATH}/feeders
+    node sensorsupdater.js
+fi
+
 tail_logs & _waitpid=$!
 wait "${_waitpid}"
