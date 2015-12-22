@@ -637,7 +637,7 @@ exports.updateSensors = function(req, res) {
           var newProperty = restaurant.Room + '_' + item.attributes[0].name;
           var schema = {};
           schema[newProperty] = {
-            '@type': 'PropertyValue',
+            'type': 'PropertyValue',
             'additionalType': item.attributes[0].name,
             'propertyID': item.id,
             'name': restaurant.Room,
