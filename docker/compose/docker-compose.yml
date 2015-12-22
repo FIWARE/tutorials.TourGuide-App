@@ -122,4 +122,4 @@ devguide:
     volumes_from:
         - idm
     # volumes:
-    #     - ~/devel/fiware/fiware-devguide-app:/home/bitergia/fiware-devguide-app
+    #     - ~/devel/fiware/fiware-devguide-app:/home/devguide/fiware-devguide-app
