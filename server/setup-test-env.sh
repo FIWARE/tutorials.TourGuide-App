@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_volume_path=/home/bitergia/fiware-devguide-app
+_volume_path=/home/devguide/fiware-devguide-app
 pushd $( dirname $0 ) > /dev/null
 _local_path=$( dirname $(pwd) )
 popd > /dev/null
