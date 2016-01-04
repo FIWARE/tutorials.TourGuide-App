@@ -76,6 +76,7 @@ RUN git clone ${GIT_URL_DEVGUIDE} && \
 # copy default subscriptions
 COPY subscription-humidity-sensors.sh ${SUBSCRIPTIONS_PATH}/
 COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
+COPY cpr-registration.sh ${SUBSCRIPTIONS_PATH}/
 
 # Add provision script for IdM
 COPY keystone_provision.py ${DEVGUIDE_USER_DIR}/keystone_provision.py
