@@ -8,6 +8,7 @@
 - [Architecture](#architecture)
 - [Installation and usage](#installation-and-usage)
 - [REST Interface](#rest-interface)
+- [Feedback](#feedback)
 
 ## Overview
 
@@ -50,6 +51,10 @@ Detailed information of how to start this environment can be found [here](https:
 The application provides a RESTful API with different routes and functions that covers the functionalities described above:
 
 * [FIWARE Devguide RESTful API](http://docs.devguide.apiary.io)
+
+## Feedback
+
+Try and tweak the Tour Guide application and if you have any feedback please contact us at http://ask.fiware.org.
 
 [travis-image]: https://travis-ci.org/Bitergia/fiware-devguide-app.svg?branch=master
 [travis-url]: https://travis-ci.org/Bitergia/fiware-devguide-app
