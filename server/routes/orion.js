@@ -3,9 +3,9 @@
  * Copyright(c) 2016 Bitergia
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
- * 
+ *
  * Orion-V2 REST API
- * 
+ *
  */
 
 // jshint node: true

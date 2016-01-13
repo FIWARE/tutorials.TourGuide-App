@@ -3,9 +3,9 @@
  * Copyright(c) 2016 Bitergia
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
- * 
+ *
  * Main application entry file using express for routing
- * 
+ *
  */
 
 // jshint node: true
