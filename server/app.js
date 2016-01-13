@@ -4,7 +4,6 @@
 
 var express = require('express');
 var auth = require('./auth');
-var site = require('./site');
 var orion = require('./routes/orion');
 
 var app = express();
