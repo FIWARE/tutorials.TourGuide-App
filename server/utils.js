@@ -16,7 +16,7 @@ var http = require('http');
 var https = require('https');
 var util = require('util');
 var shortid = require('shortid');
-var authRequest = require('./authrequest');
+var authRequest = require('./auth/authrequest');
 
 function doGet(options, callback, res, useHttps) {
   var protocol = http;

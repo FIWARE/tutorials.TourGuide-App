@@ -14,7 +14,7 @@
 'use strict';
 
 var OAuth2 = require('./oauth2').OAuth2;
-var config = require('./config');
+var config = require('../config');
 var Q = require('q');
 
 // Config data from config.js file

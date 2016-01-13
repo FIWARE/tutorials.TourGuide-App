@@ -13,7 +13,7 @@
 'use strict';
 
 var express = require('express');
-var auth = require('./auth');
+var auth = require('./auth/auth');
 var orion = require('./routes/orion');
 
 var app = express();

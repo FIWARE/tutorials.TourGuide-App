@@ -16,7 +16,7 @@
 var rp = require('request-promise');
 var querystring = require('querystring');
 var Q = require('q');
-var config = require('./config');
+var config = require('../config');
 var host = 'http://orion'; // To be changed to PEP for auth
 var port = 1026;
 

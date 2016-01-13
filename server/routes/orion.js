@@ -12,11 +12,11 @@
 
 'use strict';
 
-var authRequest = require('../authrequest');
+var authRequest = require('../auth/authrequest');
 var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
 var async = require('async');
-var auth = require('../auth');
+var auth = require('../auth/auth');
 
 var config = require('../config');
 var fiwareHeaders = {
