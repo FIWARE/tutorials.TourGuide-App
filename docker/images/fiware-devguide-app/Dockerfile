@@ -1,5 +1,5 @@
-# Copyright (C) 2015 Bitergia
-# GPLv3 License
+# Copyright(c) 2016 Bitergia
+# MIT Licensed
 
 FROM ubuntu:14.04
 MAINTAINER Bitergia <fiware-testing@bitergia.com>

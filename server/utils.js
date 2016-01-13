@@ -1,5 +1,11 @@
 /*
- * DevGuide Utils
+ * utils.js
+ * Copyright(c) 2016 Bitergia
+ * Author: Bitergia <fiware-testing@bitergia.com>
+ * MIT Licensed
+ * 
+ * Devguide Utils methods
+ * 
  */
 
 // jshint node: true, nonstandard: true

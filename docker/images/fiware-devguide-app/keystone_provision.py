@@ -1,3 +1,10 @@
+# keystone-provision.py
+# Copyright(c) 2016 Bitergia
+# Author: Bitergia <fiware-testing@bitergia.com>
+# MIT Licensed
+#
+# Default provision for Devguide
+
 import ConfigParser
 import json
 import os

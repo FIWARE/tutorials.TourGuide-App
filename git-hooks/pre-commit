@@ -1,4 +1,8 @@
 #!/bin/sh
+# pre-commit
+# Copyright(c) 2016 Bitergia
+# Author: David Muriel <dmuriel@bitergia.com>
+# MIT Licensed
 
 ret=0
 

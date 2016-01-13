@@ -3,6 +3,9 @@
  * Copyright(c) 2015 Bitergia
  * Author: Alberto Martín <alberto.martin@bitergia.com>
  * MIT Licensed
+ * 
+ * Simple script that retrieves an oauth Token from IDM
+ * 
  */
 
 // jshint node: true, jasmine: true

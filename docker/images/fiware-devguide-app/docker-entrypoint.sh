@@ -1,4 +1,8 @@
 #!/bin/bash
+# docker-entrypoint.sh
+# Copyright(c) 2016 Bitergia
+# Author: Bitergia <fiware-testing@bitergia.com>
+# MIT Licensed
 
 source /entrypoint-common.sh
 

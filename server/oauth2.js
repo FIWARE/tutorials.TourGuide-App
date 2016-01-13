@@ -1,3 +1,11 @@
+/*
+ * oauth2.js
+ * Copyright(c) 2016 Bitergia
+ * Author: Bitergia <fiware-testing@bitergia.com>
+ * MIT Licensed
+ * 
+ */
+
 // jshint node: true
 
 'use strict';

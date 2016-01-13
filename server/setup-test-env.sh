@@ -1,4 +1,8 @@
 #!/bin/bash
+# setup-test-env.sh
+# Copyright(c) 2016 Bitergia
+# Author: David Muriel <dmuriel@bitergia.com>
+# MIT Licensed
 
 _volume_path=/home/devguide/fiware-devguide-app
 pushd $( dirname $0 ) > /dev/null
