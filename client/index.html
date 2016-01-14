@@ -1,17 +1,50 @@
 <html>
+ <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+
+  <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+
+  <link rel=stylesheet type=text/css href="css/app.css">
+
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
+    <script src="js/js_utils.js"></script>
+    <script src="js/restaurants_api.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/connections_api.js"></script>
+
 <head>
 <title> FIWARE TEST</title>
+
 </head>
 <body>
-	<p>You must be signed in to see the content </p>
-   	<form action="all_restaurants_and_reviews.html" method="POST">
-   		Username:<br>
-		<input type="text" name="username">
-		<br>
-		Password:<br>
-		<input type="password" name="password">
-		<input type="submit" value="Sign in">
-   </form>
+<div id="top_menu">
+  <div id='logged_div'>
+      <p>Checking if logged </p>
+      <!--<div id='log_out'><p><a href="index.html">Log Out</a></p></div>
+      <div id='hi_user'><p>Hi, template user!</p></div>-->
+  </div>
+</div>
+<div id='roles_div' style="display:none;">
+  <p> You have the roles: </p>
+    <ul>
+      <li>template role 1</li>
+      <li>template role 2</li>
+    </ul>
+</div>
+<div id='map'>
+</div>
 
+<!--<div id='rest_info'>
+</div>-->
+<!--<button onclick="openPopUpWindow()">pop</button>-->
+<div id='pop_window' class='hidden'>
+  <div id='top_pop'>
+    <span id="pop_title">titulo del pop</span>
+    <button class="close_pop" onclick="closePopUpWindow();">x</button>
+  </div>
+  <div id="pop_content">
+   </div> 
+</div>
 </body>
 </html>

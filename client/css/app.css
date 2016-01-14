@@ -1,18 +1,34 @@
- 
+/*
+ * app.css
+ * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
+ * Authors: 
+ *   Jaisiel Santana <jaisiel@gmail.com>,
+ *   Alejandro Sánchez <alemagox@gmail.com>
+ *   Pablo Fernández <pablo.fernandez@ulpgc.es>
+ * MIT Licensed
+
+*/
+
+ body{
+ 	margin: 0;
+ 	padding: 0;
+ }
+
  #map{
-  	height: 600px;
+  	height: 100%;
   	width: 100%;
-  	margin-top: 30px;
+  	/*margin-top: 30px;*/
 }
 
 
 #logged_div{
 	position: fixed;
 	width: 100%;
-	background-color: orange;
+	background-color: rgba(255,165,0,0.6);
 	top: 0px;
 	height: 30px;
 	clear: both;
+	z-index: 1000;
 }
 
 #logged_div div{
@@ -21,6 +37,21 @@
 	margin-left: 0.5em;
 	font-size: 0.8em;
 }
+
+#logged_menu{
+	float:left !important;
+	padding-left: 60px;
+}
+
+.menu_element{
+	float: left;
+}
+
+.menu_element:after{
+	/*content: ' | ';*/
+}
+
+
 #logged_div p{
 	margin-top: 10%;
 }
@@ -79,6 +110,16 @@
 	font-weight: bold;
 	font-size: 1.15em;
 }
+
+.restaurant_reservation_label{
+	font-weight: bold;
+	font-size: 1.15em;
+}
+
+.commensals_number_label{
+	font-weight: bold;
+	font-size: 1.15em;
+}
 #top_pop{
 
 }
@@ -93,4 +134,34 @@
 #pop_title{
 	font-size: 1.5em;
 	font-weight: bold;
+}
+
+#reservation_list, #review_list{
+	list-style-type: none;
+}
+
+
+#reservations_list_div,#reviews_list_div{
+	margin-top: 50px;
+}
+
+#reservation_list li, #reviews_list li{
+	font-size: 0.9em;
+	border: 1px black solid;
+}
+
+#reservation_list li:nth-child(even), #review_list li:nth-child(even){
+	background-color: lightblue;
+}
+
+#reservation_list li:nth-child(odd), #review_list li:nth-child(odd){
+	background-color: lightgreen;
+}
+
+#reservation_list li span:nth-child(even), #review_list li span:nth-child(even){
+	width: 200px;
+}
+
+#reservation_list li span:nth-child(odd), #review_list li span:nth-child(odd){
+	width: 200px;
 }

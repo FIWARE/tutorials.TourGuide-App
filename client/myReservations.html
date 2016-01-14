@@ -11,6 +11,7 @@
     <script src="js/js_utils.js"></script>
     <script src="js/restaurants_api.js"></script>
     <script src="js/connections_api.js"></script>
+    <script src="js/myReservations.js"></script>
 
 <head>
 <title> FIWARE TEST</title>
@@ -29,19 +30,17 @@
       <li>template role 2</li>
     </ul>
 </div>
-<div id='map'>
+<div id='reservations_list_div'>
+  <ul id='reservation_list'>
+  </ul>
+</div>
+<div id='reservations_map'>
 </div>
 
 <!--<div id='rest_info'>
 </div>-->
 <!--<button onclick="openPopUpWindow()">pop</button>-->
-<div id='pop_window' class='hidden'>
-  <div id='top_pop'>
-    <span id="pop_title">titulo del pop</span>
-    <button class="close_pop" onclick="closePopUpWindow();">x</button>
-  </div>
-  <div id="pop_content">
-   </div> 
+
 </div>
 </body>
 </html>
