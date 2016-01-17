@@ -4,17 +4,17 @@ var config = {};
 
 // URL to the FI-WARE Identity Management GE
 // default: https://account.lab.fi-ware.org
-config.idmUrl = 'https://idm';
+config.idmUrl = 'https://IDM_HOSTNAME';
 
 // Oauth2 configuration
 // Found on the application profile page after registering
 // the application on the FI-WARE Identity Management GE
 
 // Client ID for the application
-config.clientId = '91b29c1f18224d048a10ef0c3317d739';
+config.clientId = 'CLIENT_ID';
 
 // Client Secret for the application
-config.clientSecret = '9439b19b703c49f399f21df4f89b7c04';
+config.clientSecret = 'CLIENT_SECRET';
 
 // Callback URL for the application
 // TODO: make callback URL configurable as the others
@@ -23,20 +23,20 @@ config.callbackUrl = 'http://compose_devguide_1/login';
 config.responseType = 'code';
 
 // Fiware service for the app
-config.fiwareService = 'devguide';
+config.fiwareService = 'FIWARE_SERVICE';
 
 // Orion
-config.orionPort = '1026';
-config.orionHostname = 'pepwilma';
-config.orionPepEnabled = 'true';
+config.orionPort = 'ORION_PORT';
+config.orionHostname = 'ORION_HOSTNAME';
+config.orionPepEnabled = 'ORION_PEP_ENABLED';
 
 // IDAS
-config.idasHostname = 'idas';
-config.idasPort = '8080';
-config.idasFiwareService = 'devguideidas';
-config.idasFiwareServicePath = '/';
-config.idasApiKey = 'devguideidas';
+config.idasHostname = 'IDAS_HOSTNAME';
+config.idasPort = 'IDAS_PORT';
+config.idasFiwareService = 'IDAS_FIWARE_SERVICE';
+config.idasFiwareServicePath = 'IDAS_FIWARE_SERVICE_PATH';
+config.idasApiKey = 'IDAS_API_KEY';
 // Do not use the pep proxy (yet) for IDAS.
-config.idasContextBrokerHostname = 'orion';
+config.idasContextBrokerHostname = 'ORION_NO_PROXY_HOSTNAME';
 
 module.exports = config;
