@@ -6,11 +6,11 @@
 # 
 # IDAS humidity sensors used in restaurants
 
-DEVGUIDE_HOST=$( hostname -i )
-DEVGUIDE_URL=http://${DEVGUIDE_HOST}/api/sensors/
+TOURGUIDE_HOST=$( hostname -i )
+TOURGUIDE_URL=http://${TOURGUIDE_HOST}/api/sensors/
 ORION_URL=http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/v1/subscribeContext
 
-cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Fiware-Service: devguideidas' --header 'Fiware-ServicePath: /' -d @-
+cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Fiware-Service: tourguideidas' --header 'Fiware-ServicePath: /' -d @-
 {
     "entities": [
         {
@@ -22,7 +22,7 @@ cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --
     "attributes": [
         "humidity"
     ],
-    "reference": "${DEVGUIDE_URL}",
+    "reference": "${TOURGUIDE_URL}",
     "duration": "P1M",
     "notifyConditions": [
         {

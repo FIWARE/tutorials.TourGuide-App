@@ -4,7 +4,7 @@
 # Author: David Muriel <dmuriel@bitergia.com>
 # MIT Licensed
 
-_volume_path=/home/devguide/fiware-devguide-app
+_volume_path=/home/tourguide/tutorials.TourGuide-App
 pushd $( dirname $0 ) > /dev/null
 _local_path=$( dirname $(pwd) )
 popd > /dev/null
@@ -20,17 +20,17 @@ function start_test_env() {
     local _tries=0
     local ret=0
 
-    # setup compose.yml to enable volume on devguide if not enabled
+    # setup compose.yml to enable volume on tourguide if not enabled
     sed -i "${_yml}" \
-        -e "/^devguide:/,$ s|.*:${_volume_path}|        - ${_local_path}:${_volume_path}|" \
-        -e "/^devguide:/,$ s|#[ ]*volumes:|volumes:|"
+        -e "/^tourguide:/,$ s|.*:${_volume_path}|        - ${_local_path}:${_volume_path}|" \
+        -e "/^tourguide:/,$ s|#[ ]*volumes:|volumes:|"
 
     # start containers with docker-compose
     docker-compose -f "${_yml}" -p tests up -d
 
-    # wait for devguide to be ready
-    container_name=$( docker-compose -f "${_yml}" -p tests ps 2>/dev/null | grep _devguide_ | cut -d ' ' -f 1 )
-    echo "Waiting for devguide to be ready."
+    # wait for tourguide to be ready
+    container_name=$( docker-compose -f "${_yml}" -p tests ps 2>/dev/null | grep _tourguide_ | cut -d ' ' -f 1 )
+    echo "Waiting for tourguide to be ready."
     while [ ${_started} -eq 0 -a ${_tries} -lt ${_max_tries} ]; do
         if ( docker logs ${container_name} | grep -qE "service apache2 reload" ) ; then
             _started=1

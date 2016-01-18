@@ -40,7 +40,7 @@ frisby.create('OAuth2 login')
     // jshint camelcase: true
     // jscs:enable
     frisby.create('Post JSON to /api/orion/reservation')
-      .post('http://devguide/api/orion/reservation', {
+      .post('http://tourguide/api/orion/reservation', {
         '@type': 'FoodEstablishmentReservation',
         partySize: 5,
         reservationFor: {
@@ -52,16 +52,16 @@ frisby.create('OAuth2 login')
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(201)
       .after(function(err, res, body) {
         var location = res.headers.location;
 
         frisby.create('Get a Reservation')
-          .get('http://devguide' + location)
+          .get('http://tourguide' + location)
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(200)
           .expectHeaderContains('content-type', 'application/json')
@@ -82,21 +82,21 @@ frisby.create('OAuth2 login')
           .toss();
 
         frisby.create('Patch a Reservation')
-          .patch('http://devguide' + location, {
+          .patch('http://tourguide' + location, {
             'partySize': '10'
           }, {
             json: true
           })
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(204)
           .toss();
 
         frisby.create('Delete a Reservation')
-          .delete('http://devguide' + location)
+          .delete('http://tourguide' + location)
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(204)
           .toss();
@@ -104,9 +104,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Get a Reservation that does not exist')
-      .get('http://devguide/api/orion/reservation/fail')
+      .get('http://tourguide/api/orion/reservation/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -121,13 +121,13 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Patch a Reservation that does not exist')
-      .patch('http://devguide/api/orion/reservation/fail', {
+      .patch('http://tourguide/api/orion/reservation/fail', {
         'partySize': 'fail!'
       }, {
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -142,9 +142,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Delete a Reservation that does not exist')
-      .delete('http://devguide/api/orion/reservation/fail')
+      .delete('http://tourguide/api/orion/reservation/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -159,9 +159,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('List all the reservations')
-      .get('http://devguide/api/orion/reservations')
+      .get('http://tourguide/api/orion/reservations')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -179,9 +179,9 @@ frisby.create('OAuth2 login')
 
     frisby.create('List all the Reservations of a user')
       .get(
-        'http://devguide/api/orion/reservations/user/user1')
+        'http://tourguide/api/orion/reservations/user/user1')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -195,9 +195,9 @@ frisby.create('OAuth2 login')
 
     frisby.create('List all the Reservations of a restaurant')
       .get(
-        'http://devguide/api/orion/reservations/restaurant/Araba')
+        'http://tourguide/api/orion/reservations/restaurant/Araba')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')

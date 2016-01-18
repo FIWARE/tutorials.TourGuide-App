@@ -1,5 +1,5 @@
 mongodbdata:
-    image: bitergia/fiware-devguide-restaurant-data:20151204
+    image: bitergia/fiware-devguide-restaurant-data:20160118
     hostname: mongodbdata
     volumes:
         - /data/db
@@ -42,7 +42,7 @@ idm:
     expose:
         - "5000"
     environment:
-        - APP_NAME=FIWAREdevGuide
+        - APP_NAME=TourGuide
 
 pepwilma:
     image: bitergia/pep-wilma:4.3.0
@@ -99,13 +99,13 @@ cygnus:
     #    - MYSQL_USER=root
     #    - MYSQL_PASSWORD=bitergia
     volumes:
-        - ~/devel/fiware/fiware-devguide-app/docker/cygnus/subscriptions:/opt/subscribe
-        - ~/devel/fiware/fiware-devguide-app/docker/cygnus/conf:/config
+        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/subscriptions:/opt/subscribe
+        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
 
 
-devguide:
+tourguide:
     image: bitergia/fiware-devguide-app
-    hostname: devguide
+    hostname: tourguide
     links:
         - orion
         - idm
@@ -123,4 +123,4 @@ devguide:
     volumes_from:
         - idm
     # volumes:
-    #     - ~/devel/fiware/fiware-devguide-app:/home/devguide/fiware-devguide-app
+    #     - ~/devel/fiware/tutorials.TourGuide-App:/home/tourguide/tutorials.TourGuide-App

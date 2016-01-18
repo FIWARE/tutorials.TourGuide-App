@@ -4,7 +4,7 @@
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
  *
- * Devguide Utils methods
+ * Tourguide Utils methods
  *
  */
 

@@ -32,7 +32,7 @@ app.configure(function() {
   app.use(express.static(__dirname + '/public'));
 });
 
-// devguide app
+// tourguide app
 app.use('/client', express.static(__dirname + '/client'));
 
 // main page

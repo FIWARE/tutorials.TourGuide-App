@@ -1,4 +1,4 @@
-# fiware-devguide-app
+# tutorials.TourGuide-App
 [![Build Status][travis-image]][travis-url]
 [![License][license-image]][license-url]
 
@@ -12,7 +12,7 @@
 
 ## Overview
 
-[FIWARE Developers Guide App](https://github.com/Bitergia/fiware-devguide-app) is a on-going node.js sample application used in the [FIWARE Developers Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
+[FIWARE Tour Guide App](https://github.com/Fiware/tutorials.TourGuide-App) is a on-going node.js sample application used in the [FIWARE Tour Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
 
 This application is a smart, context-aware application which allows to manage large Restaurant chains which are operating worldwide. Is intended to both franchise managers and to customers. To this aim, the main functionalities provided by the application are:
 
@@ -25,7 +25,7 @@ This application is a smart, context-aware application which allows to manage la
 
 ## Architecture
 
-![Architecture diagram](https://github.com/Bitergia/fiware-devguide-app/blob/master/doc/img/archDiagram.png?raw=true "Architecture diagram")
+![Architecture diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/archDiagram.png?raw=true "Architecture diagram")
 
 It includes (for the moment) the following components:
 
@@ -42,22 +42,22 @@ This project integrates a set of Generic Enablers using those enablers inside [d
 
 For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required. 
 
-![Compose Diagram](https://github.com/Bitergia/fiware-devguide-app/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
+![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
 
-Detailed information of how to start this environment can be found [here](https://github.com/Bitergia/fiware-devguide-app/tree/master/docker/images/fiware-devguide-app).
+Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.TourGuide-App).
 
 ## REST Interface
 
 The application provides a RESTful API with different routes and functions that covers the functionalities described above:
 
-* [FIWARE Devguide RESTful API](http://docs.devguide.apiary.io)
+* [FIWARE TourGuide RESTful API](http://docs.tourguide.apiary.io)
 
 ## Feedback
 
 Try and tweak the Tour Guide application and if you have any feedback please contact us at http://ask.fiware.org using the tag 'tour-guide'.
 
-[travis-image]: https://travis-ci.org/Bitergia/fiware-devguide-app.svg?branch=master
-[travis-url]: https://travis-ci.org/Bitergia/fiware-devguide-app
+[travis-image]: https://travis-ci.org/Fiware/tutorials.TourGuide-App.svg?branch=master
+[travis-url]: https://travis-ci.org/Fiware/tutorials.TourGuide-App
 
 [license-image]: https://img.shields.io/npm/l/express.svg
-[license-url]: https://github.com/Bitergia/fiware-devguide-app/blob/master/LICENSE
+[license-url]: https://github.com/Fiware/tutorials.TourGuide-App/blob/master/LICENSE

@@ -7,15 +7,15 @@ MAINTAINER Bitergia <fiware-testing@bitergia.com>
 ENV DEBIAN_FRONTEND noninteractive
 ENV INITRD no
 
-ENV DEVGUIDE_USER devguide
-ENV DEVGUIDE_USER_DIR /home/${DEVGUIDE_USER}
-ENV GIT_URL_DEVGUIDE https://github.com/Bitergia/fiware-devguide-app.git
-ENV GIT_REV_DEVGUIDE master
+ENV TOURGUIDE_USER tourguide
+ENV TOURGUIDE_USER_DIR /home/${TOURGUIDE_USER}
+ENV GIT_URL_TOURGUIDE https://github.com/Fiware/tutorials.TourGuide-App.git
+ENV GIT_REV_TOURGUIDE master
 ENV SUBSCRIPTIONS_PATH /opt/subscribe
-ENV CC_APP_SERVER_PATH ${DEVGUIDE_USER_DIR}/fiware-devguide-app/server
+ENV CC_APP_SERVER_PATH ${TOURGUIDE_USER_DIR}/tutorials.TourGuide-App/server
 
-# create devguide user
-RUN adduser --disabled-password --gecos "${DEVGUIDE_USER}" ${DEVGUIDE_USER}
+# create tourguide user
+RUN adduser --disabled-password --gecos "${TOURGUIDE_USER}" ${TOURGUIDE_USER}
 
 # install dependencies
 RUN apt-get update && \
@@ -63,15 +63,15 @@ RUN apt-get update && \
     find /var/lib/apt/lists -type f -delete && \
     rm -fr /root/.npm
 
-# setup devguide app as $DEVGUIDE_USER
-USER ${DEVGUIDE_USER}
-WORKDIR ${DEVGUIDE_USER_DIR}
+# setup tourguide app as $TOURGUIDE_USER
+USER ${TOURGUIDE_USER}
+WORKDIR ${TOURGUIDE_USER_DIR}
 
 # get the repository from git and install node dependencies
-RUN git clone ${GIT_URL_DEVGUIDE} /home/devguide/fiware-devguide-app && \
+RUN git clone ${GIT_URL_TOURGUIDE} && \
     cd ${CC_APP_SERVER_PATH} && \
     npm install --loglevel warn && \
-    rm -fr ${DEVGUIDE_USER_DIR}/.npm
+    rm -fr ${TOURGUIDE_USER_DIR}/.npm
 
 # copy default subscriptions
 COPY subscription-humidity-sensors.sh ${SUBSCRIPTIONS_PATH}/
@@ -79,7 +79,7 @@ COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 COPY cpr-registration.sh ${SUBSCRIPTIONS_PATH}/
 
 # Add provision script for IdM
-COPY keystone_provision.py ${DEVGUIDE_USER_DIR}/keystone_provision.py
+COPY keystone_provision.py ${TOURGUIDE_USER_DIR}/keystone_provision.py
 
 # Switch back to root for docker-entrypoint.sh
 USER root

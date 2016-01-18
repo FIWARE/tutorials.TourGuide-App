@@ -41,7 +41,7 @@ frisby.create('OAuth2 login')
     // jshint camelcase: true
     // jscs:enable
     frisby.create('Post JSON to /api/orion/restaurant')
-      .post('http://devguide/api/orion/restaurant', {
+      .post('http://tourguide/api/orion/restaurant', {
         '@type': 'Restaurant',
         'name': 'example',
         'address': {
@@ -60,7 +60,7 @@ frisby.create('OAuth2 login')
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(201)
       .expectHeaderContains('location',
@@ -68,9 +68,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('List all the restaurants')
-      .get('http://devguide/api/orion/restaurants')
+      .get('http://tourguide/api/orion/restaurants')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -84,9 +84,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Get a Restaurant')
-      .get('http://devguide/api/orion/restaurant/example')
+      .get('http://tourguide/api/orion/restaurant/example')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -100,9 +100,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Get a Restaurant that does not exist')
-      .get('http://devguide/api/orion/restaurant/fail')
+      .get('http://tourguide/api/orion/restaurant/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -117,25 +117,25 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Patch a Restaurant')
-      .patch('http://devguide/api/orion/restaurant/example', {
+      .patch('http://tourguide/api/orion/restaurant/example', {
         'url': 'http://www.example.com'
       }, {
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(204)
       .toss();
 
     frisby.create('Patch a Restaurant that does not exist')
-      .patch('http://devguide/api/orion/restaurant/fail', {
+      .patch('http://tourguide/api/orion/restaurant/fail', {
         'url': 'http://www.example.com'
       }, {
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -146,17 +146,17 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Delete a Restaurant')
-      .delete('http://devguide/api/orion/restaurant/example')
+      .delete('http://tourguide/api/orion/restaurant/example')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(204)
       .toss();
 
     frisby.create('Delete a Restaurant that does not exist')
-      .delete('http://devguide/api/orion/restaurant/fail')
+      .delete('http://tourguide/api/orion/restaurant/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -172,10 +172,10 @@ frisby.create('OAuth2 login')
 
     frisby.create('List all the restaurants of Franchise1')
       .get(
-        'http://devguide/api/orion/restaurants/organization/Franchise1'
+        'http://tourguide/api/orion/restaurants/organization/Franchise1'
       )
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')

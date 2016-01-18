@@ -1,6 +1,6 @@
 # Context Provider example
 
-This document explains the configuration and use of a Context Provider within the scope of Fiware Devguide.  For a detailed explanation of Context Providers, please read the official documentation for Orion Context Broker available at https://fiware-orion.readthedocs.org/en/develop/user/context_providers/index.html.
+This document explains the configuration and use of a Context Provider within the scope of Fiware TourGuide.  For a detailed explanation of Context Providers, please read the official documentation for Orion Context Broker available at https://fiware-orion.readthedocs.org/en/develop/user/context_providers/index.html.
 
 In this example we are going to register a Context Provider (CPr) for an entity on our Context Broker (CB) and then query that entity from our CB.  Before doing this we need some information about the CPr and the entity we want to register.  For our example, we are going to use the following information:
 
@@ -70,7 +70,7 @@ with:
 * our CB listening on port 1026 on localhost,
 * registration.json being a file with the json we defined earlier
 
-There's a script already available on the devguide image with this information ([cpr-registration.sh](https://github.com/Bitergia/fiware-devguide-app/blob/master/docker/images/fiware-devguide-app/cpr-registration.sh)).  To use it you just need to enable subscriptions (i.e. via ORION_SUBSCRIPTIONS_ENABLED=true on the compose file) or execute it manually inside the container.
+There's a script already available on the TourGuide image with this information ([cpr-registration.sh](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.TourGuide-App/cpr-registration.sh)).  To use it you just need to enable subscriptions (i.e. via ORION_SUBSCRIPTIONS_ENABLED=true on the compose file) or execute it manually inside the container.
 
 After registering the CPr, we shoud get a response like this:
 

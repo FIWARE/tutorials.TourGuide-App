@@ -16,7 +16,7 @@
 
 Set of scripts to generate context information to Orion Context Broker.
 
-**Note**: By default the image provided in the [docker-compose.yml](https://raw.githubusercontent.com/Bitergia/fiware-devguide-app/master/docker/compose/docker-compose.yml) has already restaurants, reservations and reviews loaded. The usage of the restaurant feeder is intended for usage in a clean Orion image with any preloaded context data. Reviews and reservations feeders can be used as many times as wanted (they generates one review/reservation for restaurant).
+**Note**: By default the image provided in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml) has already restaurants, reservations and reviews loaded. The usage of the restaurant feeder is intended for usage in a clean Orion image with any preloaded context data. Reviews and reservations feeders can be used as many times as wanted (they generates one review/reservation for restaurant).
 
 ### restaurantfeeder.js
 
@@ -31,7 +31,7 @@ node restaurantfeeder.js
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/restaurantfeeder.js
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/restaurantfeeder.js
 ```
 
 ### reservationsgenerator.js
@@ -47,7 +47,7 @@ node reservationsgenerator.js
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/reservationsgenerator.js
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/reservationsgenerator.js
 ```
 
 ### reviewsgenerator.js
@@ -63,7 +63,7 @@ node reviewsgenerator.js
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/reviewsgenerator.js
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/reviewsgenerator.js
 ```
 
 ## Sensors generators
@@ -83,7 +83,7 @@ node sensorsgenerator.js
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/sensorsgenerator.js
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/sensorsgenerator.js
 ```
 
 ### sensorsupdater.js
@@ -99,7 +99,7 @@ node sensorsupdater.js
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/sensorsupdater.js
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/sensorsupdater.js
 ```
 
 ## Occupancy updater
@@ -128,5 +128,5 @@ Available options:
 Or from inside the container:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/feeders/occupancyupdater.js --help
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeders/occupancyupdater.js --help
 ```

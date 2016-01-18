@@ -1,6 +1,6 @@
 ## oauthToken.js
 
-Simple Node.js script that retrieves a fresh token from IDM-Keyrock to allow users make requests against the [FIWARE Devguide RESTful API](http://docs.devguide.apiary.io)
+Simple Node.js script that retrieves a fresh token from IDM-Keyrock to allow users make requests against the [FIWARE TourGuide RESTful API](http://docs.tourguide.apiary.io)
 
 ### Usage:
 
@@ -17,5 +17,5 @@ node oauthToken.js <username> <password>
 Also, you can run it from inside the container in a Docker environment:
 
 ```
-docker exec -i -t compose_devguide_1 node fiware-devguide-app/server/misc/oauthToken.js <username> <password>
+docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/misc/oauthToken.js <username> <password>
 ```

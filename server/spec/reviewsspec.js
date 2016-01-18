@@ -41,7 +41,7 @@ frisby.create('OAuth2 login')
     // jshint camelcase: true
     // jscs:enable
     frisby.create('Post JSON to /api/orion/review')
-      .post('http://devguide/api/orion/review', {
+      .post('http://tourguide/api/orion/review', {
         '@type': 'Review',
         'itemReviewed': {
           '@type': 'Restaurant',
@@ -57,16 +57,16 @@ frisby.create('OAuth2 login')
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(201)
       .after(function(err, res, body) {
         var location = res.headers.location;
 
         frisby.create('Get a Review')
-          .get('http://devguide' + location)
+          .get('http://tourguide' + location)
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(200)
           .expectHeaderContains('content-type', 'application/json')
@@ -86,21 +86,21 @@ frisby.create('OAuth2 login')
           .toss();
 
         frisby.create('Patch a Review')
-          .patch('http://devguide' + location, {
+          .patch('http://tourguide' + location, {
             'name': 'Patch done!'
           }, {
             json: true
           })
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(204)
           .toss();
 
         frisby.create('Delete a Review')
-          .delete('http://devguide' + location)
+          .delete('http://tourguide' + location)
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(204)
           .toss();
@@ -108,9 +108,9 @@ frisby.create('OAuth2 login')
         frisby.create(
             'Check that the reviews counter are well added to a restaurant'
           )
-          .get('http://devguide/api/orion/restaurant/Araba')
+          .get('http://tourguide/api/orion/restaurant/Araba')
           .addHeader('X-Auth-Token', token)
-          .addHeader('fiware-service', 'devguide')
+          .addHeader('fiware-service', 'tourguide')
           .waits(delay)
           .expectStatus(200)
           .expectHeaderContains('content-type', 'application/json')
@@ -121,9 +121,9 @@ frisby.create('OAuth2 login')
             var rating = element[0].aggregateRating.ratingValue;
             frisby.create('Get all Reviews of a Restaurant')
               .get(
-                'http://devguide/api/orion/reviews/restaurant/Araba')
+                'http://tourguide/api/orion/reviews/restaurant/Araba')
               .addHeader('X-Auth-Token', token)
-              .addHeader('fiware-service', 'devguide')
+              .addHeader('fiware-service', 'tourguide')
               .waits(delay)
               .expectStatus(200)
               .expectHeaderContains('content-type', 'application/json')
@@ -143,9 +143,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('List all the reviews')
-      .get('http://devguide/api/orion/reviews')
+      .get('http://tourguide/api/orion/reviews')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -162,9 +162,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Get a Review that does not exist')
-      .get('http://devguide/api/orion/review/fail')
+      .get('http://tourguide/api/orion/review/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -179,13 +179,13 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Patch a Review that does not exist')
-      .patch('http://devguide/api/orion/review/fail', {
+      .patch('http://tourguide/api/orion/review/fail', {
         'name': 'Patch fail!'
       }, {
         json: true
       })
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -200,9 +200,9 @@ frisby.create('OAuth2 login')
       .toss();
 
     frisby.create('Delete a Review that does not exist')
-      .delete('http://devguide/api/orion/review/fail')
+      .delete('http://tourguide/api/orion/review/fail')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(404)
       .expectHeaderContains('content-type', 'application/json')
@@ -218,9 +218,9 @@ frisby.create('OAuth2 login')
 
     frisby.create('List all the reviews of a user')
       .get(
-        'http://devguide/api/orion/reviews/user/user1')
+        'http://tourguide/api/orion/reviews/user/user1')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')
@@ -234,9 +234,9 @@ frisby.create('OAuth2 login')
 
     frisby.create('List all the reviews of a restaurant')
       .get(
-        'http://devguide/api/orion/reviews/restaurant/Araba')
+        'http://tourguide/api/orion/reviews/restaurant/Araba')
       .addHeader('X-Auth-Token', token)
-      .addHeader('fiware-service', 'devguide')
+      .addHeader('fiware-service', 'tourguide')
       .waits(delay)
       .expectStatus(200)
       .expectHeaderContains('content-type', 'application/json')

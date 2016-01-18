@@ -4,7 +4,7 @@
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
  * 
- * Devguide Oauth2 methods for authentication
+ * tutorials.TourGuide-App Oauth2 methods for authentication
  * against IDM.
  * 
  */

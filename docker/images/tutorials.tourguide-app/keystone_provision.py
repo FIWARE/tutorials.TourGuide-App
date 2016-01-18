@@ -3,7 +3,7 @@
 # Author: Bitergia <fiware-testing@bitergia.com>
 # MIT Licensed
 #
-# Default provision for Devguide
+# Default provision for tourguide
 
 import ConfigParser
 import json
@@ -103,16 +103,16 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
                          role=owner_role.id,
                          project=franchise.id)
 
-    # Create Devguide APP and give provider role to the pepProxy
+    # Create tourguide APP and give provider role to the pepProxy
     # TODO: modify the url + callback when the app is ready
-    devguide_app = keystone.oauth2.consumers.create(
-        name='FIWAREdevGuide',
-        redirect_uris=['http://compose_devguide_1/login'],
-        description='Fiware devGuide Test Application',
+    tourguide_app = keystone.oauth2.consumers.create(
+        name='TourGuide',
+        redirect_uris=['http://tourguide/login'],
+        description='Fiware TourGuide Application',
         scopes=['all_info'],
         client_type='confidential',
         grant_type='authorization_code',
-        url='http://compose_devguide_1',
+        url='http://tourguide',
         img='/static/dashboard/img/logos/small/app.png')
     provider_role = next(r for r
                          in keystone.fiware_roles.roles.list()
@@ -121,7 +121,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
     keystone.fiware_roles.roles.add_to_user(
         role=provider_role.id,
         user=pep_user.id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=pep_user.default_project_id)
 
     # Creating roles
@@ -130,19 +130,19 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
     end_user = keystone.fiware_roles.roles.create(
         name='End user',
         is_internal=False,
-        application=devguide_app.id)
+        application=tourguide_app.id)
 
     # Franchise manager
     franchise_manager = keystone.fiware_roles.roles.create(
         name='Franchise manager',
         is_internal=False,
-        application=devguide_app.id)
+        application=tourguide_app.id)
 
     # Global manager
     global_manager = keystone.fiware_roles.roles.create(
         name='Global manager',
         is_internal=False,
-        application=devguide_app.id)
+        application=tourguide_app.id)
 
 
     # Make all users Restaurant viewers
@@ -151,7 +151,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
         keystone.fiware_roles.roles.add_to_user(
             role=end_user.id,
             user=user.id,
-            application=devguide_app.id,
+            application=tourguide_app.id,
             organization=user.default_project_id)
 
     # Make user0 Global Manager
@@ -159,31 +159,31 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
     keystone.fiware_roles.roles.add_to_user(
         role=global_manager.id,
         user=users[0].id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=users[0].default_project_id)
 
     keystone.fiware_roles.roles.add_to_user(
         role=franchise_manager.id,
         user=users[1].id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=franchises[0].id)
 
     keystone.fiware_roles.roles.add_to_user(
         role=franchise_manager.id,
         user=users[2].id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=franchises[1].id)
 
     keystone.fiware_roles.roles.add_to_user(
         role=franchise_manager.id,
         user=users[3].id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=franchises[2].id)
 
     keystone.fiware_roles.roles.add_to_user(
         role=franchise_manager.id,
         user=users[4].id,
-        application=devguide_app.id,
+        application=tourguide_app.id,
         organization=franchises[3].id)
 
     for i in range(4):
@@ -198,7 +198,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     perm0 = keystone.fiware_roles.permissions.create(
                 name='reservations', 
-                application=devguide_app, 
+                application=tourguide_app, 
                 action= 'POST', 
                 resource= 'NGSI10/queryContext?limit=1000&entity_type=reservation',
                 is_internal=False)
@@ -208,7 +208,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     perm1 = keystone.fiware_roles.permissions.create(
                 name='reviews', 
-                application=devguide_app, 
+                application=tourguide_app, 
                 action= 'POST', 
                 resource= 'NGSI10/queryContext?limit=1000&entity_type=review',
                 is_internal=False)
@@ -218,7 +218,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     perm2 = keystone.fiware_roles.permissions.create(
                 name='restaurants', 
-                application=devguide_app, 
+                application=tourguide_app, 
                 action= 'POST', 
                 resource= 'NGSI10/queryContext?limit=1000&entity_type=restaurant',
                 is_internal=False)

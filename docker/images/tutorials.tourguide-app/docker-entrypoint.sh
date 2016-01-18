@@ -6,14 +6,14 @@
 
 source /entrypoint-common.sh
 
-check_var DEVGUIDE_USER
-check_var DEVGUIDE_USER_DIR
+check_var TOURGUIDE_USER
+check_var TOURGUIDE_USER_DIR
 
 check_var IDM_HOSTNAME idm
 check_var IDM_PORT 5000
 check_var CONFIG_FILE /config/idm2chanchan.json
 
-check_var FIWARE_SERVICE devguide
+check_var FIWARE_SERVICE tourguide
 
 check_var ORION_HOSTNAME orion
 check_var ORION_PORT 1026
@@ -21,9 +21,9 @@ check_var ORION_PEP_ENABLED false
 
 check_var IDAS_HOSTNAME idas
 check_var IDAS_PORT 8080
-check_var IDAS_FIWARE_SERVICE devguideidas
+check_var IDAS_FIWARE_SERVICE tourguideidas
 check_var IDAS_FIWARE_SERVICE_PATH /
-check_var IDAS_API_KEY devguideidas
+check_var IDAS_API_KEY tourguideidas
 
 check_var ORION_SUBSCRIPTIONS_ENABLED true
 
@@ -52,7 +52,7 @@ case "${ORION_PEP_ENABLED}" in
 esac
 
 DOCROOT="${CC_APP_SERVER_PATH}/public"
-VHOST_HTTP="/etc/apache2/sites-available/devguide-app.conf"
+VHOST_HTTP="/etc/apache2/sites-available/tourguide-app.conf"
 APACHE_LOG_DIR=/var/log/apache2
 
 function _configure_params () {
@@ -90,8 +90,8 @@ function _setup_vhost_http () {
     # DocumentRoot [root to your app/public]
     DocumentRoot ${DOCROOT}
 
-    ErrorLog ${APACHE_LOG_DIR}/devguide-app-error.log
-    CustomLog ${APACHE_LOG_DIR}/devguide-app-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/tourguide-app-error.log
+    CustomLog ${APACHE_LOG_DIR}/tourguide-app-access.log combined
 
     # to avoid errors when using self-signed certificates
     SetEnv NODE_TLS_REJECT_UNAUTHORIZED 0
@@ -111,7 +111,7 @@ function tail_logs () {
 
 # Move the provision file to /config to make it available for IdM
 
-mv ${DEVGUIDE_USER_DIR}/keystone_provision.py /config/keystone_provision.py
+mv ${TOURGUIDE_USER_DIR}/keystone_provision.py /config/keystone_provision.py
 
 # Call checks
 check_host_port ${IDM_HOSTNAME} ${IDM_PORT}
@@ -120,7 +120,7 @@ _setup_vhost_http
 check_file ${CONFIG_FILE}
 _configure_params
 # enable new virtualhosts
-a2ensite devguide-app
+a2ensite tourguide-app
 
 # Subscribe to receive temperatures from orion
 if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then
@@ -136,7 +136,7 @@ fi
 
 # Start apache server
 
-echo "Starting devguide"
+echo "Starting tourguide"
 service apache2 start
 
 # Sensors generation
