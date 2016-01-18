@@ -68,7 +68,7 @@ USER ${DEVGUIDE_USER}
 WORKDIR ${DEVGUIDE_USER_DIR}
 
 # get the repository from git and install node dependencies
-RUN git clone ${GIT_URL_DEVGUIDE} && \
+RUN git clone ${GIT_URL_DEVGUIDE} /home/devguide/fiware-devguide-app && \
     cd ${CC_APP_SERVER_PATH} && \
     npm install --loglevel warn && \
     rm -fr ${DEVGUIDE_USER_DIR}/.npm
