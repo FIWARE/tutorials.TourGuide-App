@@ -1,5 +1,5 @@
 mongodbdata:
-    image: bitergia/fiware-devguide-restaurant-data:20160118
+    image: fiware/tutorials.tourguide-app.restaurant-data:20160118
     hostname: mongodbdata
     volumes:
         - /data/db
@@ -104,7 +104,7 @@ cygnus:
 
 
 tourguide:
-    image: bitergia/fiware-devguide-app
+    image: fiware/tutorials.tourguide-app:latest
     hostname: tourguide
     links:
         - orion
