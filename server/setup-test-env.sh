@@ -15,7 +15,7 @@ _yml="${_compose_path}/docker-compose.yml"
 
 function start_test_env() {
 
-    local _max_tries=60
+    local _max_tries=120
     local _started=0
     local _tries=0
     local ret=0
