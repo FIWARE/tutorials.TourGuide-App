@@ -53,7 +53,7 @@ function start_test_env() {
 
     if [ ${_started} -eq 0 ]; then
         echo "Test environment not ready.  Aborting."
-        ${0} stop
+        stop_test_env
         ret=1
     else
         echo "Test environment ready."
