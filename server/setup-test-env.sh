@@ -25,6 +25,11 @@ function start_test_env() {
         -e "/^tourguide:/,$ s|.*:${_volume_path}|        - ${_local_path}:${_volume_path}|" \
         -e "/^tourguide:/,$ s|#[ ]*volumes:|volumes:|"
 
+    # if travis is active
+    if [ "$TRAVIS" = "1" ]; then
+        docker-compose -f "${_yml}" -p tests pull
+    fi
+
     # start containers with docker-compose
     docker-compose -f "${_yml}" -p tests up -d
 
