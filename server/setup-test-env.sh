@@ -35,14 +35,20 @@ function start_test_env() {
 
     # wait for tourguide to be ready
     container_name=$( docker-compose -f "${_yml}" -p tests ps 2>/dev/null | grep _tourguide_ | cut -d ' ' -f 1 )
-    echo "Waiting for tourguide to be ready."
     while [ ${_started} -eq 0 -a ${_tries} -lt ${_max_tries} ]; do
-        if ( docker logs ${container_name} | grep -qE "service apache2 reload" ) ; then
+        echo -n "Waiting for tourguide to be ready [try $(( ${_tries} + 1 ))/${_max_tries}]... "
+        if ( docker logs ${container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            echo "OK."
             _started=1
         else
+            sleep 1
             _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
         fi
-        sleep 1
     done
 
     if [ ${_started} -eq 0 ]; then
