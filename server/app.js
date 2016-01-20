@@ -15,11 +15,14 @@
 var express = require('express');
 var auth = require('./auth/auth');
 var orion = require('./routes/orion');
+var multipart = require('connect-multiparty');
 
 var app = express();
 
 app.use(express.logger());
-app.use(express.bodyParser());
+app.use(express.urlencoded());
+app.use(express.json());
+app.use(multipart());
 app.use(express.cookieParser());
 app.use(express.session({
   secret: '08bf59703922c49573f008b4ce58b5b0'
