@@ -3,11 +3,10 @@
  * Copyright(c) 2016 Bitergia
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
- * 
+ *
  * Request builder for consuming Orion NGSIv2 API
- * 
+ *
  */
-
 
 // jshint node: true
 

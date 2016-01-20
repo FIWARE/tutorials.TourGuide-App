@@ -3,10 +3,10 @@
  * Copyright(c) 2016 Bitergia
  * Author: Bitergia <fiware-testing@bitergia.com>
  * MIT Licensed
- * 
+ *
  * tutorials.TourGuide-App Oauth2 methods for authentication
  * against IDM.
- * 
+ *
  */
 
 // jshint node: true

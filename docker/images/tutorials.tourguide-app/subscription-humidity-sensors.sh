@@ -3,7 +3,7 @@
 # Copyright(c) 2016 Bitergia
 # Author: David Muriel <dmuriel@bitergia.com>
 # MIT Licensed
-# 
+#
 # IDAS humidity sensors used in restaurants
 
 TOURGUIDE_HOST=$( hostname -i )
