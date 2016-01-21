@@ -1,16 +1,6 @@
-mongodbdata:
-    image: fiware/tutorials.tourguide-app.restaurant-data:20160118
-    hostname: mongodbdata
-    volumes:
-        - /data/db
-    restart: "no"
-    command: /bin/echo "Data-only container for mongodb."
-
 mongodb:
-    image: mongo:2.6
+    image: fiware/tutorials.tourguide-app.restaurant-data:20160118
     hostname: mongodb
-    volumes_from:
-        - mongodbdata
     expose:
         - "27017"
     command: --smallfiles

@@ -16,8 +16,7 @@ We strongly suggest you to use [docker-compose](https://docs.docker.com/compose/
 
 So for this purpose, we have already a simple file that launches:
 
-   * A MongoDB database
-   * Data-only container for the MongoDB database
+   * A MongoDB image with pre-loaded data
    * Orion Context Broker as a service
    * IDM Keyrock
    * PEP Proxy
@@ -27,8 +26,6 @@ So for this purpose, we have already a simple file that launches:
    * TourGuide app
 
 The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml).
-
-**Note:** Mac users please check the [data volumes in OS X](#data-volumes-in-os-x) section to configure the `docker-compose.yml` properly.
 
 Once you get it, you just have to:
 
@@ -60,19 +57,6 @@ No problem, the only thing is that you will have to deploy an Orion container yo
 By default, TourGuide show the logs from apache via `docker logs <container-id>` command.
 
 If you need to run another command in the same container, you can use the `docker exec` command.
-
-### Data volumes in OS X
-
-Some users reported that, using data volumes is not working properly with `docker` in OS X. As we are providing an image with data already loaded, the solution is to modify the `docker-compose.yml` provided in this repository and link directly `mongodb` to the data image like:
-
-```
-mongodb:
-    image: fiware/tutorials.TourGuide-App.restaurant-data:20150728
-    expose:
-        - "27017"
-    command: --smallfiles
-```
-And also removing the `mongodbdata` section.
 
 ## User feedback
 
