@@ -73,12 +73,24 @@ function stop_test_env() {
     exit 0
 }
 
+function dump_docker_logs () {
+    if [ "${DUMP_DOCKER_LOGS}" = "true" ] ; then
+        containers=( $( docker-compose -f "${_yml}" -p tests ps 2>/dev/null | awk '{print $1}' | grep tests_ ) )
+        for c in "${containers[@]}"; do
+            docker logs $c 2>&1 | sed "s/^/$c | /g"
+        done
+    fi
+}
+
 case "${1}" in
     start)
         start_test_env
         ;;
     stop)
         stop_test_env
+        ;;
+    logs)
+        dump_docker_logs
         ;;
     *)
         echo "Unknown command '${1}'"

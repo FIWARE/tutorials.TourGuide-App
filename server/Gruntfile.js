@@ -36,6 +36,11 @@ module.exports = function(grunt) {
         command: './setup-test-env.sh stop'
       },
 
+      test_env_logs: {
+        // dump logs
+        command: './setup-test-env.sh logs'
+      },
+
       tests: {
         // execute jasmine_node tests inside testing container
         command: 'docker exec -u tourguide tests_tourguide_1 bash -c "cd ~/tutorials.TourGuide-App/server ; grunt do-test"'
@@ -87,6 +92,7 @@ module.exports = function(grunt) {
       'shell:test_env_on',
       'continue:on',
       'shell:tests',
+      'shell:test_env_logs',
       'continue:off',
       'shell:test_env_off',
       'continue:fail-on-warning'
