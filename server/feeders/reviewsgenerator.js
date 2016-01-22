@@ -71,7 +71,6 @@ var feedOrionReviews = function() {
       'id': rname,
       'itemReviewed': {},
       'reviewRating': {},
-      'name': 'Rating description',
       'author': {},
       'reviewBody': 'Body review',
       'dateCreated': new Date().getTime(),

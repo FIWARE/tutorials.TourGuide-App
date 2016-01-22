@@ -341,6 +341,8 @@ function reviewToSchema(element) {
       }
     });
 
+  newElement.name = unescape(element.id);
+
   newElement = replaceTypeForSchema(newElement);
 
   return newElement;
