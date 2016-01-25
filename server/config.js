@@ -18,7 +18,7 @@ config.clientSecret = 'CLIENT_SECRET';
 
 // Callback URL for the application
 // TODO: make callback URL configurable as the others
-config.callbackUrl = 'http://compose_devguide_1/login';
+config.callbackUrl = 'http://TOURGUIDE_HOSTNAME/login';
 
 config.responseType = 'code';
 

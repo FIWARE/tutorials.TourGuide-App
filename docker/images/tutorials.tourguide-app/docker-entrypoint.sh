@@ -8,6 +8,7 @@ source /entrypoint-common.sh
 
 check_var TOURGUIDE_USER
 check_var TOURGUIDE_USER_DIR
+check_var TOURGUIDE_HOSTNAME $(hostname)
 
 check_var IDM_HOSTNAME idm
 check_var IDM_PORT 5000
@@ -63,6 +64,7 @@ function _configure_params () {
 
     # parse it into the config.js file
     sed -i ${CC_APP_SERVER_PATH}/config.js \
+        -e "s|TOURGUIDE_HOSTNAME|${TOURGUIDE_HOSTNAME}|g" \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
         -e "s|CLIENT_ID|${CLIENT_ID}|g" \
         -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
