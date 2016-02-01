@@ -722,6 +722,13 @@ function getOccupancyLevels(listOfReservations, restaurant) {
   return occupancyLevels;
 }
 
+function getTimeBetweenDates(from, to) {
+  var fromTimestamp = new Date(from).getTime();
+  var toTimestamp = new Date(to).getTime();
+  var frameTime = 'startTime==' + fromTimestamp + '..' + toTimestamp;
+  return frameTime;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -757,5 +764,6 @@ module.exports = {
   replaceTypeForOrion: replaceTypeForOrion,
   replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
-  getOccupancyLevels: getOccupancyLevels
+  getOccupancyLevels: getOccupancyLevels,
+  getTimeBetweenDates: getTimeBetweenDates
 };

@@ -19,6 +19,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
 var username = 'user0@test.com';
 var password = 'test';
+var reservationDate = '2015-12-24T10:12:23.396Z';
 var auth = 'Basic ' +
   new Buffer(config.clientId + ':' + config.clientSecret).toString('base64');
 
@@ -47,7 +48,7 @@ frisby.create('OAuth2 login')
           '@type': 'FoodEstablishment',
           name: 'Araba'
         },
-        startTime: '2015-12-24T10:12:23.396Z'
+        startTime: reservationDate
       }, {
         json: true
       })
@@ -60,6 +61,33 @@ frisby.create('OAuth2 login')
 
         frisby.create('Get a Reservation')
           .get('http://tourguide' + location)
+          .addHeader('X-Auth-Token', token)
+          .addHeader('fiware-service', 'tourguide')
+          .waits(delay)
+          .expectStatus(200)
+          .expectHeaderContains('content-type', 'application/json')
+          .expectJSON('*', {
+            '@context': 'http://schema.org',
+            '@type': 'FoodEstablishmentReservation',
+            reservationFor: {
+              '@type': 'FoodEstablishment',
+              name: 'Araba',
+              address: {
+                '@type': 'postalAddress'
+              }
+            },
+            underName: {
+              '@type': 'Person'
+            }
+          })
+          .toss();
+
+        frisby.create('Get a Reservation between dates')
+          .get(
+            'http://tourguide/api/orion/reservations/restaurant/Araba/from/' +
+            (reservationDate) +
+            '/to/' +
+            (reservationDate))
           .addHeader('X-Auth-Token', token)
           .addHeader('fiware-service', 'tourguide')
           .waits(delay)

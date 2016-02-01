@@ -607,6 +607,31 @@ exports.getOrganizationReservations = function(req, res) {
   });
 };
 
+exports.getReservationsByDate = function(req, res) {
+  var restaurantReservations = [];
+  var timeframeQuery = utils.getTimeBetweenDates(
+    req.params.from,
+    req.params.to);
+  console.log(timeframeQuery);
+  utils.sendRequest('GET',
+    {'type': 'FoodEstablishmentReservation',
+    'q': timeframeQuery,
+    'limit': 1000},
+    null,
+    req.headers)
+  .then(function(data) {
+    restaurantReservations = utils.getRestaurantReservations(
+      req.params.restaurant,
+      data.body);
+    res.statusCode = data.statusCode;
+    res.json(utils.dataToSchema(restaurantReservations));
+  })
+  .catch(function(err) {
+    res.statusCode = err.statusCode;
+    res.end();
+  });
+};
+
 // Sensors
 exports.updateSensors = function(req, res) {
   var data = req.body;
