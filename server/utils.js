@@ -280,6 +280,10 @@ function restaurantToSchema(element) {
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
       if (val !== 'undefined') {
         if (additionalProperties.indexOf(elementAttribute) !== -1) {
+          if (val.timestamp) {
+            var newDate = new Date(val.timestamp).toISOString();
+            val.timestamp = newDate;
+          }
           additionalProperty.push(val);
         } else {
           if (typeof val === 'string') {
@@ -342,8 +346,9 @@ function reviewToSchema(element) {
       }
     });
 
+  var newDate = new Date(newElement.dateCreated).toISOString();
+  newElement.dateCreated = newDate;
   newElement.name = unescape(element.id);
-
   newElement = replaceTypeForSchema(newElement);
 
   return newElement;

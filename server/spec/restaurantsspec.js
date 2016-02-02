@@ -19,6 +19,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
 var username = 'user0@test.com';
 var password = 'test';
+var date = '2016-03-06T17:16:08.225Z';
 var auth = 'Basic ' +
   new Buffer(config.clientId + ':' + config.clientSecret).toString(
     'base64');
@@ -97,6 +98,23 @@ frisby.create('OAuth2 login')
 
     frisby.create('Get a Restaurant')
       .get('http://tourguide/api/orion/restaurant/example')
+      .addHeader('X-Auth-Token', token)
+      .addHeader('fiware-service', 'tourguide')
+      .waits(delay)
+      .expectStatus(200)
+      .expectHeaderContains('content-type', 'application/json')
+      .expectJSON('*', {
+        '@context': 'http://schema.org',
+        '@type': 'Restaurant',
+        address: {
+          '@type': 'postalAddress'
+        }
+      })
+      .toss();
+
+    frisby.create('Get a Restaurant and date')
+      .get(
+      'http://tourguide/api/orion/restaurant/example/date/' + date)
       .addHeader('X-Auth-Token', token)
       .addHeader('fiware-service', 'tourguide')
       .waits(delay)

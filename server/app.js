@@ -59,6 +59,7 @@ app.all('/api/orion/*', auth.validateRequest);
 
 app.post('/api/orion/restaurant', orion.createRestaurant);
 app.get('/api/orion/restaurant/:id', orion.readRestaurant);
+app.get('/api/orion/restaurant/:id/date/:date', orion.readRestaurantWithDate);
 app.patch('/api/orion/restaurant/:id', orion.updateRestaurant);
 app.delete('/api/orion/restaurant/:id', orion.deleteRestaurant);
 app.get('/api/orion/restaurants', orion.getRestaurants);

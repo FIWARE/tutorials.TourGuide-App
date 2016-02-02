@@ -61,14 +61,129 @@ exports.createRestaurant = function(req, res) {
 };
 
 exports.readRestaurant = function(req, res) {
-  utils.getListByType('Restaurant', req.params.id, req.headers)
+  var timeframeQuery;
+  var actualOccupancyLevels;
+  var restaurantReservations;
+  var occupancyLevelsObject;
+  var restaurant;
+  var fiwareHeaders;
+  var actualDate = new Date().getTime();
+  timeframeQuery = utils.getTimeframe(actualDate);
+  utils.sendRequest('GET', {
+        'type': 'FoodEstablishmentReservation',
+        'q': timeframeQuery,
+        'limit': 1000
+      },
+      null,
+      req.headers)
     .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
+      restaurantReservations = data.body;
+      actualOccupancyLevels = utils.getOccupancyLevels(
+        restaurantReservations,
+        req.params.id);
+      console.log(actualOccupancyLevels);
+      occupancyLevelsObject = utils.updateOccupancyLevels(
+        actualOccupancyLevels);
+      utils.getListByType('Restaurant', req.params.id, req.headers)
+        .then(function(data) {
+          restaurant = data.body;
+          // add service path for the restaurant
+          fiwareHeaders = JSON.parse(JSON.stringify(req.headers));
+          if (typeof restaurant.department !== 'undefined' &&
+            restaurant.department !== '') {
+            fiwareHeaders['fiware-servicepath'] = '/' + restaurant.department;
+          }
+          utils.sendRequest('PATCH',
+              occupancyLevelsObject,
+              req.params.id,
+              fiwareHeaders)
+            .then(function(data) {
+              utils.getListByType('Restaurant', req.params.id, req.headers)
+                .then(function(data) {
+                  res.statusCode = data.statusCode;
+                  res.json(utils.dataToSchema(data.body));
+                })
+                .catch(function(err) {
+                  res.statusCode = err.statusCode;
+                  res.json(err.error);
+                });
+            })
+            .catch(function(err) {
+              res.statusCode = err.statusCode;
+              res.json(err.error);
+            });
+        })
+        .catch(function(err) {
+          res.statusCode = err.statusCode;
+          res.json(err.error);
+        });
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
-      res.json(err.error);
+      res.end();
+    });
+};
+
+exports.readRestaurantWithDate = function(req, res) {
+  var timeframeQuery;
+  var actualOccupancyLevels;
+  var restaurantReservations;
+  var occupancyLevelsObject;
+  var restaurant;
+  var fiwareHeaders;
+  timeframeQuery = utils.getTimeframe(req.params.date);
+  utils.sendRequest('GET', {
+        'type': 'FoodEstablishmentReservation',
+        'q': timeframeQuery,
+        'limit': 1000
+      },
+      null,
+      req.headers)
+    .then(function(data) {
+      restaurantReservations = data.body;
+      actualOccupancyLevels = utils.getOccupancyLevels(
+        restaurantReservations,
+        req.params.id);
+      console.log(actualOccupancyLevels);
+      occupancyLevelsObject = utils.updateOccupancyLevels(
+        actualOccupancyLevels);
+      utils.getListByType('Restaurant', req.params.id, req.headers)
+        .then(function(data) {
+          restaurant = data.body;
+          // add service path for the restaurant
+          fiwareHeaders = JSON.parse(JSON.stringify(req.headers));
+          if (typeof restaurant.department !== 'undefined' &&
+            restaurant.department !== '') {
+            fiwareHeaders['fiware-servicepath'] = '/' + restaurant.department;
+          }
+          utils.sendRequest('PATCH',
+              occupancyLevelsObject,
+              req.params.id,
+              fiwareHeaders)
+            .then(function(data) {
+              utils.getListByType('Restaurant', req.params.id, req.headers)
+                .then(function(data) {
+                  res.statusCode = data.statusCode;
+                  res.json(utils.dataToSchema(data.body));
+                })
+                .catch(function(err) {
+                  res.statusCode = err.statusCode;
+                  res.json(err.error);
+                });
+            })
+            .catch(function(err) {
+              res.statusCode = err.statusCode;
+              res.json(err.error);
+            });
+        })
+        .catch(function(err) {
+          res.statusCode = err.statusCode;
+          res.json(err.error);
+        });
+    })
+    .catch(function(err) {
+      res.statusCode = err.statusCode;
+      res.end();
     });
 };
 
@@ -143,7 +258,6 @@ exports.createReview = function(req, res) {
       auth.getUserDataPromise(req)
         .then(function(data) {
           elementToOrion = utils.reviewToOrion(data, elementToOrion);
-          console.log(elementToOrion);
           utils.sendRequest('POST', elementToOrion, null, req.headers)
             .then(function(data) {
               utils.getListByType('Review', null, fwHeaders)
@@ -305,7 +419,6 @@ exports.deleteReview = function(req, res) {
                   utils.sendRequest('PATCH', aggregateRatings,
                       restaurantName, req.headers)
                     .then(function(data) {
-                      console.log(data);
                       res.end();
                     })
                     .catch(function(err) {
@@ -612,7 +725,6 @@ exports.getReservationsByDate = function(req, res) {
   var timeframeQuery = utils.getTimeBetweenDates(
     req.params.from,
     req.params.to);
-  console.log(timeframeQuery);
   utils.sendRequest('GET',
     {'type': 'FoodEstablishmentReservation',
     'q': timeframeQuery,
