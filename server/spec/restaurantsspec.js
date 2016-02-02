@@ -51,16 +51,28 @@ frisby.create('OAuth2 login')
           'addressRegion': 'Madrid',
           'postalCode': 28911
         },
-        'department': 'Franchise',
+        'department': 'Franchise4',
         'description': 'Restaurant description',
         'priceRange': '25.0',
         'telephone': '912345678',
-        'url': 'http://www.example.com'
+        'url': 'http://www.example.com',
+        'capacity': {
+          'type': 'PropertyValue',
+          'name': 'capacity',
+          'value': 200
+        },
+        'occupancyLevels': {
+          'type': 'PropertyValue',
+          'timestamp': new Date().getTime(),
+          'name': 'occupancyLevels',
+          'value': 0
+        }
       }, {
         json: true
       })
       .addHeader('X-Auth-Token', token)
       .addHeader('fiware-service', 'tourguide')
+      .addHeader('fiware-servicepath', '/Franchise4')
       .waits(delay)
       .expectStatus(201)
       .expectHeaderContains('location',
@@ -124,6 +136,7 @@ frisby.create('OAuth2 login')
       })
       .addHeader('X-Auth-Token', token)
       .addHeader('fiware-service', 'tourguide')
+      .addHeader('fiware-servicepath', '/Franchise4')
       .waits(delay)
       .expectStatus(204)
       .toss();
@@ -149,6 +162,7 @@ frisby.create('OAuth2 login')
       .delete('http://tourguide/api/orion/restaurant/example')
       .addHeader('X-Auth-Token', token)
       .addHeader('fiware-service', 'tourguide')
+      .addHeader('fiware-servicepath', '/Franchise4')
       .waits(delay)
       .expectStatus(204)
       .toss();

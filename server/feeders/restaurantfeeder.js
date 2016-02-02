@@ -137,7 +137,11 @@ var feedOrionRestaurants = function() {
         'type': 'postalAddress'
       },
       'department': utils.randomElement(organization),
-      'capacity': utils.randomElement(capacity),
+      'capacity': {
+        'type': 'PropertyValue',
+        'name': 'capacity',
+        'value': utils.randomElement(capacity)
+      },
       'aggregateRating': {},
       'occupancyLevels': {
         'type': 'PropertyValue',

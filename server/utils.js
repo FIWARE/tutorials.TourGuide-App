@@ -256,7 +256,8 @@ function restaurantToSchema(element) {
     'Kitchen_humidity',
     'Dining_temperature',
     'Dining_humidity',
-    'occupancyLevels'
+    'occupancyLevels',
+    'capacity'
   ];
 
   restaurantSchemaElements.push.apply(restaurantSchemaElements,
