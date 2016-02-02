@@ -729,6 +729,17 @@ function getTimeBetweenDates(from, to) {
   return frameTime;
 }
 
+function updateOccupancyLevels(occupancyLevel) {
+  return {
+    'occupancyLevels': {
+      'type': 'PropertyValue',
+      'timestamp': Date.now(),
+      'name': 'occupancyLevels',
+      'value': occupancyLevel
+    }
+  };
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -765,5 +776,6 @@ module.exports = {
   replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
-  getTimeBetweenDates: getTimeBetweenDates
+  getTimeBetweenDates: getTimeBetweenDates,
+  updateOccupancyLevels: updateOccupancyLevels
 };

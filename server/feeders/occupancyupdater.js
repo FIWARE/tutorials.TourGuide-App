@@ -169,17 +169,6 @@ function getOccupancyLevelByDate(restaurant, from, to) {
     );
 }
 
-function updateOccupancyLevels(restaurant, occupancyLevel) {
-  return {
-    'occupancyLevels': {
-      'type': 'PropertyValue',
-      'timestamp': Date.now(),
-      'name': 'occupancyLevels',
-      'value': occupancyLevel
-    }
-  };
-}
-
 function updateRestaurants() {
 
   var to = Date.now(); // in milliseconds
@@ -205,8 +194,7 @@ function updateRestaurants() {
           if (verbose) {
             console.log('Occupancy:', occupancyLevel, '/', restaurant.capacity);
           }
-          var occupancyLevels = updateOccupancyLevels(restaurant,
-                                                      occupancyLevel);
+          var occupancyLevels = utils.updateOccupancyLevels(occupancyLevel);
           if (updateContextBroker) {
             // add service path for the restaurant
             if (typeof restaurant.department !== 'undefined' &&
