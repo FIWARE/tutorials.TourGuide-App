@@ -83,7 +83,7 @@ exports.readRestaurant = function(req, res) {
         req.params.id);
       console.log(actualOccupancyLevels);
       occupancyLevelsObject = utils.updateOccupancyLevels(
-        actualOccupancyLevels);
+        actualOccupancyLevels, actualDate);
       utils.getListByType('Restaurant', req.params.id, req.headers)
         .then(function(data) {
           restaurant = data.body;
@@ -146,7 +146,7 @@ exports.readRestaurantWithDate = function(req, res) {
         req.params.id);
       console.log(actualOccupancyLevels);
       occupancyLevelsObject = utils.updateOccupancyLevels(
-        actualOccupancyLevels);
+        actualOccupancyLevels, req.params.date);
       utils.getListByType('Restaurant', req.params.id, req.headers)
         .then(function(data) {
           restaurant = data.body;

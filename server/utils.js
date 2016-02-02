@@ -735,11 +735,11 @@ function getTimeBetweenDates(from, to) {
   return frameTime;
 }
 
-function updateOccupancyLevels(occupancyLevel) {
+function updateOccupancyLevels(occupancyLevel, date) {
   return {
     'occupancyLevels': {
       'type': 'PropertyValue',
-      'timestamp': Date.now(),
+      'timestamp': date,
       'name': 'occupancyLevels',
       'value': occupancyLevel
     }
