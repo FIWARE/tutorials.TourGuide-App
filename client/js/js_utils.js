@@ -67,7 +67,7 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback)
         }
     }
     xmlhttp.open("GET", url, true);
-    xmlhttp.setRequestHeader('Fiware-Service','devguide')
+    xmlhttp.setRequestHeader('Fiware-Service','tourguide')
     xmlhttp.send();
 }
 
@@ -114,7 +114,7 @@ function delete_ajax_petition(url, on_success_callback, on_failure_callback)
         }
     }
     xmlhttp.open("DELETE", url, true);
-    xmlhttp.setRequestHeader('Fiware-Service','devguide')
+    xmlhttp.setRequestHeader('Fiware-Service','tourguide')
     xmlhttp.send();
 }
 
@@ -162,7 +162,7 @@ function post_ajax_petition(url, on_success_callback, on_failure_callback, data)
         }
     }
     xmlhttp.open("POST", url, true);
-    xmlhttp.setRequestHeader('Fiware-Service','devguide')
+    xmlhttp.setRequestHeader('Fiware-Service','tourguide')
     xmlhttp.setRequestHeader("Content-type", "application/json");
     xmlhttp.send(JSON.stringify(data));
 }

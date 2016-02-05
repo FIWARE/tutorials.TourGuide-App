@@ -1,5 +1,37 @@
 <html>
- <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+
+
+<head>
+<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+   <!-- FI-WARE styles -->
+    <link href="stylesheets/styles.css" rel="stylesheet">
+  
+    <!-- Addons Styles -->
+    <!--<link href="addons/.../css/file.css" rel="stylesheet"> -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="javascripts/bootstrap/bootstrap.min.js"></script>
+    <!-- Addons Javascripts -->
+    <!--<script src="addons/.../js/file.min.js"></script> -->
+    <script src="javascripts/bootstrap/modal.js"></script>
+    <!--<script src="javascripts/bootstrap/dropdown.js"></script>--> 
+
+
+     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
@@ -12,29 +44,56 @@
     <script src="js/restaurants_api.js"></script>
     <script src="js/connections_api.js"></script>
     <script src="js/myReviews.js"></script>
-
-<head>
 <title> FIWARE TEST</title>
 
 </head>
 <body>
-<div id='logged_div'>
-    <p>Checking if logged </p>
+<div class="container-fluid">
+  <nav id="top_menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
+    <div id='logged_div' class="navbar navbar-default" role="navigation">
+        <p>Checking if logged </p>
 
-</div>
-<div id='roles_div' style="display:none;">
-  <p> You have the roles: </p>
-    <ul>
-      <li>template role 1</li>
-      <li>template role 2</li>
-    </ul>
-</div>
+    </div>
+
+
+  </nav>
+
 <div id='reviews_list_div'>
-  <ul id='review_list'>
+  <ul id='review_list'class="hidden" >
   </ul>
 </div>
-<div id='reviews_map'>
-</div>
+
+  <div class="table-fixed-container">
+      <table id="reviews_table" class="table table-fixed table-hover">
+      <thead>
+        <tr>
+          <th class="col-xs-4">Restaurant</th>
+          <th class="col-xs-2">Rating</th>
+          <th class="col-xs-2"></th>
+          <th class="col-xs-2"></th>
+          <th class="col-xs-2"></th>
+        </tr>
+      </thead>
+      <tbody id="reviews_table_body">
+      </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <div id='pop_window' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="pop_title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4  id ="pop_title" class="modal-title">Modal Header</h4>
+        </div>
+        <div id="pop_content" class="modal-body">
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 </div>
 </body>
