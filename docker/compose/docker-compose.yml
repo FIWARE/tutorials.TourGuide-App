@@ -1,5 +1,5 @@
 mongodb:
-    image: fiware/tutorials.tourguide-app.restaurant-data:20160201 
+    image: fiware/tutorials.tourguide-app.restaurant-data:20160201
     hostname: mongodb
     expose:
         - "27017"
@@ -23,7 +23,7 @@ authzforce:
         - "8080"
 
 idm:
-    image: bitergia/idm-keyrock:4.3.0
+    image: bitergia/idm-keyrock:5.1.0
     hostname: idm
     links:
         - authzforce

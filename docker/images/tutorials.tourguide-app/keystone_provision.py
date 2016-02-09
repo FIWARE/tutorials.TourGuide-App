@@ -5,7 +5,6 @@
 #
 # Default provision for tourguide
 
-import ConfigParser
 import json
 import os
 import string
@@ -13,14 +12,8 @@ import code
 import readline
 import rlcompleter
 
-from conf import settings
-
+import settings
 from keystoneclient.v3 import client
-
-from fabric.api import task
-from fabric.tasks import Task
-from fabric.state import env
-from fabric.api import execute
 
 def _register_user(keystone, name, activate=True):
     email = name + '@test.com'
@@ -47,17 +40,13 @@ def _create_organization(keystone, org_name):
         website='')
     return org
 
-@task
 def test_data(keystone_path=settings.KEYSTONE_ROOT):
     """Populate the database with some users, organizations and applications
     for convenience"""
 
     # Log as idm
-    config = ConfigParser.ConfigParser()
-    config.read(keystone_path + 'etc/keystone.conf')
-    admin_port = config.get('DEFAULT', 'admin_port')
     endpoint = 'http://{ip}:{port}/v3'.format(ip='127.0.0.1',
-                                              port=admin_port)
+                                              port=settings.KEYSTONE_ADMIN_PORT)
     keystone = client.Client(
         username=settings.IDM_USER_CREDENTIALS['username'],
         password=settings.IDM_USER_CREDENTIALS['password'],
@@ -116,7 +105,7 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
         img='/static/dashboard/img/logos/small/app.png')
     provider_role = next(r for r
                          in keystone.fiware_roles.roles.list()
-                         if r.name == 'provider')
+                         if r.name == 'Provider')
 
     keystone.fiware_roles.roles.add_to_user(
         role=provider_role.id,
@@ -228,3 +217,5 @@ def test_data(keystone_path=settings.KEYSTONE_ROOT):
 
     keystone.fiware_roles.permissions.add_to_role(
                     global_manager, perm2)
+
+test_data('./')
