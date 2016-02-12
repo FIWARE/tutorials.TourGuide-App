@@ -27,15 +27,20 @@ So for this purpose, we have already a simple file that launches:
 
 The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml).
 
-Once you get it, you just have to:
-
+Once you get it, you just have to pull the images:
+```
+docker-compose pull
+```
+And then start the containers:
 ```
 docker-compose up -d
 ```
 
+Note that even though the `docker-compose up -d` does also pull the images, we suggest to do it separately to avoid synchronization issues.
+
 Also, there are several enviroment variables that you can configure in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml):
 
-   * `ORION_HOSTNAME`. Hostname of the Orion application protected by a proxy. By default the value is `pepwilma` 
+   * `ORION_HOSTNAME`. Hostname of the Orion application protected by a proxy. By default the value is `pepwilma`
    * `ORION_NO_PROXY_HOSTNAME`. Hostname of the Orion application without proxy. By default the value is `orion`
    * `ORION_PORT`. Port of the Orion application. By default the value is `1026`
    * `ORION_PEP_ENABLED`. Activate the PEP Proxy. By default the value is `true`
