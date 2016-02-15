@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Installation and usage](#installation-and-usage)
+  - [Deploying on a Cloud Fiware Lab Instance](#deploying-on-a-cloud-fiware-lab-instance)
 - [REST Interface](#rest-interface)
 - [Feedback](#feedback)
 
@@ -40,11 +41,17 @@ It includes (for the moment) the following components:
 
 This project integrates a set of Generic Enablers using those enablers inside [docker](https://github.com/docker/docker) containers. It also comes with restaurants, reviews and reservations loaded to start working out of the box, as well as users and organizations to play with it.
 
-For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required. 
+For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required.
 
 ![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
 
-Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.TourGuide-App).
+Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app).
+
+### Deploying on a Cloud Fiware Lab Instance
+
+You can deploy an instance of the Fiware TourGuide App in a cloud instance using [Docker-machine](https://docs.docker.com/machine/). Detailed information of this process can be found in the following documentation:
+
+* [Installing Docker on FIWARE Cloud](http://simple-docker-hosting-on-fiware-cloud.readthedocs.org/en/latest/manuals/install/)
 
 ## REST Interface
 
