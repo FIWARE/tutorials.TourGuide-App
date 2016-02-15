@@ -12,7 +12,7 @@
 init_connexions = function(){
 
   //check if user is logged in
-  get_ajax_petition('http://compose_devguide_1/client/user',logged_in, not_logged_in);
+  get_ajax_petition('http://tourguide/client/user',logged_in, not_logged_in);
 }
 
 
@@ -25,8 +25,10 @@ function logged_in(userInfo){
   localStorage.setItem("userInfo", userInfo);
   
   userInfo = JSON.parse(userInfo);
-  html = '<div id="log_out"><p><a href="http://compose_devguide_1/logout">Log Out</a></p></div>';
-  html += '\n<div id="hi_user"><p>Hi,'+userInfo["displayName"]+'!</p></div>';
+  html = '<ul class="nav navbar-nav pull-right" id="log_out_menu">';
+  html += '\n<li class="menu_element" id="hi_user"><p>Hi,'+userInfo["displayName"]+'!</p></li>';
+   html += '<li class="menu_element" id="log_out" ><a href="http://tourguide/logout">Log Out</a></li>';
+  html += '</ul>'
   document.getElementById("logged_div").innerHTML = html;
   create_and_show_menu(userInfo);
   show_roles();
@@ -36,33 +38,54 @@ function logged_in(userInfo){
 
 function create_and_show_menu(userInfo)
 {
-  html = '<div id=logged_menu>';
+  html = '<ul class="nav navbar-nav pull-left" id="logged_menu">';
 
     //check each menu element
     //TODO check roles
 
-
-
-    //view organizations restaurants
-    if( has_role(userInfo, "Restaurant Viewer") || has_role(userInfo, "Global manager") )
-    {
-      //we should ask before for each organization but the user hasn't yet
-      html += '<div class="menu_element"><p><a href="myRestaurants.html">My restaurants</a></p></div>';
-    }
+    console.log(userInfo);
+    html += '<li class="menu_element"><a href="index.html">Home</a></li>';
 
     //check each menu element
-    if( has_role(userInfo, "End user") )
+
+    //view organizations restaurants
+    if( has_role(userInfo, "Restaurant Viewer") || has_role(userInfo, "Global manager") || true )//hacked
     {
-      html += '<div class="menu_element"><p><a href="myReservations.html">My Reservations</a></p></div>';
+      //we should ask before for each organization but the user hasn't yet
+      //html += '<li class="menu_element"><a href="myRestaurants.html">My restaurants</a></li>';
+      if (userInfo.organizations.length > 0)
+      {
+        html += '<li class="dropdown">\n';
+        html += '<a  id="myRestaurantsButtonLink" class="dropdown-toggle" data-toggle="dropdown" role="button" href="#">';
+        html += 'My restaurants <b class="caret"></b></a>\n';
+        html += '<ul class ="dropdown-menu" aria-labelledby="myRestaurantsButtonLink" role="menu">';
+          //html += '<li role="presentation">';
+          //html += '<a href="myRestaurants.html" tabindex="-1" role="menuitem">All my restaurants</a></li>';
+        for (var index=0; index < userInfo.organizations.length; index++)
+        {
+          html += '<li role="presentation">';
+            html += '<a href="myRestaurants.html?franchise='+userInfo.organizations[index]["name"]
+            +'" tabindex="-1" role="menuitem">'+userInfo.organizations[index]["name"]+'</a>';
+          html += '</li>';
+        }
+       
+        html += '</ul>';
+        html += '</li>';
+      }
     }
 
     if( has_role(userInfo, "End user") )
     {
-      html += '<div class="menu_element"><p><a href="myReviews.html">My reviews</a></p></div>';
+      html += '<li class="menu_element"><a href="myReservations.html">My Reservations</a></li>';
     }
 
-    html += '<div class="menu_element"><p><a href="index.html">Inicio</a></p></div>';
-  html += '</div>'
+    if( has_role(userInfo, "End user") )
+    {
+      html += '<li class="menu_element"><a href="myReviews.html">My reviews</a></li>';
+    }
+
+
+  html += '</ul>'
   //insert menu inside logged_div
   document.getElementById("logged_div").innerHTML += html;
 }
@@ -77,7 +100,7 @@ return false;
 }
 function not_logged_in(){
   localStorage.removeItem("userInfo");
-  html = '<div id="log_in"><p><a href="http://compose_devguide_1/auth">Log in</a></p></div>';
+  html = '<div id="log_in"><p><a href="http://tourguide/auth">Log in</a></p></div>';
   document.getElementById("logged_div").innerHTML = html;
   return;
 }

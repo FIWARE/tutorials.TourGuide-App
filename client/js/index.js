@@ -11,6 +11,8 @@
 
 //initialization
 init_index = function(){
+
+$("#pop_window").modal()
 map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
 
@@ -20,6 +22,8 @@ get_all_restaurants();
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+
 
 
 

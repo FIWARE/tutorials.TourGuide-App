@@ -1,0 +1,7 @@
+.backstretch,
+.backstretch img{
+  position: relative;
+}
+.backstretch img{
+top: 0px !important;
+}
