@@ -63,6 +63,61 @@ By default, TourGuide show the logs from apache via `docker logs <container-id>`
 
 If you need to run another command in the same container, you can use the `docker exec` command.
 
+## IdM Users, Organizations, Apps, Roles and Permissions
+
+This IdM image is intended to work with [Fiware TourGuide-App](https://github.com/Fiware/tutorials.TourGuide-App). Due to this, we've generated Users, Organizations, Apps, Roles and Permissions adapted to it in this uncoupled  [file](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/keystone_provision.py).
+
+**Note** the following provision is intended just for testing purposes. To add/remove information to this image, you can always use the [Identity API](http://developer.openstack.org/api-ref-identity-v3.html)
+
+### Users
+
+| Role     | Username           | Password   |
+|----------|--------------------|------------|
+| Admin    | idm                | idm        |
+| Provider | pepproxy@test.com  | test       |
+| Owner    | user0@test.com     | test       |
+| Owner    | user1@test.com     | test       |
+| Owner    | user2@test.com     | test       |
+| Owner    | user3@test.com     | test       |
+| Owner    | user4@test.com     | test       |
+| Owner    | user5@test.com     | test       |
+| Owner    | user6@test.com     | test       |
+| Owner    | user7@test.com     | test       |
+| Owner    | user8@test.com     | test       |
+| Owner    | user9@test.com     | test       |
+
+### Organizations (or *projects* if using the [Identity API](http://developer.openstack.org/api-ref-identity-v3.html))
+
+| Organization name   | Description                    | Users                     |
+|---------------------|--------------------------------|---------------------------|
+| Franchise1          | Franchise1                     | user0@test.com (owner)    |
+| Franchise2          | Franchise2                     | user0@test.com (owner)    |
+| Franchise3          | Franchise3                     | user0@test.com (owner)    |
+| Franchise4          | Franchise4                     | user0@test.com (owner)    |
+
+
+### Apps
+
+| Application name  | Description                       | URL                       | Redirect URI                     |
+|-------------------|-----------------------------------|---------------------------|----------------------------------|
+| FIWARE devGuide   | Fiware devGuide Test Application  | http://tourguide          | http://tourguide/login           |
+
+### Roles
+
+| Role name           | Granted to user                         |
+|---------------------|-----------------------------------------|
+| Provider            | pepproxy@test.com                       |
+| End user            | All                                     |
+| Franchise Manager   | user0@test.com     (Franchise1)         |
+| Franchise Manager   | user1@test.com     (Franchise2)         |
+| Franchise Manager   | user2@test.com     (Franchise3)         |
+| Franchise Manager   | user3@test.com     (Franchise4)         |
+| Global Manager      | user0@test.com                          |
+
+### Permissions
+
+We've added several permissions for Orion Operations. You can check all of them by accessing the IdM or [here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/keystone_provision.py#L186)
+
 ## User feedback
 
 ### Documentation
