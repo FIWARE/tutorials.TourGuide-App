@@ -92,6 +92,18 @@ cygnus:
         - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/subscriptions:/opt/subscribe
         - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
 
+cep-proton:
+    image: bitergia/cep-proton:master
+    hostname: cep-proton
+    expose:
+        - "8080"
+        - "8686"
+        - "3002"
+        - "3302"
+    ports:
+        - "8080:8080"
+    links:
+        - orion
 
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
