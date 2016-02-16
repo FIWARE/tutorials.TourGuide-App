@@ -547,6 +547,7 @@ function reservationToOrion(userObject, schemaObject) {
     //Time in miliseconds to Orion
     schemaObject.startTime = newDate;
     schemaObject.underName = {};
+    schemaObject.partySize = parseInt(schemaObject.partySize, 10);
     schemaObject.underName.type = 'Person';
     schemaObject.underName.name = userObject.id;
     schemaObject.reservationStatus = 'Confirmed';
