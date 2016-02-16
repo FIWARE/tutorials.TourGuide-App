@@ -530,7 +530,7 @@ exports.createReservation = function(req, res) {
   .then(function(data) {
     elementToOrion = req.body;
     elementToOrion.reservationFor.address = data.body.address;
-    capacity = data.body.capacity;
+    capacity = data.body.capacity.value;
     timeframeQuery = utils.getTimeframe(req.body.startTime);
     utils.sendRequest('GET',
       {'type': 'FoodEstablishmentReservation',
