@@ -341,7 +341,11 @@ function reviewToSchema(element) {
       val = element[elementAttribute];
       if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
         if (val !== 'undefined') {
-          newElement[elementAttribute] = val;
+          if (typeof val === 'string') {
+            newElement[elementAttribute] = unescape(val);
+          } else {
+            newElement[elementAttribute] = val;
+          }
         }
       }
     });
@@ -376,7 +380,11 @@ function reservationToSchema(element) {
     if (reservationSchemaElements.indexOf(elementAttribute) !==
       -1) {
       if (val !== 'undefined') {
-        newElement[elementAttribute] = val;
+        if (typeof val === 'string') {
+          newElement[elementAttribute] = unescape(val);
+        } else {
+          newElement[elementAttribute] = val;
+        }
       }
     }
   });
@@ -520,6 +528,7 @@ function reviewToOrion(userObject, schemaObject) {
     var rname = schemaObject.itemReviewed.name;
     rname += '-' + shortid.generate();
     schemaObject.id = rname;
+    schemaObject.reviewBody = fixedEncodeURIComponent(schemaObject.reviewBody);
     schemaObject.author = {};
     schemaObject.author.type = 'Person';
     schemaObject.author.name = userObject.id;
