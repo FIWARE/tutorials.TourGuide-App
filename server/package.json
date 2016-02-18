@@ -8,13 +8,14 @@
     "connect-multiparty": "^2.0.0",
     "continuation-local-storage": "^3.1.4",
     "express": "3.x",
+    "minimist": "~1.2.0",
     "node-geocoder": "^3.1.0",
     "node-mysql": "0.4.x",
     "q": "~1.4.1",
     "querystring": "0.2.0",
     "request-promise": "^1.0.1",
     "shortid": "2.2.2",
-    "minimist": "~1.2.0"
+    "tv4": "^1.2.7"
   },
   "repository": {
     "type": "git",

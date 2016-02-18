@@ -17,47 +17,63 @@ var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
 var async = require('async');
 var auth = require('../auth/auth');
+var tv4 = require('tv4');
+var schema = require('../schema/schema');
 
 var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
+tv4.addSchema('restaurant', schema.restaurant);
 
 // Restaurants
 
 exports.createRestaurant = function(req, res) {
   var elementToOrion = req.body;
-  var address = elementToOrion.address.streetAddress + ' ' +
-      elementToOrion.address.addressLocality;
-  geocoder.geocode(address)
+  var valid = tv4.validate(elementToOrion, 'restaurant');
+  if (valid) {
+    var address = elementToOrion.address.streetAddress + ' ' +
+    elementToOrion.address.addressLocality;
+    geocoder.geocode(address)
     .then(function(geoRes) {
       if (geoRes !== '[]') {
         elementToOrion = utils.restaurantToOrion(elementToOrion, geoRes[0]);
       }
       utils.sendRequest('POST', elementToOrion, null, req.headers)
-        .then(function(data) {
-          res.headers = data.headers;
-          res.location('/api/orion/restaurant/' + elementToOrion.id);
-          res.statusCode = data.statusCode;
-          res.end();
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.end();
-        });
+      .then(function(data) {
+        res.headers = data.headers;
+        res.location('/api/orion/restaurant/' + elementToOrion.id);
+        res.statusCode = data.statusCode;
+        res.end();
+      })
+      .catch(function(err) {
+        res.statusCode = err.statusCode;
+        res.end();
+      });
     })
     .catch(function(err) {
       console.log('Geo-location could not be processed. Error: ' + err);
       utils.sendRequest('POST', elementToOrion, null, req.headers)
-        .then(function(data) {
-          res.statusCode = data.statusCode;
-          res.end();
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.end();
-        });
+      .then(function(data) {
+        res.statusCode = data.statusCode;
+        res.end();
+      })
+      .catch(function(err) {
+        res.statusCode = err.statusCode;
+        res.end();
+      });
     });
+  } else {
+    res.statusCode = 400;
+    res.json({
+      error: {
+        message: tv4.error.message,
+        code: 400,
+        params: tv4.error.params,
+        title: 'Bad request'
+      }
+    });
+  }
 };
 
 exports.readRestaurant = function(req, res) {
