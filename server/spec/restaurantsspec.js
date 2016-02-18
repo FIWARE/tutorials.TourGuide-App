@@ -54,7 +54,7 @@ frisby.create('OAuth2 login')
         },
         'department': 'Franchise4',
         'description': 'Restaurant description',
-        'priceRange': '25.0',
+        'priceRange': 25.0,
         'telephone': '912345678',
         'url': 'http://www.example.com',
         'capacity': {
