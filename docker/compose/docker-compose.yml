@@ -113,6 +113,7 @@ tourguide:
         - idm
         - pepwilma
         - idasiotacpp:idas
+        - cep-proton
     environment:
         - ORION_HOSTNAME=pepwilma
         - ORION_NO_PROXY_HOSTNAME=orion
@@ -122,6 +123,7 @@ tourguide:
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false
+        - CEP_ENABLED=false
     volumes_from:
         - idm
     # volumes:
