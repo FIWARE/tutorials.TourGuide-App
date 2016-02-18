@@ -338,8 +338,10 @@ exports.updateReview = function(req, res) {
             });
           } else {
             fixedReviewObject = req.body;
-            fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
-              fixedReviewObject.reviewBody);
+            if (fixedReviewObject.reviewBody) {
+              fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
+                fixedReviewObject.reviewBody);
+            }
             utils.sendRequest('PATCH', fixedReviewObject, req.params.id,
                 req.headers)
               .then(function(data) {
