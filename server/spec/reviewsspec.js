@@ -87,7 +87,7 @@ frisby.create('OAuth2 login')
 
         frisby.create('Patch a Review')
           .patch('http://tourguide' + location, {
-            'name': 'Patch done!'
+            'reviewBody': 'Patch done!\n'
           }, {
             json: true
           })

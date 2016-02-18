@@ -320,6 +320,7 @@ exports.updateReview = function(req, res) {
   var restaurantName;
   var userId;
   var servicePath;
+  var fixedReviewObject;
   utils.getListByType('Review', req.params.id, req.headers)
     .then(function(data) {
       restaurantName = data.body.itemReviewed.name;
@@ -336,7 +337,11 @@ exports.updateReview = function(req, res) {
               }
             });
           } else {
-            utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
+            fixedReviewObject = req.body;
+            fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
+              fixedReviewObject.reviewBody);
+            utils.sendRequest('PATCH', fixedReviewObject, req.params.id,
+                req.headers)
               .then(function(data) {
                 var fwHeaders = JSON.parse(JSON.stringify(req.headers));
                 if (typeof fwHeaders['fiware-servicepath'] !==
