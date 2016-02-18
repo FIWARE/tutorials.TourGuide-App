@@ -107,7 +107,6 @@ exports.validateRequest = function(req, res, next) {
         res.statusCode = e.statusCode;
         res.json(JSON.parse(e.data));
       } else {
-        console.log(JSON.parse(response));
         next();
       }
     }
