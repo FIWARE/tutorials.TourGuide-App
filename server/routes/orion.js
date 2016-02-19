@@ -72,6 +72,7 @@ exports.createRestaurant = function(req, res) {
         message: tv4.error.message,
         code: 400,
         params: tv4.error.params,
+        dataPath: tv4.error.dataPath,
         title: 'Bad request'
       }
     });
@@ -296,25 +297,25 @@ exports.createReview = function(req, res) {
                 res.statusCode = err.statusCode;
                 res.json(err.error);
               });
-            })
-            .catch(function(err) {
-              res.statusCode = err.statusCode;
-              res.json(err.error);
-            });
-            res.headers = data.headers;
-            res.location('/api/orion/review/' + elementToOrion.id);
-            res.statusCode = data.statusCode;
-            res.end();
           })
           .catch(function(err) {
             res.statusCode = err.statusCode;
-            res.end();
+            res.json(err.error);
           });
+          res.headers = data.headers;
+          res.location('/api/orion/review/' + elementToOrion.id);
+          res.statusCode = data.statusCode;
+          res.end();
         })
         .catch(function(err) {
           res.statusCode = err.statusCode;
-          res.json(JSON.parse(err.data));
+          res.end();
         });
+      })
+      .catch(function(err) {
+        res.statusCode = err.statusCode;
+        res.json(JSON.parse(err.data));
+      });
     })
     .catch(function(err) {
       res.statusCode = err.statusCode;
@@ -328,7 +329,7 @@ exports.createReview = function(req, res) {
         message: tv4.error.message,
         code: 400,
         params: tv4.error.params,
-        dataPath : tv4.error.dataPath,
+        dataPath: tv4.error.dataPath,
         title: 'Bad request'
       }
     });
@@ -635,7 +636,7 @@ exports.createReservation = function(req, res) {
         message: tv4.error.message,
         code: 400,
         params: tv4.error.params,
-        dataPath : tv4.error.dataPath,
+        dataPath: tv4.error.dataPath,
         title: 'Bad request'
       }
     });
