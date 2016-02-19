@@ -111,3 +111,46 @@ module.exports.reservation = {
     },
     'required': ['@type', 'partySize', 'startTime', 'reservationFor']
 };
+
+module.exports.review = {
+    '$schema': 'http://json-schema.org/draft-04/schema#',
+    'title': 'Review',
+    'description': 'A review model',
+    'type': 'object',
+    'properties': {
+        '@type': {
+            'description': 'Type of the review',
+            'type': 'string'
+        },
+        'itemReviewed': {
+            'type': 'object',
+            'properties': {
+                '@type': {
+                  'type': 'string'
+                },
+                'name': {
+                  'type': 'string'
+                }
+            },
+            'minItems': 1,
+            'uniqueItems': true
+        },
+        'reviewRating': {
+            'type': 'object',
+            'properties': {
+                '@type': {
+                  'type': 'string'
+                },
+                'ratingValue': {
+                  'type': 'number'
+                }
+            },
+            'minItems': 1,
+            'uniqueItems': true
+        },
+        'reviewBody': {
+            'type': 'string'
+        }
+    },
+    'required': ['@type', 'itemReviewed', 'reviewRating', 'reviewBody']
+};

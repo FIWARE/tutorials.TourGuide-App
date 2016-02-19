@@ -26,6 +26,7 @@ var fiwareHeaders = {
 };
 tv4.addSchema('restaurant', schema.restaurant);
 tv4.addSchema('reservation', schema.reservation);
+tv4.addSchema('review', schema.review);
 
 // Restaurants
 
@@ -265,48 +266,50 @@ exports.createReview = function(req, res) {
   var restaurantName = elementToOrion.itemReviewed.name;
   var restaurantReviews;
   var aggregateRatings;
-  // -- We first get information regarding the restaurant
-  var fwHeaders = JSON.parse(JSON.stringify(req.headers));
-  if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
-    delete fwHeaders['fiware-servicepath'];
-  }
-  utils.getListByType('Restaurant', restaurantName, fwHeaders)
+  var valid = tv4.validate(elementToOrion, 'review');
+  if (valid) {
+    // -- We first get information regarding the restaurant
+    var fwHeaders = JSON.parse(JSON.stringify(req.headers));
+    if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
+      delete fwHeaders['fiware-servicepath'];
+    }
+    utils.getListByType('Restaurant', restaurantName, fwHeaders)
     .then(function(data) {
       auth.getUserDataPromise(req)
+      .then(function(data) {
+        elementToOrion = utils.reviewToOrion(data, elementToOrion);
+        utils.sendRequest('POST', elementToOrion, null, req.headers)
         .then(function(data) {
-          elementToOrion = utils.reviewToOrion(data, elementToOrion);
-          utils.sendRequest('POST', elementToOrion, null, req.headers)
-            .then(function(data) {
-              utils.getListByType('Review', null, fwHeaders)
-                .then(function(data) {
-                  restaurantReviews = utils.getRestaurantReviews(
-                    restaurantName,
-                    data.body);
-                  aggregateRatings = utils.getAggregateRating(
-                    restaurantReviews);
-                  utils.sendRequest('PATCH', aggregateRatings,
-                                    restaurantName, req.headers)
-                    .then(function(data) {
-                      res.end();
-                    })
-                    .catch(function(err) {
-                      res.statusCode = err.statusCode;
-                      res.json(err.error);
-                    });
-                })
-                .catch(function(err) {
-                  res.statusCode = err.statusCode;
-                  res.json(err.error);
-                });
-              res.headers = data.headers;
-              res.location('/api/orion/review/' + elementToOrion.id);
-              res.statusCode = data.statusCode;
-              res.end();
+          utils.getListByType('Review', null, fwHeaders)
+          .then(function(data) {
+            restaurantReviews = utils.getRestaurantReviews(
+              restaurantName,
+              data.body);
+            aggregateRatings = utils.getAggregateRating(
+              restaurantReviews);
+            utils.sendRequest('PATCH', aggregateRatings,
+              restaurantName, req.headers)
+              .then(function(data) {
+                res.end();
+              })
+              .catch(function(err) {
+                res.statusCode = err.statusCode;
+                res.json(err.error);
+              });
             })
             .catch(function(err) {
               res.statusCode = err.statusCode;
-              res.end();
+              res.json(err.error);
             });
+            res.headers = data.headers;
+            res.location('/api/orion/review/' + elementToOrion.id);
+            res.statusCode = data.statusCode;
+            res.end();
+          })
+          .catch(function(err) {
+            res.statusCode = err.statusCode;
+            res.end();
+          });
         })
         .catch(function(err) {
           res.statusCode = err.statusCode;
@@ -317,6 +320,19 @@ exports.createReview = function(req, res) {
       res.statusCode = err.statusCode;
       res.json(err.error);
     });
+  } else {
+    console.log(tv4.error);
+    res.statusCode = 400;
+    res.json({
+      error: {
+        message: tv4.error.message,
+        code: 400,
+        params: tv4.error.params,
+        dataPath : tv4.error.dataPath,
+        title: 'Bad request'
+      }
+    });
+  }
 };
 
 exports.readReview = function(req, res) {
