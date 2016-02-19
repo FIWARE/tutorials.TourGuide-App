@@ -25,12 +25,22 @@ module.exports.restaurant = {
         },
         'address': {
             'type': 'object',
-            'items': {
-                '@type': 'string',
-                'streetAddress': 'string',
-                'addressLocality': 'string',
-                'addressRegion': 'string',
-                'postalCode': 'number'
+            'properties': {
+                '@type': {
+                  'type': 'string'
+                },
+                'streetAddress': {
+                  'type': 'string'
+                },
+                'addressLocality': {
+                  'type': 'string'
+                },
+                'addressRegion': {
+                  'type': 'string'
+                },
+                'postalCode': {
+                  'type': 'number'
+                }
             },
             'minItems': 1,
             'uniqueItems': true
@@ -54,21 +64,35 @@ module.exports.restaurant = {
         },
         'capacity': {
             'type': 'object',
-            'items': {
-                'type': 'string',
-                'name': 'string',
-                'value': 'number'
+            'properties': {
+                'type': {
+                  'type': 'string'
+                },
+                'name': {
+                  'type': 'string'
+                },
+                'value': {
+                  'type': 'number'
+                }
             },
             'minItems': 1,
             'uniqueItems': true
         },
         'occupancyLevels': {
             'type': 'object',
-            'items': {
-                'type': 'string',
-                'timestamp': 'string',
-                'name': 'string',
-                'value': 'number'
+            'properties': {
+                'type': {
+                  'type': 'string'
+                },
+                'timestamp': {
+                  'type': 'string'
+                },
+                'name': {
+                  'type': 'string'
+                },
+                'value': {
+                  'type': 'number'
+                }
             },
             'minItems': 1,
             'uniqueItems': true

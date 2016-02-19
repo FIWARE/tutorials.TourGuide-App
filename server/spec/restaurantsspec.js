@@ -64,7 +64,7 @@ frisby.create('OAuth2 login')
         },
         'occupancyLevels': {
           'type': 'PropertyValue',
-          'timestamp': new Date().getTime(),
+          'timestamp': new Date().toISOString(),
           'name': 'occupancyLevels',
           'value': 0
         }
