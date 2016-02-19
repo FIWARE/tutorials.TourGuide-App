@@ -74,7 +74,40 @@ module.exports.restaurant = {
             'uniqueItems': true
         }
     },
-    'required': ['@type', 'name', 'address', 'department', 
+    'required': ['@type', 'name', 'address', 'department',
     'description', 'priceRange',
     'telephone', 'url', 'capacity', 'occupancyLevels']
+};
+
+module.exports.reservation = {
+    '$schema': 'http://json-schema.org/draft-04/schema#',
+    'title': 'Reservation',
+    'description': 'A reservation model',
+    'type': 'object',
+    'properties': {
+        '@type': {
+            'description': 'Type of the reservation',
+            'type': 'string'
+        },
+        'partySize': {
+            'type': 'number'
+        },
+        'startTime': {
+            'type': 'string'
+        },
+        'reservationFor': {
+            'type': 'object',
+            'properties': {
+                '@type': {
+                  'type': 'string'
+                },
+                'name': {
+                  'type': 'string'
+                }
+            },
+            'minItems': 1,
+            'uniqueItems': true
+        }
+    },
+    'required': ['@type', 'partySize', 'startTime', 'reservationFor']
 };

@@ -25,6 +25,7 @@ var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 tv4.addSchema('restaurant', schema.restaurant);
+tv4.addSchema('reservation', schema.reservation);
 
 // Restaurants
 
@@ -546,66 +547,83 @@ exports.createReservation = function(req, res) {
   var capacity;
   var actualOccupancyLevels;
   var timeframeQuery;
-  // -- We first get information regarding the restaurant
-  utils.getListByType('Restaurant',
-                      req.body.reservationFor.name,
-                      req.headers)
-  .then(function(data) {
-    elementToOrion = req.body;
-    elementToOrion.reservationFor.address = data.body.address;
-    capacity = data.body.capacity.value;
-    timeframeQuery = utils.getTimeframe(req.body.startTime);
-    utils.sendRequest('GET',
-      {'type': 'FoodEstablishmentReservation',
-      'q': timeframeQuery,
-      'limit': 1000},
-      null,
-      req.headers)
+  var valid = tv4.validate(req.body, 'reservation');
+  if (valid) {
+    // -- We first get information regarding the restaurant
+    utils.getListByType('Restaurant',
+        req.body.reservationFor.name,
+        req.headers)
     .then(function(data) {
-      restaurantReservations = data.body;
-      actualOccupancyLevels = utils.getOccupancyLevels(
-        restaurantReservations,
-        req.body.reservationFor.name);
-
-      if (actualOccupancyLevels + req.body.partySize > capacity) {
-        res.statusCode = 409;
-        res.json({
-          error: {
-            message: 'The ocuppancy levels have reached its limit',
-            code: 409,
-            title: 'Conflict'
-          }
-        });
-      } else {
-        auth.getUserDataPromise(req)
-        .then(function(data) {
-          elementToOrion = utils.reservationToOrion(data, elementToOrion);
-          utils.sendRequest('POST', elementToOrion, null, req.headers)
+      elementToOrion = req.body;
+      elementToOrion.reservationFor.address = data.body.address;
+      capacity = data.body.capacity.value;
+      timeframeQuery = utils.getTimeframe(req.body.startTime);
+      utils.sendRequest('GET', {
+            'type': 'FoodEstablishmentReservation',
+            'q': timeframeQuery,
+            'limit': 1000
+          },
+          null,
+          req.headers)
+      .then(function(data) {
+        restaurantReservations = data.body;
+        actualOccupancyLevels = utils.getOccupancyLevels(
+          restaurantReservations,
+          req.body.reservationFor.name);
+        if (actualOccupancyLevels + req.body.partySize > capacity) {
+          res.statusCode = 409;
+          res.json({
+            error: {
+              message: 'The ocuppancy levels have reached its limit',
+              code: 409,
+              title: 'Conflict'
+            }
+          });
+        } else {
+          auth.getUserDataPromise(req)
           .then(function(data) {
-            res.headers = data.headers;
-            res.location('/api/orion/reservation/' + elementToOrion.id);
-            res.statusCode = data.statusCode;
-            res.end();
+            elementToOrion = utils.reservationToOrion(data,
+              elementToOrion);
+            utils.sendRequest('POST', elementToOrion, null, req.headers)
+            .then(function(data) {
+              res.headers = data.headers;
+              res.location('/api/orion/reservation/' +
+                elementToOrion.id);
+              res.statusCode = data.statusCode;
+              res.end();
+            })
+            .catch(function(err) {
+              res.statusCode = err.statusCode;
+              res.end();
+            });
           })
           .catch(function(err) {
             res.statusCode = err.statusCode;
-            res.end();
+            res.json(JSON.parse(err.data));
           });
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(JSON.parse(err.data));
-        });
-      }
+        }
+      })
+      .catch(function(err) {
+        res.statusCode = err.statusCode;
+        res.json(JSON.parse(err.data));
+      });
     })
     .catch(function(err) {
-
+      res.statusCode = err.statusCode;
+      res.json(err.error);
     });
-  })
-  .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.json(err.error);
-  });
+  } else {
+    res.statusCode = 400;
+    res.json({
+      error: {
+        message: tv4.error.message,
+        code: 400,
+        params: tv4.error.params,
+        dataPath : tv4.error.dataPath,
+        title: 'Bad request'
+      }
+    });
+  }
 };
 
 exports.readReservation = function(req, res) {
@@ -675,6 +693,7 @@ exports.deleteReservation = function(req, res) {
       res.json(err.error);
     });
 };
+
 exports.getReservations = function(req, res) {
   utils.getListByType('FoodEstablishmentReservation', null, req.headers)
     .then(function(data) {
