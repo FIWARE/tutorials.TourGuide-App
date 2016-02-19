@@ -85,7 +85,12 @@ module.exports.restaurant = {
                   'type': 'string'
                 },
                 'timestamp': {
-                  'type': 'string'
+                  'type': 'string',
+                  // jshint maxlen: false
+                  // jscs:disable maximumLineLength
+                  'pattern': '/[0-9]{4,}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+|)(?:[+-][0-9]{2}:[0-9]{2}|Z)/'
+                  // jshint maxlen: 80
+                  // jscs:enable
                 },
                 'name': {
                   'type': 'string'
@@ -117,7 +122,12 @@ module.exports.reservation = {
             'type': 'number'
         },
         'startTime': {
-            'type': 'string'
+            'type': 'string',
+            // jshint maxlen: false
+            // jscs:disable maximumLineLength
+            'pattern': '/[0-9]{4,}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+|)(?:[+-][0-9]{2}:[0-9]{2}|Z)/'
+            // jshint maxlen: 80
+            // jscs:enable
         },
         'reservationFor': {
             'type': 'object',
