@@ -193,7 +193,9 @@ _configure_params
 a2ensite tourguide-app
 
 # Setup CEP project
-cep_setup
+if [ "${CEP_ENABLED}" = "true" ] ; then
+    cep_setup
+fi
 
 # Subscribe to receive temperatures from orion
 if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then
