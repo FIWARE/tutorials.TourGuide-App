@@ -14,16 +14,16 @@ var map; //map instance
 //a proxy should be used if the API is not in the same location as the web app.
 proxyurl='';
 
-
+base_url= 'http://tourguide/api/orion/';
 
 /* get all restaurants and show it */
 function get_all_restaurants()
 {
-	get_ajax_petition("http://tourguide/api/orion/restaurants/", showRestaurants, function(){alert('Could not retrive restaurants');});
+	get_ajax_petition(base_url+"restaurants/", showRestaurants, function(){alert('Could not retrive restaurants');});
 }
 
 function get_organization_restaurants(organization){
-	url = "http://tourguide/api/orion/restaurants/organization/"+organization
+	url = base_url+"restaurants/organization/"+organization
 	get_ajax_petition(url, 
 		showRestaurants, function(){alert('Could not retrive restaurants');}
 		);
@@ -235,7 +235,7 @@ function editNewReview(restaurant_name){
 function edit_review(reviewId){
 
 	userInfo= JSON.parse(localStorage.getItem("userInfo"));
-	url = "http://tourguide/api/orion/review/"+reviewId;
+	url = base_url+"review/"+reviewId;
 	get_ajax_petition(url,
 			showEditReview,
 			 function(){
@@ -291,7 +291,7 @@ function showEditReview(reviewResponse)
 function view_review(reviewId){
 
 	userInfo= JSON.parse(localStorage.getItem("userInfo"));
-	url = "http://tourguide/api/orion/review/"+reviewId;
+	url = base_url+"review/"+reviewId;
 	get_ajax_petition(url,
 			viewReview,
 			 function(){
@@ -411,7 +411,7 @@ function createNewReview(restaurant_name)
 
 
 
-	post_ajax_petition('http://tourguide/api/orion/review/',
+	post_ajax_petition(base_url+'review/',
 		closePopUpWindow, 
 		function(err){alert("Cannot add review"), console.log(err)}, data);
 
@@ -435,7 +435,7 @@ function updateReview(reviewId)
 
 
 
-	patch_ajax_petition('http://tourguide/api/orion/review/'+reviewId,
+	patch_ajax_petition(base_url+'review/'+reviewId,
 		function(){closePopUpWindow(); location.reload();}, 
 		function(err){alert("Cannot update review"), console.log(err), closePopUpWindow()}, data);
 
@@ -577,7 +577,7 @@ function set_time_availability()
 	availability_time_count ++;
 	available_time_array = {};
 
-	url= "http://tourguide/api/orion/restaurant/"+document.getElementById("restaurant_name").value+"/date/";
+	url= base_url+"restaurant/"+document.getElementById("restaurant_name").value+"/date/";
 	while ( date.getTime() <= max_date.getTime())
 	{
 		time = date.toISOString();
@@ -698,7 +698,7 @@ function createNewReservation(restaurant_name)
 
 
 	
-	post_ajax_petition('http://tourguide/api/orion/reservation/',
+	post_ajax_petition(base_url+'reservation/',
 		closePopUpWindow, 
 		function(err){alert("Cannot add reservation"), console.log(err)}, data);
 
@@ -710,7 +710,7 @@ function createNewReservation(restaurant_name)
 /*get reviews from a restaurant an show it */
 function getAndShowRestaurantReviews(id)
 {
-	url="http://tourguide/api/orion/reviews/restaurant/"+id;
+	url=base_url+"reviews/restaurant/"+id;
 	document.getElementById("pop_title").innerHTML =id;
 	get_ajax_petition(url,
 			showRestaurantReviews,
@@ -823,7 +823,7 @@ function showRestaurantReviews(reviewsResponse)
 /*get reservations from a restaurant an show it */
 function getAndShowRestaurantReservations(id)
 {
-	url = "http://tourguide/api/orion/reservations/restaurant/"+id;
+	url = base_url+"reservations/restaurant/"+id;
 	document.getElementById("pop_title").innerHTML =id;
 	get_ajax_petition(url,
 		showRestaurantReservations, 
@@ -946,7 +946,7 @@ function showRestaurantReservations(reservationsResponse)
 
 
 function get_user_reservation(username){
-	url = "http://tourguide/api/orion/reservations/user/"+username;
+	url = base_url+"reservations/user/"+username;
 	get_ajax_petition(url,
 		//create_reservations_list,
 		create_reservations_table,
@@ -1051,7 +1051,7 @@ function cancel_reservation(reservation_id)
 	if( !(window.confirm("Delete reservation?") ))
 		return;
 
-	delete_ajax_petition('http://tourguide/api/orion/reservation/'+reservation_id, 
+	delete_ajax_petition(base_url+'reservation/'+reservation_id, 
 			function(){location.reload();}, 
 			function(err){alert("Could not delete the reservation."); console.log(err); /*location.reload();*/})
 
@@ -1060,7 +1060,7 @@ function cancel_reservation(reservation_id)
 
 
 function get_user_reviews(username){
-	url = "http://tourguide/api/orion/reviews/user/"+username;
+	url = base_url+"reviews/user/"+username;
 	get_ajax_petition(url,
 		//create_reviews_list,
 		create_reviews_table,
@@ -1176,7 +1176,7 @@ function delete_review(review_id)
 	if( !(window.confirm("Delete review?") ))
 		return;
 
-	delete_ajax_petition('http://tourguide/api/orion/review/'+review_id, 
+	delete_ajax_petition(base_url+'review/'+review_id, 
 			function(){location.reload();}, 
 			function(err){alert("Could not delete the review."); console.log(err); /*location.reload();*/})
 
@@ -1254,7 +1254,7 @@ function calcCurrentReservations(date, restaurant_name){
 }
 
 function get_reservations_per_date(restaurant_name){
-	url = url = "http://tourguide/api/orion/reservations/restaurant/"+restaurant_name;
+	url = url = base_url+"reservations/restaurant/"+restaurant_name;
 	get_ajax_petition(url,
 			set_reservations_per_date_var,
 			 function(){
