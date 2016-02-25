@@ -309,3 +309,11 @@
 #loading_time img{
 	max-height: 1.2em;
 }
+
+.alert{
+	position:relative;
+	z-index:50;
+	margin-top: 50px;
+	margin-right: 10px;
+	margin-left: 50px;
+}

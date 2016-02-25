@@ -13,8 +13,12 @@ init_reservations = function(){
 
 $("#pop_window").modal()
 
-userInfo= JSON.parse(localStorage.getItem("userInfo"))
-get_user_reservation(userInfo["displayName"]);
+//only gets reservations if the user is logged
+login_needed(function(){
+	userInfo= JSON.parse(localStorage.getItem("userInfo"));
+	get_user_reservation(userInfo["displayName"]);
+});
+
 
 //todo translate to common js
 $("tbody").height($(window).height()- $("thead th").height()- $("#logged_div").height()-50);
