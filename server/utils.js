@@ -594,12 +594,14 @@ function getRestaurantReviews(restaurant, listOfElements) {
 // filter reviews by organization
 function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
   // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(listOfRestaurants);
+  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
 
   // filter reviews of the restaurants of the franchise
   return objectToArray(listOfReviews).filter(
     function(element) {
-      return listOfRestaurants.indexOf(element.itemReviewed.name) !== -1;
+      return listOfRestaurants.some(function(restaurant) {
+        return restaurant.id === element.itemReviewed.name;
+      });
     }
   );
 }
@@ -624,12 +626,14 @@ function getRestaurantReservations(restaurant, listOfElements) {
 
 function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(listOfRestaurants);
+  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
 
   // filter reservations of the restaurants of the franchise
   return objectToArray(listOfReservations).filter(
     function(element) {
-      return listOfRestaurants.indexOf(element.reservationFor.name) !== -1;
+      return listOfRestaurants.some(function(restaurant) {
+        return restaurant.id === element.reservationFor.name;
+      });
     }
   );
 }
