@@ -236,5 +236,44 @@ frisby.create('OAuth2 login')
         }
       })
       .toss();
+
+    frisby.create('List all the Reservations of a restaurant by date')
+      // jshint maxlen: 140
+      // jscs:disable maximumLineLength
+      .get('http://tourguide/api/orion/reservations/restaurant/Araba/from/2014-01-01T00:00:00.000Z/to/2017-01-01T00:00:00.000Z')
+       // jshint camelcase: true
+       // jscs:enable
+      .addHeader('X-Auth-Token', token)
+      .addHeader('fiware-service', 'tourguide')
+      .waits(delay)
+      .expectStatus(200)
+      .expectHeaderContains('content-type', 'application/json')
+      .expectJSON('*', {
+        reservationFor: {
+          '@type': 'FoodEstablishment',
+          name: 'Araba'
+        }
+      })
+      .toss();
+
+    frisby.create('List all the Reservations of an Organization')
+    .get(
+      'http://tourguide/api/orion/reservations/organization/Franchise1')
+    .addHeader('X-Auth-Token', token)
+    .addHeader('fiware-service', 'tourguide')
+    .waits(delay)
+    .expectStatus(200)
+    .expectHeaderContains('content-type', 'application/json')
+    .expectJSON('*', {
+      '@context': 'http://schema.org',
+      '@type': 'FoodEstablishmentReservation',
+      reservationFor: {
+        '@type': 'FoodEstablishment'
+      },
+      underName: {
+        '@type': 'Person'
+      }
+    })
+    .toss();
   })
   .toss();
