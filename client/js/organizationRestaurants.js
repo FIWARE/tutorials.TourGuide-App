@@ -1,5 +1,5 @@
 /*
- * myRestaurants.js
+ * organizationRestaurants.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
  * Authors: 
  *   Jaisiel Santana <jaisiel@gmail.com>,
@@ -13,14 +13,16 @@ init_index = function(){
 map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
 
-userInfo= JSON.parse(localStorage.getItem("userInfo"));
-franchise = window.location.search.replace("?","");//get franchise from url
-prefix = "franchise=";
-if (franchise.slice(0, prefix.length) == prefix)
-{
-	get_organization_restaurants(franchise.slice(prefix.length));
-}
+login_needed(function(){
+	userInfo= JSON.parse(localStorage.getItem("userInfo"));
+	organization = window.location.search.replace("?","");//get organization from url
+	prefix = "organization=";
+	if (organization.slice(0, prefix.length) == prefix)
+	{
+		get_organization_restaurants(organization.slice(prefix.length));
+	}
 
+});
 
 //set tile layer
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

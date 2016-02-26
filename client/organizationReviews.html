@@ -26,19 +26,12 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="javascripts/bootstrap/bootstrap.min.js"></script>
     <!-- Addons Javascripts -->
+    <!--<script src="addons/.../js/file.min.js"></script> -->
     <script src="javascripts/bootstrap/modal.js"></script>
-   <!-- <script src="javascripts/bootstrap/dropdown.js"></script> -->
-
-    <script src="addons/timepicker/jquery.timepicker.min.js"></script>
-    <link rel="stylesheet" href="addons/timepicker/jquery.timepicker.css" />
+    <!--<script src="javascripts/bootstrap/dropdown.js"></script>--> 
 
 
-
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
-
-
-  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
     <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
@@ -49,8 +42,8 @@
   <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
     <script src="js/js_utils.js"></script>
     <script src="js/restaurants_api.js"></script>
-    <script src="js/myRestaurants.js"></script>
     <script src="js/connections_api.js"></script>
+    <script src="js/organizationReviews.js"></script>
 <title> FIWARE TEST</title>
 
 </head>
@@ -61,10 +54,31 @@
         <p>Checking if logged </p>
 
     </div>
+
+
   </nav>
-  <!--<div id='map'  class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> -->
-  <div id='map'>
+
+<div id='reviews_list_div'>
+  <ul id='review_list'class="hidden" >
+  </ul>
+</div>
+
+  <div class="table-fixed-container">
+      <table id="reviews_table" class="table table-fixed table-hover">
+      <thead>
+        <tr>
+          <th class="col-xs-4">Restaurant</th>
+          <th class="col-xs-2">Rating</th>
+          <th class="col-xs-2"></th>
+          <th class="col-xs-2"></th>
+        </tr>
+      </thead>
+      <tbody id="reviews_table_body">
+      </tbody>
+      </table>
+    </div>
   </div>
+
 
   <div id='pop_window' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="pop_title">
     <div class="modal-dialog modal-lg">
@@ -79,7 +93,7 @@
 
     </div>
   </div>
+
 </div>
-  
 </body>
 </html>

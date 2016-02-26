@@ -40,7 +40,7 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback)
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
           
-           if(xmlhttp.status == 200){
+           if((xmlhttp.status == 200) || (xmlhttp.status == 304)){
                on_success_callback(xmlhttp.responseText);
            }
            else if(xmlhttp.status == 404) {
@@ -66,7 +66,7 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback)
            }
         }
     }
-    xmlhttp.open("GET", url, true);
+    xmlhttp.open("GET", url+"?cache="+(Math.random()*1000000), true);
     xmlhttp.setRequestHeader('Fiware-Service','tourguide')
     xmlhttp.send();
 }

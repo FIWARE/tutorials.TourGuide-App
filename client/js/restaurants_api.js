@@ -11,9 +11,11 @@
 
 //global vars
 var map; //map instance
+
 //a proxy should be used if the API is not in the same location as the web app.
 proxyurl='';
 
+//base url for API
 base_url= 'http://tourguide/api/orion/';
 
 /* get all restaurants and show it */
@@ -201,12 +203,12 @@ function add_create_review_link(restaurant_name)
 }
 
 
-
+/*
 function editNewReview(restaurant_name){
 
 	userInfo= JSON.parse(localStorage.getItem("userInfo"));
 	document.getElementById("pop_title").innerHTML =''+restaurant_name;
-	reviewForm = '';
+	reviewForm = '<h5> NEWWESDF</h5>';
 	reviewForm +='\n<form name="editReviewForm" class="editReviewForm">';
 	reviewForm +='\nYour review:<br>';
 	reviewForm +='\n<textarea name="reviewBody"></textarea><br>';
@@ -226,6 +228,98 @@ function editNewReview(restaurant_name){
 
 	document.getElementById("pop_content").innerHTML =reviewForm;
 
+	openPopUpWindow();
+
+}
+
+*/
+function editNewReview(restaurant_name){
+
+	userInfo= JSON.parse(localStorage.getItem("userInfo"));
+	document.getElementById("pop_title").innerHTML =''+restaurant_name;
+
+	//remove previous content
+	var popContent = document.getElementById("pop_content");
+	while (popContent.firstChild) {
+	    popContent.removeChild(popContent.lastChild);
+	}
+
+	var reviewForm = document.createElement("FORM");
+	reviewForm.setAttribute("class", "editReviewForm");
+	reviewForm.setAttribute("name", "editReviewForm");
+
+
+	//select
+	var ratingSelect = document.createElement('SELECT');
+	ratingSelect.setAttribute("name", "ratingValue");
+	ratingSelect.setAttribute("id", "ratingValue");
+
+	var ratingLabel = document.createElement('LABEL');
+	ratingLabel.setAttribute("for", "ratingValue");
+	ratingLabel.innerHTML="Rating value:";
+
+	var max_rating = 5;
+	//dynamic option generation
+	for( var i=0; i <= max_rating; i++)
+	{
+		var option = document.createElement('OPTION');
+		option.setAttribute("value",""+i);
+		option.innerHTML=i+ " Stars";
+		ratingSelect.appendChild(option);
+	}
+
+
+	reviewForm.appendChild(ratingLabel);
+	reviewForm.appendChild(ratingSelect);
+
+
+	//review body
+
+	var reviewBody = document.createElement("TEXTAREA");
+	reviewBody.setAttribute("name","reviewBody");
+	reviewBody.setAttribute("id","reviewBody");
+
+	var reviewBodyLabel = document.createElement("LABEL");
+	reviewBodyLabel.setAttribute("for","reviewBody");
+	reviewBodyLabel.setAttribute("class","textarea-label");
+	reviewBodyLabel.innerHTML= "Your review:";
+
+	reviewForm.appendChild(reviewBodyLabel);
+	reviewForm.appendChild(reviewBody);
+
+
+	//submit
+
+	var submitButton = document.createElement("INPUT");
+	submitButton.setAttribute("type", "submit");
+	submitButton.setAttribute("value", "Create Review");
+	submitButton.setAttribute("onclick", "createNewReview(\''+restaurant_name+'\')");
+
+
+	reviewForm.appendChild(submitButton);
+
+	popContent.appendChild(reviewForm);
+
+/*
+	reviewForm +='\n<form name="editReviewForm" class="editReviewForm">';
+	reviewForm +='\nYour review:<br>';
+	reviewForm +='\n<textarea name="reviewBody"></textarea><br>';
+	reviewForm +='\nRating value:';
+	reviewForm +='\n<select name="ratingValue">';
+  	reviewForm +='\n<option value="0">0 Stars</option>';
+  	reviewForm +='\n<option value="1">1 Star</option>';
+  	reviewForm +='\n<option value="2">2 Stars</option>';
+  	reviewForm +='\n<option value="3">3 Stars</option>';
+  	reviewForm +='\n<option value="4">4 Stars</option>';
+  	reviewForm +='\n<option value="5">5 Stars</option>';
+	reviewForm +='\n</select>';
+	reviewForm +='\n</form>';
+	reviewForm +='\n<input type="submit" value="Create Review" onclick="createNewReview(\''+restaurant_name+'\')">';
+	reviewForm +='\n</form>';
+
+
+	document.getElementById("pop_content").innerHTML =reviewForm;
+*/
 	openPopUpWindow();
 
 }
@@ -512,7 +606,7 @@ function editNewReservation(restaurant_name){
 		'minTime': minTime+'',
     	'maxTime': maxTime+'',
 	    'disableTimeRanges': [
-	        ['4pm', '8:01pm']
+	        //['4pm', '8:01pm']
 	    ]
 	});
 
@@ -578,16 +672,34 @@ function set_time_availability()
 	available_time_array = {};
 
 	url= base_url+"restaurant/"+document.getElementById("restaurant_name").value+"/date/";
+	var time_out=0;
 	while ( date.getTime() <= max_date.getTime())
 	{
-		time = date.toISOString();
+		var time = date.toISOString();
 		//console.log(date);
 		//console.log(url+time);
-		get_ajax_petition(url+time,
-			process_occupancy_response, 
-			function(){ console.log("fail");checkEnablereservationTime();}
-			);
-
+		/*
+		time_out += 50;
+		setTimeout(function(){
+		//var time2 = eval(time);
+			get_ajax_petition(url+time,
+				process_occupancy_response, 
+				function(){ console.log("fail");checkEnablereservationTime();}
+				);
+		}, time_out);
+		*/
+		/*
+		for(var j=0; j<2500; j++){
+		//var time2 = eval(time);
+		var a = j;
+		console.log(a);
+		}
+		*/
+			get_ajax_petition(url+time,
+				process_occupancy_response, 
+				function(){ console.log("fail");checkEnablereservationTime();}
+				);
+		
 		date.setTime(date.getTime()+30*60*1000); //add 30 minutes to reservation date
 	}
 
@@ -622,7 +734,7 @@ function process_occupancy_response(restaurantResponse){
 
 	
 	available_time_array[new Date(time).toLocaleTimeString()] = !((capacity - occupancyLevel - n_commensals) < 0 );
-
+	console.log("check for:" + new Date(time).toLocaleTimeString());
 	checkEnablereservationTime();
 }
 
@@ -640,17 +752,19 @@ function checkEnablereservationTime()
     			console.log(key +"-->"+available_time_array[key]);
 		}
 		*/
+		createDisableTimeRanges(available_time_array);
+
 	}
+
 
 	//console.log("finish");
 	//console.log(availability_time_count);
-	createDisableTimeRanges(available_time_array);
 
 }
 
 function createDisableTimeRanges(dates)
 {
-	disableTimeRanges=[];
+	var disableTimeRanges=[];
 	var day;
 	var max_range;
 	for (var key in available_time_array) {
@@ -658,13 +772,14 @@ function createDisableTimeRanges(dates)
 			if (!available_time_array[key])
 			{
 				day = document.getElementById("reservation_date").value;
-				max_range= (new Date((new Date((day+" "+maxTime).replace(/-/g, "/"))).getTime()+(1000*60*29))).toLocaleTimeString();
+				max_range= (new Date((new Date((day+" "+key).replace(/-/g, "/"))).getTime()+(1000*60*29))).toLocaleTimeString();
 				disableTimeRanges.push([key,max_range]);
 			}
 	}
-	//console.log("time to disabled");
-	//console.log(disableTimeRanges);
-	$('#reservation_time').timepicker('option', { 'disableTimeRanges': [disableTimeRanges] });
+	console.log(available_time_array);
+	console.log("time to disabled");
+	console.log(disableTimeRanges);
+	$('#reservation_time').timepicker('option', { 'disableTimeRanges': disableTimeRanges });
 
 	
 }
@@ -687,7 +802,7 @@ function createNewReservation(restaurant_name)
 
 	data = {
 			  "@type": "FoodEstablishmentReservation",
-			  "partySize": partySize,
+			  "partySize": parseInt(partySize),
 			  "reservationFor": {
 			    "@type": "FoodEstablishment",
 			    "name": ""+restaurant_name
@@ -953,6 +1068,14 @@ function get_user_reservation(username){
 		function(){alert("cannot get your reservations");});
 }
 
+function get_organization_reservation(organization){
+	url = base_url+"reservations/organization/"+organization;
+	get_ajax_petition(url,
+		//create_reservations_list,
+		create_organization_reservations_table,
+		function(){alert("cannot get organization reservations");});
+}
+
 function create_reservations_list(reservationsResponse)
 {
 	reservationsResponse= JSON.parse(reservationsResponse);
@@ -1043,6 +1166,55 @@ function create_reservations_table(reservationsResponse)
 
 
 
+function create_organization_reservations_table(reservationsResponse)
+{
+	reservationsResponse= JSON.parse(reservationsResponse);
+
+	//clean previous table content
+	var myNode = document.getElementById("reservations_table_body");
+		while (myNode.firstChild) {
+		    myNode.removeChild(myNode.lastChild);
+		}
+
+
+	if (reservationsResponse.length < 1)
+	{
+		document.getElementById("reservations_table_body").innerHTML = "<tr>No reservations are available.</ts>";
+	    return;
+
+	}
+
+
+	cancel_reservation_url_base = "";
+	for (var j=0, lim=reservationsResponse.length; j < lim; j++)
+	{
+		var row = document.createElement("TR");
+
+		var name = document.createElement("TD");
+		name.innerHTML = reservationsResponse[j]["reservationFor"]["name"];
+		row.appendChild(name);
+
+		var time = document.createElement("TD");
+		time.innerHTML =  fixBookingTime(reservationsResponse[j]["startTime"])
+		row.appendChild(time);
+
+		var commensals = document.createElement("TD");
+		commensals.innerHTML = reservationsResponse[j]["partySize"];
+		row.appendChild(commensals);
+
+		var cancel = document.createElement("TD");
+		cancel.innerHTML = '<a href="javascript:cancel_reservation('+
+			'\''+reservationsResponse[j]["reservationId"]+'\''	 + ')"> cancel reservation </a>';
+		row.appendChild(cancel);
+
+
+		document.getElementById("reservations_table_body").appendChild(row);
+	}
+	
+}
+
+
+
 
 function cancel_reservation(reservation_id)
 {
@@ -1063,8 +1235,16 @@ function get_user_reviews(username){
 	url = base_url+"reviews/user/"+username;
 	get_ajax_petition(url,
 		//create_reviews_list,
-		create_reviews_table,
+		create_user_reviews_table,
 		function(){alert("cannot get your reviews");});
+}
+
+
+function get_organization_reviews(organization){
+	url = base_url+"reviews/organization/"+organization;
+	get_ajax_petition(url,
+		create_organizations_reviews_table,
+		function(){alert("cannot get organization reviews");});
 }
 
 
@@ -1112,7 +1292,7 @@ function create_reviews_list(reviewsResponse)
 }
 
 
-function create_reviews_table(reviewsResponse)
+function create_user_reviews_table(reviewsResponse)
 {
 	reviewsResponse= JSON.parse(reviewsResponse);
 
@@ -1156,6 +1336,57 @@ function create_reviews_table(reviewsResponse)
 			'\''+reviewsResponse[j]["name"]+'\''	 + ')"> Edit review </a>';
 		edit.setAttribute("class","col-xs-2");
 		row.appendChild(edit);
+
+		var del = document.createElement("TD");
+		del.innerHTML = '<a href="javascript:delete_review('+
+			'\''+reviewsResponse[j]["name"]+'\''	 + ')"> Delete review </a>';
+		del.setAttribute("class","col-xs-2");
+		row.appendChild(del);
+
+
+		document.getElementById("reviews_table_body").appendChild(row);
+	}
+	
+}
+
+function create_organizations_reviews_table(reviewsResponse)
+{
+	reviewsResponse= JSON.parse(reviewsResponse);
+
+	if (reviewsResponse.length < 1)
+	{
+		document.getElementById("reviews_table_body").innerHTML = "<tr>No reviews are available.</tr>";
+	    return;
+
+	}
+
+	//clean previous table content
+	var myNode = document.getElementById("reviews_table_body");
+		while (myNode.firstChild) {
+		    myNode.removeChild(myNode.lastChild);
+		}
+	cancel_reservation_url_base = "";
+	for (var j=0, lim=reviewsResponse.length; j < lim; j++)
+	{
+
+		var row = document.createElement("TR");
+
+		var name = document.createElement("TD");
+		name.innerHTML = reviewsResponse[j]["itemReviewed"]["name"];
+		name.setAttribute("class","col-xs-4");
+		row.appendChild(name);
+
+		var rating = document.createElement("TD");
+		rating.innerHTML =  reviewsResponse[j]["reviewRating"]["ratingValue"];
+		rating.setAttribute("class","col-xs-2");
+		row.appendChild(rating);
+
+
+		var view = document.createElement("TD");
+		view.innerHTML = '<a href="javascript:view_review('+
+			'\''+reviewsResponse[j]["name"]+'\''	 + ')"> View review </a>';
+		view.setAttribute("class","col-xs-2");
+		row.appendChild(view);
 
 		var del = document.createElement("TD");
 		del.innerHTML = '<a href="javascript:delete_review('+
