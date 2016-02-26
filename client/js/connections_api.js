@@ -57,31 +57,6 @@ function create_and_show_menu(userInfo)
 
     //check each menu element
 
-    //view organizations restaurants
-    if( has_role(userInfo, "Restaurant Viewer") || has_role(userInfo, "Global manager") || true )//hacked
-    {
-      //we should ask before for each organization but the user hasn't yet
-      //html += '<li class="menu_element"><a href="myRestaurants.html">My restaurants</a></li>';
-      if (userInfo.organizations.length > 0)
-      {
-        html += '<li class="dropdown">\n';
-        html += '<a  id="myRestaurantsButtonLink" class="dropdown-toggle" data-toggle="dropdown" role="button" href="#">';
-        html += 'My restaurants <b class="caret"></b></a>\n';
-        html += '<ul class ="dropdown-menu" aria-labelledby="myRestaurantsButtonLink" role="menu">';
-          //html += '<li role="presentation">';
-          //html += '<a href="myRestaurants.html" tabindex="-1" role="menuitem">All my restaurants</a></li>';
-        for (var index=0; index < userInfo.organizations.length; index++)
-        {
-          html += '<li role="presentation">';
-            html += '<a href="myRestaurants.html?franchise='+userInfo.organizations[index]["name"]
-            +'" tabindex="-1" role="menuitem">'+userInfo.organizations[index]["name"]+'</a>';
-          html += '</li>';
-        }
-       
-        html += '</ul>';
-        html += '</li>';
-      }
-    }
 
     if( has_role(userInfo, "End user") )
     {
@@ -93,6 +68,39 @@ function create_and_show_menu(userInfo)
       html += '<li class="menu_element"><a href="myReviews.html">My reviews</a></li>';
     }
 
+    if( has_role(userInfo, "Restaurant Viewer") || has_role(userInfo, "Global manager") || true )//hacked
+    {
+      if (userInfo.organizations.length > 0)
+      {
+        html += '<li class="dropdown">';
+        html += '<a  id="myOrganizationsButtonLink" class="dropdown-toggle" data-toggle="dropdown" role="button" href="#">';
+        html += 'My Organizations <b class="caret"></b></a>\n';
+        html += '<ul class ="dropdown-menu  multi-level" aria-labelledby="myOrganizationsButtonLink" role="menu">';
+
+        
+        for (var index=0; index < userInfo.organizations.length; index++)
+        {
+          html += '<li class="dropdown-submenu">';
+            html += '<a href="#" tabindex="-1">'+userInfo.organizations[index]["name"]+'</a>';
+            html += '<ul class="dropdown-menu">'; 
+              html+= '<li>';
+                html += '<a tabindex="-1" href="organizationRestaurants.html?organization='+userInfo.organizations[index]["name"]+'" >Restaurants</a>';
+              html += '</li>'; 
+              html+= '<li>';
+                html += '<a tabindex="-1" href="organizationReservations.html?organization='+userInfo.organizations[index]["name"]+'" >Reservations</a>';
+              html += '</li>'; 
+              html+= '<li>';
+                html += '<a tabindex="-1" href="organizationReviews.html?organization='+userInfo.organizations[index]["name"]+'" >Reviews</a>';
+              html += '</li>';
+            html += '</ul>'; 
+          html += '</li>';
+        }
+       
+
+        html += '</ul>';
+        html += '</li>';
+      }
+    }
 
   html += '</ul>'
   //insert menu inside logged_div
