@@ -255,5 +255,25 @@ frisby.create('OAuth2 login')
         }
       })
       .toss();
+
+    frisby.create('List all the Reservations of an Organization')
+    .get(
+      'http://tourguide/api/orion/reservations/organization/Franchise1')
+    .addHeader('X-Auth-Token', token)
+    .addHeader('fiware-service', 'tourguide')
+    .waits(delay)
+    .expectStatus(200)
+    .expectHeaderContains('content-type', 'application/json')
+    .expectJSON('*', {
+      '@context': 'http://schema.org',
+      '@type': 'FoodEstablishmentReservation',
+      reservationFor: {
+        '@type': 'FoodEstablishment'
+      },
+      underName: {
+        '@type': 'Person'
+      }
+    })
+    .toss();
   })
   .toss();
