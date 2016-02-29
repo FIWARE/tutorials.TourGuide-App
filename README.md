@@ -21,6 +21,7 @@
     - [How to run Feeders for the data image generation](#how-to-run-feeders-for-the-data-image-generation)
     - [How to retrieve an Oauth Token to request the API](#how-to-retrieve-an-oauth-token-to-request-the-api)
 - [API Overview](#api-overview)
+- [End to End tests](#end-to-end-tests)
 - [Feedback](#feedback)
 
 ## Overview
@@ -98,6 +99,17 @@ Every request against the TourGuide API must be authenticated. For that purpose,
 The application provides a RESTful API with different routes and functions that covers the functionalities described above:
 
 * [FIWARE TourGuide RESTful API](http://docs.tourguide.apiary.io)
+
+## End to End tests
+
+To run the end to end tests, you will need to first download the repository, then browse to `server` folder and run:
+
+```
+$ npm install
+$ grunt
+```
+
+[Grunt](https://github.com/gruntjs/grunt) will run `jshint` and `jscs` linters as well as start a full TourGuide environment and run the End to End [jasmine-node](https://github.com/mhevery/jasmine-node) tests.
 
 ## Feedback
 
