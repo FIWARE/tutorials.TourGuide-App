@@ -10,7 +10,8 @@
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-- [Installation and usage](#installation-and-usage)
+- [How to build and install](#how-to-build-and-install)
+  - [Installation and Administration Guide](#installation-and-administration-guide)
   - [Deploying on a Cloud Fiware Lab Instance](#deploying-on-a-cloud-fiware-lab-instance)
 - [REST Interface](#rest-interface)
 - [Feedback](#feedback)
@@ -41,13 +42,15 @@ It includes (for the moment) the following components:
 * [PEP Proxy - Wilma](https://github.com/ging/fi-ware-pep-proxy), to add authentication and authorization security to the application.
 * [IDM KeyRock](https://github.com/ging/fi-ware-idm), covering the user profile management, authorization and authentication among others.
 
-## Installation and usage
+## How to build and install
 
 This project integrates a set of Generic Enablers using those enablers inside [docker](https://github.com/docker/docker) containers. It also comes with restaurants, reviews and reservations loaded to start working out of the box, as well as users and organizations to play with it.
 
 For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required.
 
 ![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
+
+### Installation and Administration Guide
 
 Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app).
 
