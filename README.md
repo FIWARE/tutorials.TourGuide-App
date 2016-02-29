@@ -13,6 +13,7 @@
 - [How to build and install](#how-to-build-and-install)
   - [Installation and Administration Guide](#installation-and-administration-guide)
   - [Deploying on a Cloud Fiware Lab Instance](#deploying-on-a-cloud-fiware-lab-instance)
+- [User and Programmers Manual](#user-and-programmers-manual)
 - [REST Interface](#rest-interface)
 - [Feedback](#feedback)
 
@@ -59,6 +60,10 @@ Detailed information of how to start this environment can be found [here](https:
 You can deploy an instance of the Fiware TourGuide App in a cloud instance using [Docker-machine](https://docs.docker.com/machine/). Detailed information of this process can be found in the following documentation:
 
 * [Installing Docker on FIWARE Cloud](http://simple-docker-hosting-on-fiware-cloud.readthedocs.org/en/latest/manuals/install/)
+
+## User and Programmers Manual
+
+The complete user guide of this environment is available at [Readthedocs](http://fiwaretourguide.readthedocs.org/en/latest/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/).
 
 ## REST Interface
 
