@@ -1,7 +1,7 @@
 /*
  * myRestaurants.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
- * Authors: 
+ * Authors:
  *   Jaisiel Santana <jaisiel@gmail.com>,
  *   Alejandro Sánchez <alemagox@gmail.com>
  *   Pablo Fernández <pablo.fernandez@ulpgc.es>
@@ -9,13 +9,13 @@
 
 */
 //initialization
-init_index = function(){
+init_index = function() {
 map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
 
-userInfo= JSON.parse(localStorage.getItem("userInfo"));
-franchise = window.location.search.replace("?","");//get franchise from url
-prefix = "franchise=";
+userInfo = JSON.parse(localStorage.getItem('userInfo'));
+franchise = window.location.search.replace('?', '');//get franchise from url
+prefix = 'franchise=';
 if (franchise.slice(0, prefix.length) == prefix)
 {
 	get_organization_restaurants(franchise.slice(prefix.length));
@@ -33,13 +33,13 @@ d.yyyymmdd();
 
 
 $('#reservation_date').datepicker({
-    dateFormat: "yy-mm-dd",
-    minDate: "-0d",//only allow future reservations
-    maxDate: "+90d", // 3 month max
+    dateFormat: 'yy-mm-dd',
+    minDate: '-0d',//only allow future reservations
+    maxDate: '+90d', // 3 month max
     firstDay: 0,
     beforeShowDay: calcCurrentReservations
 });
 
-}
+};
 
 addLoadEvent(init_index);
