@@ -20,7 +20,7 @@
     - [How to generate a new restaurant data image](#how-to-generate-a-new-restaurant-data-image)
     - [How to run Feeders for the data image generation](#how-to-run-feeders-for-the-data-image-generation)
     - [How to retrieve an Oauth Token to request the API](#how-to-retrieve-an-oauth-token-to-request-the-api)
-- [REST Interface](#rest-interface)
+- [API Overview](#api-overview)
 - [Feedback](#feedback)
 
 ## Overview
@@ -93,7 +93,7 @@ Find out how to load information into a new image using the [Tourguide feeders](
 
 Every request against the TourGuide API must be authenticated. For that purpose, we provide [a simple script](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/misc) to generate an Oauth Token based on a username and password of the [preloaded data](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app#idm-users-organizations-apps-roles-and-permissions).
 
-## REST Interface
+## API Overview
 
 The application provides a RESTful API with different routes and functions that covers the functionalities described above:
 
