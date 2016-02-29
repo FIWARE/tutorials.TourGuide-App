@@ -1,3 +1,4 @@
+'use strict';
 /*
  * myRestaurants.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
@@ -9,13 +10,14 @@
 
 */
 //initialization
-init_index = function() {
+var map;
+var init_index = function() {
 map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
 
-userInfo = JSON.parse(localStorage.getItem('userInfo'));
-franchise = window.location.search.replace('?', '');//get franchise from url
-prefix = 'franchise=';
+//var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+var franchise = window.location.search.replace('?', '');//get franchise from url
+var prefix = 'franchise=';
 if (franchise.slice(0, prefix.length) == prefix)
 {
 	get_organization_restaurants(franchise.slice(prefix.length));
@@ -24,11 +26,12 @@ if (franchise.slice(0, prefix.length) == prefix)
 
 //set tile layer
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    attribution:
+    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
 
-d = new Date();
+var d = new Date();
 d.yyyymmdd();
 
 

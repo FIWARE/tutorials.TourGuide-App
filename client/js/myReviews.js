@@ -1,3 +1,4 @@
+'use strict';
 /*
  * myReviews.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
@@ -9,18 +10,19 @@
 
 */
 //initialization
-init_reviews = function() {
+var init_reviews = function() {
 
 
 //only gets reviews if the user is loged
 login_needed(function() {
-	userInfo = JSON.parse(localStorage.getItem('userInfo'));
+	var userInfo = JSON.parse(localStorage.getItem('userInfo'));
 	get_user_reviews(userInfo['displayName']);
 });
 
 
 //todo translate to common js
-$('tbody').height($(window).height() - $('thead th').height() - $('#logged_div').height() - 50);
+$('tbody').height($(window).height() - $('thead th').height() -
+	 $('#logged_div').height() - 50);
 };
 
 addLoadEvent(init_reviews);
