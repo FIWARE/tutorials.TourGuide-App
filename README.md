@@ -19,7 +19,7 @@
     - [How to configure Cygnus in TourGuide](#how-to-configure-cygnus-in-tourguide)
     - [How to generate a new restaurant data image](#how-to-generate-a-new-restaurant-data-image)
     - [How to run Feeders for the data image generation](#how-to-run-feeders-for-the-data-image-generation)
-    - [How to retrieve an Oauth Token to request the API](#how-to-retrieve-an-oauth-token-to-request-the-api)
+    - [How to retrieve an Oauth Token to use the API](#how-to-retrieve-an-oauth-token-to-use-the-api)
 - [API Overview](#api-overview)
 - [End to End tests](#end-to-end-tests)
 - [Feedback](#feedback)
@@ -76,7 +76,7 @@ The complete user guide of this environment is available at [Readthedocs](http:/
 
 #### How to configure a Context Provider in Orion
 
-[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/ContextProvider.md) you can find a simple example of how to configure a Context Provider in TourGuide using Orion.
+[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/ContextProvider.md) you can find a simple example of how to configure a Context Provider  using Orion.
 
 #### How to configure Cygnus in TourGuide
 
@@ -90,9 +90,9 @@ The image provided is based on [Euskadi Open Data information](http://opendata.e
 
 Find out how to load information into a new image using the [Tourguide feeders](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/feeders).
 
-#### How to retrieve an Oauth Token to request the API
+#### How to retrieve an Oauth Token to use the API
 
-Every request against the TourGuide API must be authenticated. For that purpose, we provide [a simple script](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/misc) to generate an Oauth Token based on a username and password of the [preloaded data](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app#idm-users-organizations-apps-roles-and-permissions).
+Every TourGuide API request must be authenticated. For that purpose, we provide [a simple script](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/misc) to generate an Oauth Token based on a username and password of the [preloaded data](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app#idm-users-organizations-apps-roles-and-permissions).
 
 ## API Overview
 
