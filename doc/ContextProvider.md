@@ -70,7 +70,7 @@ with:
 * our CB listening on port 1026 on localhost,
 * registration.json being a file with the json we defined earlier
 
-There's a script already available on the TourGuide image with this information ([cpr-registration.sh](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.TourGuide-App/cpr-registration.sh)).  To use it you just need to enable subscriptions (i.e. via ORION_SUBSCRIPTIONS_ENABLED=true on the compose file) or execute it manually inside the container.
+There's a script already available on the TourGuide image with this information ([cpr-registration.sh](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/cpr-registration.sh)).  To use it you just need to enable subscriptions (i.e. via ORION_SUBSCRIPTIONS_ENABLED=true on the compose file) or execute it manually inside the container.
 
 After registering the CPr, we shoud get a response like this:
 
