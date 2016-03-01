@@ -18,8 +18,14 @@ var proxyurl = '';
 var base_url = 'http://tourguide/api/orion/';
 
 var reservations_per_date;
-var minTime = '12:30';
-var maxTime = '22:30';
+var minTime = {
+  hours: 12,
+  minutes: 30
+};
+var maxTime = {
+  hours: 22,
+  minutes: 30
+};
 var already_party_size_init = false;
 
 var availability_time_count;
@@ -384,22 +390,19 @@ function createNewReview(restaurant_name) {
   var ratingValue = document.forms.editReviewForm.ratingValue.value;
   var reviewBody = document.forms.editReviewForm.reviewBody.value;
 
-
   var data = {
-      '@type': 'Review',
-      'itemReviewed': {
+    '@type': 'Review',
+    'itemReviewed': {
       '@type': 'Restaurant',
       'name': '' + restaurant_name,
-      },
-      'name': 'Rating description',
-      'reviewBody': '' + reviewBody,
-      'reviewRating': {
+    },
+    'name': 'Rating description',
+    'reviewBody': '' + reviewBody,
+    'reviewRating': {
       '@type': 'Rating',
-      'ratingValue': ratingValue
-      }
-    };
-
-
+      'ratingValue': parseInt(ratingValue, 10)
+    }
+  };
 
   post_ajax_petition(base_url + 'review/',
     closePopUpWindow,
@@ -411,16 +414,13 @@ function updateReview(reviewId) {
   var ratingValue = document.forms.editReviewForm.ratingValue.value;
   var reviewBody = document.forms.editReviewForm.reviewBody.value;
 
-
   var data = {
-
-      'reviewBody': '' + reviewBody,
-      'reviewRating': {
+    'reviewBody': '' + reviewBody,
+    'reviewRating': {
       '@type': 'Rating',
-      'ratingValue': ratingValue
-      }
-    };
-
+      'ratingValue': parseInt(ratingValue, 10)
+    }
+  };
 
 
   patch_ajax_petition(base_url + 'review/' + reviewId,
@@ -460,26 +460,17 @@ function editNewReservation(restaurant_name) {
   reservationForm += '<input type="hidden" name="restaurant_name"' +
     ' id="restaurant_name" value="' + restaurant_name + '">';
   reservationForm += '\nNumber of commensals:<br/>';
-  reservationForm += '\n<select name="partySize" id="party_size">';
-  //reservationForm +='\n<option value="0">0</option>';
-  reservationForm += '<option disabled selected> -- select an option --' +
-    ' </option>';
-  reservationForm += '\n<option value="1">1</option>';
-  reservationForm += '\n<option value="2">2</option>';
-  reservationForm += '\n<option value="3">3</option>';
-  reservationForm += '\n<option value="4">4</option>';
-  reservationForm += '\n<option value="5">5</option>';
-  reservationForm += '\n<option value="100">100</option>';
-  reservationForm += '\n</select>';
+  reservationForm += '\n<input type="number" name="partySize" id="partySize" min="1">';
+
   //reservationForm +='\n<input type="number" name="partySize"
   //min="1" max="20">';
 
   reservationForm += '<br>\nDate:<br>';
-  reservationForm += '\n<input id = "reservation_date" disabled> <br>';
+  reservationForm += '\n<input type="date" id = "reservation_date" disabled> <br>';
   //reservationForm +='\n<input type="datetime-local"
   //name="reservationDate"><br>';
   reservationForm += '\nTime:<br>';
-  reservationForm += '\n<input id = "reservation_time" disabled>' +
+  reservationForm += '\n<input type="time" id = "reservation_time" disabled>' +
     ' <div id="loading_time"><img src="img/loading.gif"/> ' +
     'Calculating availability</div><br>';
 
@@ -507,8 +498,8 @@ function editNewReservation(restaurant_name) {
 
   $('#reservation_time').timepicker({
     'timeFormat': 'H:i:s',
-    'minTime': minTime + '',
-    'maxTime': maxTime + '',
+    'minTime': minTime.hours + ':' + minTime.minutes,
+    'maxTime': maxTime.hours + ':' + maxTime.minutes,
     'disableTimeRanges': [
       ['4pm', '8:01pm']
     ]
@@ -520,7 +511,7 @@ function editNewReservation(restaurant_name) {
   //party_size does not fire initReservatiomTime yet
    already_party_size_init = false;
 
-  document.getElementById('party_size').addEventListener('change',
+  document.getElementById('partySize').addEventListener('change',
                         enableCalendar);
 
   //open
@@ -531,11 +522,12 @@ function enableCalendar() {
   document.getElementById('reservation_date').removeAttribute('disabled');
 }
 
+
 function initReservationTime() {
   if (typeof already_party_size_init === false) {
     //console.log("first init");
     already_party_size_init = true;
-    document.getElementById('party_size').addEventListener('change',
+    document.getElementById('partySize').addEventListener('change',
       initReservationTime);
   }
   //console.log("init ")
@@ -551,15 +543,14 @@ function initReservationTime() {
 function set_time_availability() {
   //don't allow select time during process
   document.getElementById('reservation_time').setAttribute('disabled', '');
-  var day = document.getElementById('reservation_date').value;
-  //console.log("day:");
-  //console.log(document.getElementById('reservation_date').value);
+  var day = new Date(document.getElementById('reservation_date').value);
 
-  //console.log("minTime:");
-  //console.log(minTime);
-  var max_date = new Date((day + ' ' + maxTime).replace(/-/g, '/'));
-  var date = new Date((day + ' ' + minTime).replace(/-/g, '/'));
-  //console.log(date);
+
+  var max_date = new Date(day.getTime());
+  max_date.setHours(maxTime.hours, maxTime.minutes);
+
+  var date = new Date(day.getTime());
+  date.setHours(minTime.hours, minTime.minutes);
 
   availability_time_count = (max_date.getTime() -
     date.getTime()) / 1000 / 60 / 30; //get number of steps (30 min)
@@ -571,8 +562,6 @@ function set_time_availability() {
     document.getElementById('restaurant_name').value + '/date/';
   while (date.getTime() <= max_date.getTime()) {
     var time = date.toISOString();
-    //console.log(date);
-    //console.log(url+time);
     get_ajax_petition(url + time,
       process_occupancy_response,
       function() { console.log('fail');checkEnablereservationTime();}
@@ -608,8 +597,7 @@ function process_occupancy_response(restaurantResponse) {
   }
 
 
-  var n_commensals = parseInt(document.getElementById('party_size').value);
-
+  var n_commensals = document.getElementById('partySize').valueAsNumber;
 
   available_time_array[new Date(time).toLocaleTimeString()] =
     !((capacity - occupancyLevel - n_commensals) < 0);
@@ -640,13 +628,16 @@ function createDisableTimeRanges(dates) {
   var disableTimeRanges = [];
   var day;
   var max_range;
+  var max_date;
   for (var key in available_time_array) {
     if (available_time_array.hasOwnProperty(key)) {
       if (!available_time_array[key]) {
-        day = document.getElementById('reservation_date').value;
-        max_range = (new Date((new Date((day + ' ' +
-               maxTime).replace(/-/g, '/'))).getTime() +
-              (1000 * 60 * 29))).toLocaleTimeString();
+        day = new Date(document.getElementById('reservation_date').value);
+
+        max_date = day;
+        max_date.setHours(maxTime.hours, maxTime.minutes);
+        max_range =
+          new Date(max_date.getTime() + (1000 * 60 * 29)).toLocaleTimeString();
         disableTimeRanges.push([key, max_range]);
       }
     }
@@ -658,26 +649,26 @@ function createDisableTimeRanges(dates) {
 }
 
 function createNewReservation(restaurant_name) {
-  var partySize = document.forms.editReservationForm.partySize.value;
-  var reservationDate =
-    document.forms.editReservationForm.reservation_date.value;
-
-
+  var partySize =
+    document.forms.editReservationForm.partySize.valueAsNumber;
   var reservation_datetime =
-    document.forms.editReservationForm.reservation_date.value + 'T' +
-    document.forms.editReservationForm.reservation_time.value;
+    new Date(document.forms.editReservationForm.reservation_date.value);
+  var reservation_time =
+    new Date($('#reservation_time').timepicker('getTime'));
 
 
+  reservation_datetime.setHours(reservation_time.getHours(),
+                                reservation_time.getMinutes());
 
   var data = {
-        '@type': 'FoodEstablishmentReservation',
-        'partySize': partySize,
-        'reservationFor': {
-        '@type': 'FoodEstablishment',
-        'name': '' + restaurant_name
-        },
-        'startTime': reservation_datetime
-      };
+    '@type': 'FoodEstablishmentReservation',
+    'partySize': partySize,
+    'reservationFor': {
+      '@type': 'FoodEstablishment',
+      'name': '' + restaurant_name
+    },
+    'startTime': reservation_datetime.toISOString()
+  };
 
 
   post_ajax_petition(base_url + 'reservation/',
@@ -815,7 +806,6 @@ function showRestaurantReservations(reservationsResponse) {
     myNode.removeChild(myNode.lastChild);
   }
 
-
   reservationsResponse = JSON.parse(reservationsResponse);
 
   if (reservationsResponse.length < 1) {
@@ -880,7 +870,6 @@ function showRestaurantReservations(reservationsResponse) {
     commensals.setAttribute('class', 'col-xs-2');
     commensals.innerHTML = reservationsResponse[j].partySize;
     row.appendChild(commensals);
-
 
     tableBody.appendChild(row);
   }
