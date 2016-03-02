@@ -24,198 +24,175 @@ function addLoadEvent(func) {
   }
 }
 
-
 function get_ajax_petition(url, on_success_callback, on_failure_callback)
 {
-  var xmlhttp;
 
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+  var xhr = new XMLHttpRequest();
+
+
+  xhr.onload = function (e)
+  {
+    if (200 == this.status)
+    {
+      on_success_callback(this.response);
     }
+    else
+    {
+      try
+      {
+        on_failure_callback();
+      }
+      catch (err)
+      {
+        on_failure_callback(this.response);
+      }
+    }
+  };
 
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+  xhr.onerror = function (e)
+  {
+    try
+    {
+      on_failure_callback();
+    }
+    catch (err)
+    {
+      on_failure_callback(this.response);
+    }
+  };
 
-           if (xmlhttp.status == 200) {
-               on_success_callback(xmlhttp.responseText);
-           }
-           else if (xmlhttp.status == 404) {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-
-           }
-           else {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-           }
-        }
-    };
-    xmlhttp.open('GET', url, true);
-    xmlhttp.setRequestHeader('Fiware-Service', 'tourguide');
-    xmlhttp.send();
+  xhr.open('GET', url, true);
+  xhr.setRequestHeader('Fiware-Service', 'tourguide');
+  xhr.send();
 }
 
 
 function delete_ajax_petition(url, on_success_callback, on_failure_callback)
 {
-  var xmlhttp;
+  var xhr = new XMLHttpRequest();
 
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+
+  xhr.onload = function (e)
+  {
+    if (204 == this.status)
+    {
+      on_success_callback(this.response);
     }
+    else
+    {
+      try
+      {
+        on_failure_callback();
+      }
+      catch (err)
+      {
+        on_failure_callback(this.response);
+      }
+    }
+  };
 
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-           console.log(xmlhttp.responseText);
-           if (xmlhttp.status == 204) {
-               on_success_callback(xmlhttp.responseText);
-           }
-           else if (xmlhttp.status == 404) {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
+  xhr.onerror = function (e)
+  {
+    try
+    {
+      on_failure_callback();
+    }
+    catch (err)
+    {
+      on_failure_callback(this.response);
+    }
+  };
 
-           }
-           else {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-           }
-        }
-    };
-    xmlhttp.open('DELETE', url, true);
-    xmlhttp.setRequestHeader('Fiware-Service', 'tourguide');
-    xmlhttp.send();
+  xhr.open('DELETE', url, true);
+  xhr.setRequestHeader('Fiware-Service', 'tourguide');
+  xhr.send();
 }
 
 
 
 function post_ajax_petition(url, on_success_callback, on_failure_callback, data)
 {
-  var xmlhttp;
+  var xhr = new XMLHttpRequest();
 
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+
+  xhr.onload = function (e)
+  {
+    if (200 == this.status)
+    {
+      on_success_callback(this.response);
     }
+    else
+    {
+      try
+      {
+        on_failure_callback();
+      }
+      catch (err)
+      {
+        on_failure_callback(this.response);
+      }
+    }
+  };
 
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+  xhr.onerror = function (e)
+  {
+    try
+    {
+      on_failure_callback();
+    }
+    catch (err)
+    {
+      on_failure_callback(this.response);
+    }
+  };
 
-           if (xmlhttp.status == 201) {
-               on_success_callback(xmlhttp.responseText);
-           }
-           else if (xmlhttp.status == 404) {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
 
-           }
-           else {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-           }
-        }
-    };
-    xmlhttp.open('POST', url, true);
-    xmlhttp.setRequestHeader('Fiware-Service', 'tourguide');
-    xmlhttp.setRequestHeader('Content-type', 'application/json');
-    xmlhttp.send(JSON.stringify(data));
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Fiware-Service', 'tourguide');
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.send(JSON.stringify(data));
 }
 
 
 function patch_ajax_petition(url, on_success_callback, on_failure_callback, data)
 {
-  console.log('patch debug:');
-  console.log('url: ' + url);
-  console.log(data);
-  var xmlhttp;
 
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+  var xhr = new XMLHttpRequest();
+
+  xhr.onload = function (e)
+  {
+    if ((201 == this.status) || (204 == this.status))
+    {
+      on_success_callback(this.response);
     }
+    else
+    {
+      try
+      {
+        on_failure_callback();
+      }
+      catch (err)
+      {
+        on_failure_callback(this.response);
+      }
+    }
+  };
 
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-
-           if ((xmlhttp.status == 201) || xmlhttp.status == 204) {
-               on_success_callback(xmlhttp.responseText);
-           }
-           else if (xmlhttp.status == 404) {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-
-           }
-           else {
-              try
-              {
-                on_failure_callback();
-              }
-              catch (err)
-              {
-                on_failure_callback(xmlhttp.responseText);
-              }
-           }
-        }
-    };
-    xmlhttp.open('PATCH', url, true);
-    xmlhttp.setRequestHeader('Fiware-Service', 'tourguide');
-    xmlhttp.setRequestHeader('Content-type', 'application/json');
-    xmlhttp.send(JSON.stringify(data));
+  xhr.onerror = function (e)
+  {
+    try
+    {
+      on_failure_callback();
+    }
+    catch (err)
+    {
+      on_failure_callback(this.response);
+    }
+  }
+    xhr.open('PATCH', url, true);
+    xhr.setRequestHeader('Fiware-Service', 'tourguide');
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.send(JSON.stringify(data));
 }
 
 
