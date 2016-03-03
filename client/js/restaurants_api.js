@@ -48,90 +48,90 @@ function showRestaurants(restaurants) {
     for (var i = 0, len = restaurants.length; i < len; i++) {
 
         var restaurant = restaurants[i];
-        var mark = {'name': restaurant['name']};
+        var mark = {'name': restaurant.name};
 
         //get desired attributes
         try{
-            mark['address'] = restaurant['address']['streetAddress'];
+            mark.address = restaurant.address.streetAddress;
         }
         catch (err) {
-            console.log('Cannot get street address for ' + restaurant['name']);
+            console.log('Cannot get street address for ' + restaurant.name);
         }
 
         try {
-            mark['locality'] = restaurant['address']['addressLocality'];
+            mark.locality = restaurant.address.addressLocality;
         }
         catch (err) {
             console.log('Cannot get locality address for ' +
-                restaurant['name']);
+                restaurant.name);
         }
 
         try {
-            mark['region'] = restaurant['address']['addressRegion'];
+            mark.region = restaurant.address.addressRegion;
         }
         catch (err) {
-            console.log('Cannot get region address for ' + restaurant['name']);
+            console.log('Cannot get region address for ' + restaurant.name);
         }
 
         try {
-            mark['telephone'] = restaurant['telephone'];
+            mark.telephone = restaurant.telephone;
         }
         catch (err) {
-            console.log('Cannot get telephone for ' + restaurant['name']);
+            console.log('Cannot get telephone for ' + restaurant.name);
         }
 
         try {
-            mark['description'] = restaurant['description'];
+            mark.description = restaurant.description;
         }
         catch (err) {
-            console.log('Cannot get description for ' + restaurant['name']);
+            console.log('Cannot get description for ' + restaurant.name);
         }
 
         try {
-            mark['ratingValue'] = restaurant['aggregateRating']['ratingValue'];
+            mark.ratingValue = restaurant.aggregateRating.ratingValue;
         }
         catch (err) {
-            console.log('Cannot get ratingValue for ' + restaurant['name']);
+            console.log('Cannot get ratingValue for ' + restaurant.name);
         }
 
         try {
-            mark['reviewCount'] = restaurant['aggregateRating']['reviewCount'];
+            mark.reviewCount = restaurant.aggregateRating.reviewCount;
         }
         catch (err) {
-            console.log('Cannot get reviewCount for ' + restaurant['name']);
+            console.log('Cannot get reviewCount for ' + restaurant.name);
         }
 
-        mark['coords'] = [];
+        mark.coords = [];
 
         try {
-            mark['coords'].push(parseFloat(restaurant['geo']['latitude']));
-            if (isNaN(mark['coords'][0])) {
+            mark.coords.push(parseFloat(restaurant.geo.latitude));
+            if (isNaN(mark.coords[0])) {
                 console.log('invalid latitude ' +
-                    restaurant['geo']['latitude'] +
-                    ' for restaurant ' + restaurant['name']);
+                    restaurant.geo.latitude +
+                    ' for restaurant ' + restaurant.name);
                 errors = errors + 1;
                 continue;
             }
         }
         catch (err) {
-            console.log('Cannot get latitude for ' + restaurant['name']);
+            console.log('Cannot get latitude for ' + restaurant.name);
             console.log(err);
             errors = errors + 1;
             continue;
         }
 
         try {
-            mark['coords'].push(parseFloat(restaurant['geo']['longitude']));
-            if (isNaN(mark['coords'][1])) {
+            mark.coords.push(parseFloat(restaurant.geo.longitude));
+            if (isNaN(mark.coords[1])) {
                 console.log('invalid longitude ' +
-                    restaurant['geo']['longitude'] + ' for restaurant ' +
-                    restaurant['name']);
+                    restaurant.geo.longitude + ' for restaurant ' +
+                    restaurant.name);
                 errors = errors + 1;
                 continue;
             }
         }
         catch (err) {
-            console.log('Cannot get longitude for ' + restaurant['name']);
+            console.log('Cannot get longitude for ' + restaurant.name);
             console.log(err);
             errors = errors + 1;
             continue;
@@ -148,32 +148,30 @@ function showRestaurants(restaurants) {
     for (var i = 0, len = restaurant_marks.length; i < len; i++) {
 
         //add mark to map
-        restaurant_marks[i]['mark'] = L.marker(restaurant_marks[i]['coords']);
-        var popHtml = "<div class='markPopUp'><b>" + restaurant_marks[i]['name'] +
-            '</b><br>Address: ' + restaurant_marks[i]['address'] +
-            '<br>Phone: ' +
-        restaurant_marks[i]['telephone'] +
+        restaurant_marks[i].mark = L.marker(restaurant_marks[i].coords);
+        var popHtml = "<div class='markPopUp'><b>" + restaurant_marks[i].name +
+            '</b><br>Address: ' + restaurant_marks[i].address +
+            '<br>Phone: ' + restaurant_marks[i].telephone +
 
         '<br><a onclick="getAndShowRestaurantReviews(\'' +
-            restaurant_marks[i]['name'] +
-            '\')">Show reviews </a>' +
+            restaurant_marks[i].name + '\')">Show reviews </a>' +
         '<br><a onclick="getAndShowRestaurantReservations(\'' +
-            restaurant_marks[i]['name'] + '\')">Show reservations </a>' +
-        '<br>' + add_create_review_link(restaurant_marks[i]['name']) +
-        '<br>' + add_create_reservation_link(restaurant_marks[i]['name']) +
+            restaurant_marks[i].name + '\')">Show reservations </a>' +
+        '<br>' + add_create_review_link(restaurant_marks[i].name) +
+        '<br>' + add_create_reservation_link(restaurant_marks[i].name) +
         '</div>';
-        restaurant_marks[i]['mark'].bindPopup(popHtml);
+        restaurant_marks[i].mark.bindPopup(popHtml);
 
 
         //reference all mark info for use from leaflet
-        restaurant_marks[i]['mark']['extraInfo'] = restaurant_marks[i];
+        restaurant_marks[i].mark.extraInfo = restaurant_marks[i];
 
-        markerClusters.addLayer(restaurant_marks[i]['mark']);
+        markerClusters.addLayer(restaurant_marks[i].mark);
 
         //group for make a bbox that contains all markers.
         //Skipped Pascual Berganzo because it is in Colombia
-        if (restaurant_marks[i]['name'] != 'Pascual Berganzo')
-            markers.push(restaurant_marks[i]['mark']);
+        if (restaurant_marks[i].name != 'Pascual Berganzo')
+            markers.push(restaurant_marks[i].mark);
 
     }
 
@@ -256,11 +254,11 @@ function showEditReview(reviewResponse) {
 
 
     document.getElementById('pop_title').innerHTML = 'Edit review ' +
-        review['name'] + ' for ' + review['itemReviewed']['name'];
+        review.name + ' for ' + review.itemReviewed.name;
     var reviewForm = '';
     reviewForm += '\n<form name="editReviewForm" class="editReviewForm">';
     reviewForm += '\nYour review:<br>';
-    reviewForm += '\n<textarea name="reviewBody">' + review['reviewBody'] +
+    reviewForm += '\n<textarea name="reviewBody">' + review.reviewBody +
         '</textarea><br>';
     reviewForm += '\nRating value:';
     reviewForm += '\n<select name="ratingValue">';
@@ -273,7 +271,7 @@ function showEditReview(reviewResponse) {
     reviewForm += '\n</select>';
     reviewForm += '\n</form>';
     reviewForm += '\n<input type="submit" value="Update Review" ' +
-        'onclick="updateReview(\'' + review['name'] + '\')">';
+        'onclick="updateReview(\'' + review.name + '\')">';
     reviewForm += '\n</form>';
 
 
@@ -281,7 +279,7 @@ function showEditReview(reviewResponse) {
 
     //mark the selected
     var select_object = document.getElementsByName('ratingValue')[0];
-    var value = review['reviewRating']['ratingValue'];
+    var value = review.reviewRating.ratingValue;
     mark_selected_value(select_object, value);
 
     openPopUpWindow();
@@ -344,7 +342,7 @@ function viewReview(reviewResponse) {
     rating.innerHTML =
         '<span class="rating_label">Rating: </span> ' +
         '<span class="rating_value">' +
-        review['reviewRating']['ratingValue'] +
+        review.reviewRating.ratingValue +
         '</span>';
     top.appendChild(rating);
 
@@ -354,7 +352,7 @@ function viewReview(reviewResponse) {
     author.innerHTML =
         '<span class="author_label">Author: </span> ' +
         '<span class="author_value">' +
-        review['author']['name'] +
+        review.author.name +
         '</span>';
     top.appendChild(author);
 
@@ -370,7 +368,7 @@ function viewReview(reviewResponse) {
     body.innerHTML =
         '<span class="body_label"></span> ' +
         '<span class="body_value">' +
-        review['reviewBody'] +
+        review.reviewBody +
         '</span>';
     reviewElement.appendChild(body);
 
@@ -396,8 +394,8 @@ function mark_selected_value(select_object, value) {
 
 
 function createNewReview(restaurant_name) {
-    var ratingValue = document.forms['editReviewForm']['ratingValue'].value;
-    var reviewBody = document.forms['editReviewForm']['reviewBody'].value;
+    var ratingValue = document.forms.editReviewForm.ratingValue.value;
+    var reviewBody = document.forms.editReviewForm.reviewBody.value;
 
 
     var data = {
@@ -424,8 +422,8 @@ function createNewReview(restaurant_name) {
 
 
 function updateReview(reviewId) {
-    var ratingValue = document.forms['editReviewForm']['ratingValue'].value;
-    var reviewBody = document.forms['editReviewForm']['reviewBody'].value;
+    var ratingValue = document.forms.editReviewForm.ratingValue.value;
+    var reviewBody = document.forms.editReviewForm.reviewBody.value;
 
 
     var data = {
@@ -621,17 +619,17 @@ function process_occupancy_response(restaurantResponse) {
 
     restaurantResponse = restaurantResponse[0];
     //console.log(restaurantResponse);
-    var properties = restaurantResponse['additionalProperty'];
+    var properties = restaurantResponse.additionalProperty;
     var capacity, occupancyLevel, time;
 
     for (var i = 0; i < properties.length; i++) {
-        if ('capacity' == properties[i]['name']) {
-            capacity = properties[i]['value'];
+        if ('capacity' == properties[i].name) {
+            capacity = properties[i].value;
         }
 
-        if ('occupancyLevels' == properties[i]['name']) {
-            occupancyLevel = properties[i]['value'];
-            time = properties[i]['timestamp'];
+        if ('occupancyLevels' == properties[i].name) {
+            occupancyLevel = properties[i].value;
+            time = properties[i].timestamp;
         }
     }
 
@@ -689,14 +687,14 @@ function createDisableTimeRanges(dates) {
 }
 
 function createNewReservation(restaurant_name) {
-    var partySize = document.forms['editReservationForm']['partySize'].value;
+    var partySize = document.forms.editReservationForm.partySize.value;
     var reservationDate =
-        document.forms['editReservationForm']['reservation_date'].value;
+        document.forms.editReservationForm.reservation_date.value;
 
 
     var reservation_datetime =
-        document.forms['editReservationForm']['reservation_date'].value + 'T' +
-        document.forms['editReservationForm']['reservation_time'].value;
+        document.forms.editReservationForm.reservation_date.value + 'T' +
+        document.forms.editReservationForm.reservation_time.value;
 
 
 
@@ -777,7 +775,7 @@ function showRestaurantReviews(reviewsResponse) {
         rating.innerHTML =
             '<span class="rating_label">Rating: </span> ' +
             '<span class="rating_value">' +
-            reviewsResponse[j]['reviewRating']['ratingValue'] +
+            reviewsResponse[j].reviewRating.ratingValue +
             '</span>';
         top.appendChild(rating);
 
@@ -787,7 +785,7 @@ function showRestaurantReviews(reviewsResponse) {
         author.innerHTML =
             '<span class="author_label">Author: </span>' +
             ' <span class="author_value">' +
-            reviewsResponse[j]['author']['name'] +
+            reviewsResponse[j].author.name +
             '</span>';
         top.appendChild(author);
 
@@ -810,7 +808,7 @@ function showRestaurantReviews(reviewsResponse) {
         body.setAttribute('class', 'review_body-div');
         body.innerHTML = '<span class="body_label"></span>' +
             ' <span class="body_value">' +
-            reviewsResponse[j]['reviewBody'] +
+            reviewsResponse[j].reviewBody +
             '</span>';
         reviewElement.appendChild(body);
 
@@ -908,17 +906,17 @@ function showRestaurantReservations(reservationsResponse) {
 
         var underName = document.createElement('TD');
         underName.setAttribute('class', 'col-xs-6');
-        underName.innerHTML = reservationsResponse[j]['underName']['name'];
+        underName.innerHTML = reservationsResponse[j].underName.name;
         row.appendChild(underName);
 
         var time = document.createElement('TD');
         time.setAttribute('class', 'col-xs-4');
-        time.innerHTML = fixBookingTime(reservationsResponse[j]['startTime']);
+        time.innerHTML = fixBookingTime(reservationsResponse[j].startTime);
         row.appendChild(time);
 
         var commensals = document.createElement('TD');
         commensals.setAttribute('class', 'col-xs-2');
-        commensals.innerHTML = reservationsResponse[j]['partySize'];
+        commensals.innerHTML = reservationsResponse[j].partySize;
         row.appendChild(commensals);
 
 
@@ -959,19 +957,19 @@ function create_reservations_list(reservationsResponse) {
         reservationHTML = '<li>' +
             '<span class="restaurant_reservation_label">Restaurant:' +
                 ' </span> <span class="restaurant_reservation_">' +
-                reservationsResponse[j]['reservationFor']['name'] +
+                reservationsResponse[j].reservationFor.name +
             '</span>\n' +
             '<span class="reservation_time_label">Time: </span>' +
                 ' <span class="time_value">' +
-                 fixBookingTime(reservationsResponse[j]['startTime']) +
+                 fixBookingTime(reservationsResponse[j].startTime) +
             '</span>\n' +
             '<span class="commensals_number_label">Commensals</span>\n' +
             '<span class="commensals">' +
-            reservationsResponse[j]['partySize'] +
+            reservationsResponse[j].partySize +
             '</span>\n' +
             '<span class="cancel_reservation">' +
             '<a href="javascript:cancel_reservation(' +
-            '\'' + reservationsResponse[j]['reservationId'] + '\''  + ')">' +
+            '\'' + reservationsResponse[j].reservationId + '\''  + ')">' +
             ' cancel reservation </a>' +
             '</span>\n' +
             '</li>';
@@ -1011,20 +1009,20 @@ function create_reservations_table(reservationsResponse) {
         var row = document.createElement('TR');
 
         var name = document.createElement('TD');
-        name.innerHTML = reservationsResponse[j]['reservationFor']['name'];
+        name.innerHTML = reservationsResponse[j].reservationFor.name;
         row.appendChild(name);
 
         var time = document.createElement('TD');
-        time.innerHTML = fixBookingTime(reservationsResponse[j]['startTime']);
+        time.innerHTML = fixBookingTime(reservationsResponse[j].startTime);
         row.appendChild(time);
 
         var commensals = document.createElement('TD');
-        commensals.innerHTML = reservationsResponse[j]['partySize'];
+        commensals.innerHTML = reservationsResponse[j].partySize;
         row.appendChild(commensals);
 
         var cancel = document.createElement('TD');
         cancel.innerHTML = '<a href="javascript:cancel_reservation(' +
-            '\'' + reservationsResponse[j]['reservationId'] + '\''  + ')">' +
+            '\'' + reservationsResponse[j].reservationId+ '\''  + ')">' +
             ' cancel reservation </a>';
         row.appendChild(cancel);
 
@@ -1082,22 +1080,22 @@ function create_reviews_list(reviewsResponse) {
         reservationHTML = '<li>' +
             '<span class="restaurant_review_label">Restaurant: </span>' +
                 ' <span class="restaurant_review_">' +
-                reviewsResponse[j]['itemReviewed']['name'] +
+                reviewsResponse[j].itemReviewed.name +
             '</span>\n' +
             '<span class="review_rating_value">Rating: </span>' +
             ' <span class="rating_value">' +
-                 reviewsResponse[j]['reviewRating']['ratingValue'] +
+                 reviewsResponse[j].reviewRating.ratingValue +
             '</span>\n' +
             '<span class="view_review"><a href="javascript:view_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\''    + ')">' +
+            '\'' + reviewsResponse[j].name + '\''   + ')">' +
             ' View review </a>' +
             '</span>\n' +
             '<span class="edit_review"><a href="javascript:edit_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\''    +
+            '\'' + reviewsResponse[j].name + '\''    +
             ')"> Edit review </a>' +
             '</span>\n' +
             '<span class="delete_review"><a href="javascript:delete_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\''    +
+            '\'' + reviewsResponse[j].name + '\''    +
             ')"> Delete review </a>' +
             '</span>\n' +
             '</li>';
@@ -1133,31 +1131,31 @@ function create_reviews_table(reviewsResponse) {
         var row = document.createElement('TR');
 
         var name = document.createElement('TD');
-        name.innerHTML = reviewsResponse[j]['itemReviewed']['name'];
+        name.innerHTML = reviewsResponse[j].itemReviewed.name;
         name.setAttribute('class', 'col-xs-4');
         row.appendChild(name);
 
         var rating = document.createElement('TD');
-        rating.innerHTML = reviewsResponse[j]['reviewRating']['ratingValue'];
+        rating.innerHTML = reviewsResponse[j].reviewRating.ratingValue;
         rating.setAttribute('class', 'col-xs-2');
         row.appendChild(rating);
 
 
         var view = document.createElement('TD');
         view.innerHTML = '<a href="javascript:view_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\'' + ')"> View review </a>';
+            '\'' + reviewsResponse[j].name + '\'' + ')"> View review </a>';
         view.setAttribute('class', 'col-xs-2');
         row.appendChild(view);
 
         var edit = document.createElement('TD');
         edit.innerHTML = '<a href="javascript:edit_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\'' + ')"> Edit review </a>';
+            '\'' + reviewsResponse[j].name + '\'' + ')"> Edit review </a>';
         edit.setAttribute('class', 'col-xs-2');
         row.appendChild(edit);
 
         var del = document.createElement('TD');
         del.innerHTML = '<a href="javascript:delete_review(' +
-            '\'' + reviewsResponse[j]['name'] + '\'' + ')"> Delete review </a>';
+            '\'' + reviewsResponse[j].name + '\'' + ')"> Delete review </a>';
         del.setAttribute('class', 'col-xs-2');
         row.appendChild(del);
 
@@ -1286,7 +1284,7 @@ function set_reservations_per_date_var(reservationsResponse) {
     var lim;
     for (j = 0, lim = reservationsResponse.length; j < lim; j++) {
 
-        date_day = new Date(reservationsResponse[j]['startTime']);
+        date_day = new Date(reservationsResponse[j].startTime);
         date_day = '' + date_day.toLocaleDateString();
 
         if ('undefined' === typeof(reservations_per_date[date_day])) {

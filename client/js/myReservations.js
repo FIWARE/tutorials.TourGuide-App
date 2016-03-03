@@ -17,7 +17,7 @@ var init_reservations = function() {
     //only gets reservations if the user is logged
     login_needed(function() {
         var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        get_user_reservation(userInfo['displayName']);
+        get_user_reservation(userInfo.displayName);
 });
 
 

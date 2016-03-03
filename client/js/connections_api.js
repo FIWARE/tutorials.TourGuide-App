@@ -101,8 +101,8 @@ function create_and_show_menu(userInfo) {
 }
 
 function has_role(userInfo, role) {
-  for (var index = 0, len = userInfo['roles'].length; index < len; ++index) {
-    if (role == userInfo['roles'][index]['name']){
+  for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
+    if (role == userInfo.roles[index].name){
       return true;
     }
   }
@@ -123,14 +123,14 @@ function show_logout() {
 }
 
 function show_roles() {
-  var roles = JSON.parse(localStorage.getItem('userInfo'))['roles'];
+  var roles = JSON.parse(localStorage.getItem('userInfo')).roles;
 
   var html = '<p> You have the roles: </p>';
   html += '\n<ul>';
 
 
   for (i = 0, len = roles.length; i < len; i++) {
-    html += '\n<li>' + roles[i]['name'] + '</li>';
+    html += '\n<li>' + roles[i].name + '</li>';
 
   }
 

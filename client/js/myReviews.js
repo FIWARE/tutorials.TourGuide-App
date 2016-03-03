@@ -16,7 +16,7 @@ var init_reviews = function() {
   //only gets reviews if the user is loged
   login_needed(function() {
       var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      get_user_reviews(userInfo['displayName']);
+      get_user_reviews(userInfo.displayName);
   });
 
 
