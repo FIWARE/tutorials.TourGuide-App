@@ -1,3 +1,4 @@
+'use strict';
 /*
  * myReservations.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
@@ -9,19 +10,20 @@
 
 */
 //initialization
-init_reservations = function() {
+var init_reservations = function() {
 
 $('#pop_window').modal();
 
 //only gets reservations if the user is logged
 login_needed(function() {
-	userInfo = JSON.parse(localStorage.getItem('userInfo'));
+	var userInfo = JSON.parse(localStorage.getItem('userInfo'));
 	get_user_reservation(userInfo['displayName']);
 });
 
 
 //todo translate to common js
-$('tbody').height($(window).height() - $('thead th').height() - $('#logged_div').height() - 50);
+$('tbody').height($(window).height() - $('thead th').height() -
+	$('#logged_div').height() - 50);
 
 };
 
