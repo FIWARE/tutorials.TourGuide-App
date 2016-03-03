@@ -12,35 +12,35 @@
 //initialization
 var map;
 var init_index = function() {
-    map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
+  map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
 
-    //var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    var franchise = window.location.search.replace('?', '');//get franchise from url
-    var prefix = 'franchise=';
-    if (franchise.slice(0, prefix.length) == prefix) {
-        get_organization_restaurants(franchise.slice(prefix.length));
-    }
+  //var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  var franchise = window.location.search.replace('?', '');//get franchise from url
+  var prefix = 'franchise=';
+  if (franchise.slice(0, prefix.length) == prefix) {
+    get_organization_restaurants(franchise.slice(prefix.length));
+  }
 
 
-    //set tile layer
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution:
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+  //set tile layer
+  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution:
+    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
 
-    var d = new Date();
-    d.yyyymmdd();
+  var d = new Date();
+  d.yyyymmdd();
 
 
-    $('#reservation_date').datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: '-0d',//only allow future reservations
-        maxDate: '+90d', // 3 month max
-        firstDay: 0,
-        beforeShowDay: calcCurrentReservations
-    });
+  $('#reservation_date').datepicker({
+    dateFormat: 'yy-mm-dd',
+    minDate: '-0d',//only allow future reservations
+    maxDate: '+90d', // 3 month max
+    firstDay: 0,
+    beforeShowDay: calcCurrentReservations
+  });
 
 };
 
