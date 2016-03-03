@@ -20,7 +20,7 @@ var franchise = window.location.search.replace('?', '');//get franchise from url
 var prefix = 'franchise=';
 if (franchise.slice(0, prefix.length) == prefix)
 {
-	get_organization_restaurants(franchise.slice(prefix.length));
+    get_organization_restaurants(franchise.slice(prefix.length));
 }
 
 

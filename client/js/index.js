@@ -11,18 +11,19 @@
 */
 var map;
 //initialization
-var init_index = function() {
+var init_index = function () {
 
-$('#pop_window').modal();
- map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
+    $('#pop_window').modal();
+    map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
-//only gets restaurants if the user is logged
-login_needed(function() {get_all_restaurants();});
-//set tile layer
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution:
-    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+    //only gets restaurants if the user is logged
+    login_needed(function () {get_all_restaurants();});
+    //set tile layer
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution:
+                '&copy; <a href="http://osm.org/copyright">' +
+                'OpenStreetMap</a> contributors'
+    }).addTo(map);
 
 
 

@@ -16,14 +16,14 @@ $('#pop_window').modal();
 
 //only gets reservations if the user is logged
 login_needed(function() {
-	var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-	get_user_reservation(userInfo['displayName']);
+    var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    get_user_reservation(userInfo['displayName']);
 });
 
 
 //todo translate to common js
 $('tbody').height($(window).height() - $('thead th').height() -
-	$('#logged_div').height() - 50);
+    $('#logged_div').height() - 50);
 
 };
 
