@@ -11,8 +11,6 @@
 */
 //initialization
 var init_reviews = function() {
-
-
   //only gets reviews if the user is loged
   login_needed(function() {
     var userInfo = JSON.parse(localStorage.getItem('userInfo'));

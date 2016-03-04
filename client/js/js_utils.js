@@ -15,7 +15,8 @@ function addLoadEvent(func) {
   var oldonload = window.onload;
   if (typeof window.onload != 'function') {
     window.onload = func;
-  } else {
+  }
+  else {
     window.onload = function() {
       if (oldonload) {
         oldonload();
@@ -32,7 +33,8 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback) {
   if (window.XMLHttpRequest) {
     // code for IE7+, Firefox, Chrome, Opera, Safari
     xmlhttp = new XMLHttpRequest();
-  } else {
+  }
+  else {
     // code for IE6, IE5
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
   }
@@ -73,7 +75,8 @@ function delete_ajax_petition(url, on_success_callback, on_failure_callback) {
   if (window.XMLHttpRequest) {
     // code for IE7+, Firefox, Chrome, Opera, Safari
     xmlhttp = new XMLHttpRequest();
-  } else {
+  }
+  else {
     // code for IE6, IE5
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
   }
@@ -110,21 +113,20 @@ function delete_ajax_petition(url, on_success_callback, on_failure_callback) {
 
 
 
-function post_ajax_petition(url, on_success_callback, on_failure_callback, data)
-{
+function post_ajax_petition(url, on_success_callback, on_failure_callback, data) {
   var xmlhttp;
 
   if (window.XMLHttpRequest) {
     // code for IE7+, Firefox, Chrome, Opera, Safari
     xmlhttp = new XMLHttpRequest();
-  } else {
+  }
+  else {
     // code for IE6, IE5
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
   }
 
   xmlhttp.onreadystatechange = function() {
     if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-
       if (xmlhttp.status == 201) {
         on_success_callback(xmlhttp.responseText);
       }
@@ -135,7 +137,6 @@ function post_ajax_petition(url, on_success_callback, on_failure_callback, data)
           catch (err) {
           on_failure_callback(xmlhttp.responseText);
         }
-
       }
       else {
         try {
@@ -163,36 +164,35 @@ function patch_ajax_petition(url, on_success_callback, on_failure_callback, data
   if (window.XMLHttpRequest) {
     // code for IE7+, Firefox, Chrome, Opera, Safari
     xmlhttp = new XMLHttpRequest();
-  } else {
+  }
+  else {
     // code for IE6, IE5
     xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
   }
 
   xmlhttp.onreadystatechange = function() {
     if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-
       if ((xmlhttp.status == 201) || xmlhttp.status == 204) {
         on_success_callback(xmlhttp.responseText);
       }
       else if (xmlhttp.status == 404) {
         try
         {
-            on_failure_callback();
+          on_failure_callback();
         }
         catch (err)
         {
           on_failure_callback(xmlhttp.responseText);
         }
-
       }
-        else {
-          try {
-            on_failure_callback();
-          }
-          catch (err) {
-            on_failure_callback(xmlhttp.responseText);
-          }
-       }
+      else {
+        try {
+          on_failure_callback();
+        }
+        catch (err) {
+          on_failure_callback(xmlhttp.responseText);
+        }
+     }
     }
   };
   xmlhttp.open('PATCH', url, true);

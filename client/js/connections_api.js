@@ -11,7 +11,6 @@
 */
 
 var init_connexions = function() {
-
   //check if user is logged in
   get_ajax_petition('http://tourguide/client/user', logged_in, not_logged_in);
 };
@@ -41,7 +40,6 @@ function logged_in(userInfo) {
     console.log('LOGOUT');
     localStorage.removeItem('userInfo');
   };
-
 
   return;
 }
@@ -94,7 +92,6 @@ function create_and_show_menu(userInfo) {
       '</a></li>';
   }
 
-
   html += '</ul>';
   //insert menu inside logged_div
   document.getElementById('logged_div').innerHTML += html;
@@ -102,11 +99,11 @@ function create_and_show_menu(userInfo) {
 
 function has_role(userInfo, role) {
   for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
-    if (role == userInfo.roles[index].name){
+    if (role == userInfo.roles[index].name) {
       return true;
     }
   }
-return false;
+  return false;
 }
 
 function not_logged_in() {
@@ -129,9 +126,8 @@ function show_roles() {
   html += '\n<ul>';
 
 
-  for (i = 0, len = roles.length; i < len; i++) {
+  for (var i = 0, len = roles.length; i < len; i++) {
     html += '\n<li>' + roles[i].name + '</li>';
-
   }
 
   html += '\n</ul>';
@@ -156,21 +152,18 @@ function login_needed(action) {
   }
 
   setTimeout(function() {
-  if (null != localStorage.getItem('userInfo')) {
-      action();
-      return;
-  }
-  else {
-    show_message('Log in required', 'alert-warning');
-  }
-}, 500);
-
-
+    if (null != localStorage.getItem('userInfo')) {
+        action();
+        return;
+    }
+    else {
+      show_message('Log in required', 'alert-warning');
+    }
+  }, 500);
 }
 
 /* alerType could be alert-warning(default) or alert-danger*/
 function show_message(message, alertType) {
-
   alertType = typeof alertType !== 'undefined' ? alertType : 'alert-warning';
 
   var alert = document.createElement('DIV');

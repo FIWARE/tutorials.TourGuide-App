@@ -18,12 +18,12 @@ var init_reservations = function() {
   login_needed(function() {
     var userInfo = JSON.parse(localStorage.getItem('userInfo'));
     get_user_reservation(userInfo.displayName);
-});
+  });
 
 
-//todo translate to common js
-$('tbody').height($(window).height() - $('thead th').height() -
-  $('#logged_div').height() - 50);
+  //todo translate to common js
+  $('tbody').height($(window).height() - $('thead th').height() -
+    $('#logged_div').height() - 50);
 
 };
 

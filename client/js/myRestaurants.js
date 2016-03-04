@@ -16,7 +16,8 @@ var init_index = function() {
 
 
   //var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  var franchise = window.location.search.replace('?', '');//get franchise from url
+  //get franchise from url
+  var franchise = window.location.search.replace('?', '');
   var prefix = 'franchise=';
   if (franchise.slice(0, prefix.length) == prefix) {
     get_organization_restaurants(franchise.slice(prefix.length));
