@@ -49,7 +49,7 @@ Also, there are several enviroment variables that you can configure in the [dock
    * `ORION_SUBSCRIPTIONS_ENABLED`. Activates the Orion sensors subscription, updating the Restaurant information. By default the value is `false`. **Note**: `SENSORS_GENERATION_ENABLED` must be set to `true`, otherwise there won't be sensors and no data will be generated.
    * `SENSORS_FORCED_UPDATE_ENABLED`. Updates the values of the sensors. By default the value is `false`. **Note**: `SENSORS_GENERATION_ENABLED` must be set to `true`, otherwise there won't be sensors and no data will be generated.
 
-And all the services will be up. End to end testing can be done using the REST interface. And example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/restaurant_feeder.js).
+And all the services will be up. End to end testing can be done using the REST interface. And example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/feeders/restaurantfeeder.js).
 
 **Note**: as retrieving the `<container-ip>` for TourGuide and orion containers can be a bit 'tricky', we've created a set of utilities and useful scripts for handling docker images. You can find them all [here](https://github.com/Bitergia/docker/tree/master/utils).
 
