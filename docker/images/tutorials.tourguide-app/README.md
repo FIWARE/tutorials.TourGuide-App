@@ -38,7 +38,7 @@ docker-compose up -d
 
 Note that even though the `docker-compose up -d` does also pull the images, we suggest to do it separately to avoid synchronization issues.
 
-Also, there are several enviroment variables that you can configure in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml):
+Also, there are several environment variables that you can configure in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml):
 
    * `ORION_HOSTNAME`. Hostname of the Orion application protected by a proxy. By default the value is `pepwilma`
    * `ORION_NO_PROXY_HOSTNAME`. Hostname of the Orion application without proxy. By default the value is `orion`
@@ -49,7 +49,13 @@ Also, there are several enviroment variables that you can configure in the [dock
    * `ORION_SUBSCRIPTIONS_ENABLED`. Activates the Orion sensors subscription, updating the Restaurant information. By default the value is `false`. **Note**: `SENSORS_GENERATION_ENABLED` must be set to `true`, otherwise there won't be sensors and no data will be generated.
    * `SENSORS_FORCED_UPDATE_ENABLED`. Updates the values of the sensors. By default the value is `false`. **Note**: `SENSORS_GENERATION_ENABLED` must be set to `true`, otherwise there won't be sensors and no data will be generated.
 
-And all the services will be up. End to end testing can be done using the REST interface. And example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/feeders/restaurantfeeder.js).
+And all the services will be up. The client will be reachable at:
+
+```
+http://tourguide
+```
+
+End to end testing can be done using the [REST interface](http://docs.tourguide.apiary.io). An example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/feeders/restaurantfeeder.js).
 
 **Note**: as retrieving the `<container-ip>` for TourGuide and orion containers can be a bit 'tricky', we've created a set of utilities and useful scripts for handling docker images. You can find them all [here](https://github.com/Bitergia/docker/tree/master/utils).
 
@@ -100,7 +106,7 @@ This IdM image is intended to work with [Fiware TourGuide-App](https://github.co
 
 | Application name  | Description                       | URL                       | Redirect URI                     |
 |-------------------|-----------------------------------|---------------------------|----------------------------------|
-| FIWARE devGuide   | Fiware devGuide Test Application  | http://tourguide          | http://tourguide/login           |
+| FIWARE TourGuide  | Fiware TourGuide Test Application | http://tourguide          | http://tourguide/login           |
 
 ### Roles
 
