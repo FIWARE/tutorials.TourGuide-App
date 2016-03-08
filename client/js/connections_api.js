@@ -11,15 +11,12 @@
 */
 
 var init_connexions = function() {
-
   //check if user is logged in
   get_ajax_petition('http://tourguide/client/user', logged_in, not_logged_in);
 };
 
 
 addLoadEvent(init_connexions);
-
-
 
 
 function logged_in(userInfo) {
@@ -44,78 +41,71 @@ function logged_in(userInfo) {
     localStorage.removeItem('userInfo');
   };
 
-
   return;
 }
 
-function create_and_show_menu(userInfo)
-{
+function create_and_show_menu(userInfo) {
   var html = '<ul class="nav navbar-nav pull-left" id="logged_menu">';
 
-    //check each menu element
-    //TODO check roles
+  //check each menu element
+  //TODO check roles
 
-    console.log(userInfo);
-    html += '<li class="menu_element"><a href="index.html">Home</a></li>';
+  console.log(userInfo);
+  html += '<li class="menu_element"><a href="index.html">Home</a></li>';
 
-    //check each menu element
+  //check each menu element
 
-    //view organizations restaurants
-    if (has_role(userInfo, 'Restaurant Viewer') ||
-        has_role(userInfo, 'Global manager') || true)//hacked
-    {
-      //we should ask before for each organization but the user hasn't yet
-      if (userInfo.organizations.length > 0)
-      {
+  //view organizations restaurants
+  if (has_role(userInfo, 'Restaurant Viewer') ||
+      has_role(userInfo, 'Global manager') || true) {//hacked
+    //we should ask before for each organization but the user hasn't yet
+    if (userInfo.organizations.length > 0) {
 
-        html += '<li class="dropdown">\n';
-        html += '<a  id="myRestaurantsButtonLink" class="dropdown-toggle" ' +
-          'data-toggle="dropdown" role="button" href="#">';
-        html += 'My restaurants <b class="caret"></b></a>\n';
-        html += '<ul class ="dropdown-menu" ' +
-          'aria-labelledby="myRestaurantsButtonLink" role="menu">';
-          //html += '<li role="presentation">';
-        for (var index = 0; index < userInfo.organizations.length; index++)
-        {
-          html += '<li role="presentation">';
-            html += '<a href="myRestaurants.html?franchise=' +
-              userInfo.organizations[index].name +
-              '" tabindex="-1" role="menuitem">' +
-              userInfo.organizations[index].name + '</a>';
-          html += '</li>';
-        }
-
-        html += '</ul>';
+      html += '<li class="dropdown">\n';
+      html += '<a  id="myRestaurantsButtonLink" class="dropdown-toggle" ' +
+        'data-toggle="dropdown" role="button" href="#">';
+      html += 'My restaurants <b class="caret"></b></a>\n';
+      html += '<ul class ="dropdown-menu" ' +
+        'aria-labelledby="myRestaurantsButtonLink" role="menu">';
+        //html += '<li role="presentation">';
+      for (var index = 0; index < userInfo.organizations.length; index++) {
+        html += '<li role="presentation">';
+          html += '<a href="myRestaurants.html?franchise=' +
+            userInfo.organizations[index].name +
+            '" tabindex="-1" role="menuitem">' +
+            userInfo.organizations[index].name + '</a>';
         html += '</li>';
       }
-    }
 
-    if (has_role(userInfo, 'End user'))
-    {
-      html += '<li class="menu_element"><a href="myReservations.html">' +
-        'My Reservations</a></li>';
+      html += '</ul>';
+      html += '</li>';
     }
+  }
 
-    if (has_role(userInfo, 'End user'))
-    {
-      html += '<li class="menu_element"><a href="myReviews.html">My reviews' +
-        '</a></li>';
-    }
+  if (has_role(userInfo, 'End user')) {
+    html += '<li class="menu_element"><a href="myReservations.html">' +
+      'My Reservations</a></li>';
+  }
 
+  if (has_role(userInfo, 'End user')) {
+    html += '<li class="menu_element"><a href="myReviews.html">My reviews' +
+      '</a></li>';
+  }
 
   html += '</ul>';
   //insert menu inside logged_div
   document.getElementById('logged_div').innerHTML += html;
 }
 
-function has_role(userInfo, role)
-{
-  for (var index = 0, len = userInfo['roles'].length; index < len; ++index) {
-    if (role == userInfo['roles'][index]['name'])
+function has_role(userInfo, role) {
+  for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
+    if (role == userInfo.roles[index].name) {
       return true;
+    }
   }
-return false;
+  return false;
 }
+
 function not_logged_in() {
   localStorage.removeItem('userInfo');
   var html = '<div id="log_in"><p><a href="http://tourguide/auth">Log in</a>' +
@@ -130,16 +120,14 @@ function show_logout() {
 }
 
 function show_roles() {
-  var roles = JSON.parse(localStorage.getItem('userInfo'))['roles'];
+  var roles = JSON.parse(localStorage.getItem('userInfo')).roles;
 
   var html = '<p> You have the roles: </p>';
   html += '\n<ul>';
 
 
-  for (i = 0, len = roles.length; i < len; i++)
-  {
-    html += '\n<li>' + roles[i]['name'] + '</li>';
-
+  for (var i = 0, len = roles.length; i < len; i++) {
+    html += '\n<li>' + roles[i].name + '</li>';
   }
 
   html += '\n</ul>';
@@ -157,32 +145,25 @@ function hide_roles() {
 }
 
 
-function login_needed(action)
-{
-  if (null != localStorage.getItem('userInfo'))
-  {
+function login_needed(action) {
+  if (null != localStorage.getItem('userInfo')) {
     action();
     return;
   }
 
   setTimeout(function() {
-  if (null != localStorage.getItem('userInfo'))
-  {
-      action();
-      return;
-  }
-  else {
-    show_message('Log in required', 'alert-warning');
-  }
-}, 500);
-
-
+    if (null != localStorage.getItem('userInfo')) {
+        action();
+        return;
+    }
+    else {
+      show_message('Log in required', 'alert-warning');
+    }
+  }, 500);
 }
 
 /* alerType could be alert-warning(default) or alert-danger*/
-function show_message(message, alertType)
-{
-
+function show_message(message, alertType) {
   alertType = typeof alertType !== 'undefined' ? alertType : 'alert-warning';
 
   var alert = document.createElement('DIV');
