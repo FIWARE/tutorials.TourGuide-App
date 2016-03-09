@@ -9,7 +9,7 @@
 CEP_URL=http://compose_cep-proton_1:8080/ProtonOnWebServer/rest/events
 ORION_URL=http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/v1/subscribeContext
 
-cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' --header 'Fiware-Service: devguideiot' --header 'Fiware-ServicePath: /' -d @-
+cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' --header 'Fiware-Service: tourguideul20' --header 'Fiware-ServicePath: /' -d @-
 {
     "entities": [
         {
