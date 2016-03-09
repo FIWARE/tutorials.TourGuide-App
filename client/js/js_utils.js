@@ -30,28 +30,17 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback) {
 
   var xhr = new XMLHttpRequest();
 
-
-  xhr.onload = function (e) {
+  xhr.onload = function(e) {
     if (200 == this.status) {
       on_success_callback(this.response);
     }
     else {
-      try {
-        on_failure_callback();
-      }
-      catch (err) {
-        on_failure_callback(this.response);
-      }
+      on_failure_callback(this.response);
     }
   };
 
-  xhr.onerror = function (e) {
-    try {
-      on_failure_callback();
-    }
-    catch (err) {
-      on_failure_callback(this.response);
-    }
+  xhr.onerror = function(e) {
+    on_failure_callback(this.response);
   };
 
   xhr.open('GET', url, true);
@@ -63,27 +52,17 @@ function get_ajax_petition(url, on_success_callback, on_failure_callback) {
 function delete_ajax_petition(url, on_success_callback, on_failure_callback) {
   var xhr = new XMLHttpRequest();
 
-  xhr.onload = function (e) {
+  xhr.onload = function(e) {
     if (204 == this.status) {
       on_success_callback(this.response);
     }
     else {
-      try {
-        on_failure_callback();
-      }
-      catch (err) {
-        on_failure_callback(this.response);
-      }
+      on_failure_callback(this.response);
     }
   };
 
-  xhr.onerror = function (e) {
-    try {
-      on_failure_callback();
-    }
-    catch (err) {
-      on_failure_callback(this.response);
-    }
+  xhr.onerror = function(e) {
+    on_failure_callback(this.response);
   };
 
   xhr.open('DELETE', url, true);
@@ -96,34 +75,24 @@ function post_ajax_petition(url, on_success_callback, on_failure_callback, data)
   var xhr = new XMLHttpRequest();
 
 
-  xhr.onload = function (e) {
+  xhr.onload = function(e) {
     if (200 == this.status) {
       on_success_callback(this.response);
     }
     else {
-      try {
-        on_failure_callback();
-      }
-      catch (err) {
-        on_failure_callback(this.response);
-      }
-    }
-  };
-
-  xhr.onerror = function (e) {
-    try {
-      on_failure_callback();
-    }
-    catch (err) {
       on_failure_callback(this.response);
     }
   };
 
+  xhr.onerror = function(e) {
+      on_failure_callback(this.response);
+  };
 
-    xhr.open('POST', url, true);
-    xhr.setRequestHeader('Fiware-Service', 'tourguide');
-    xhr.setRequestHeader('Content-type', 'application/json');
-    xhr.send(JSON.stringify(data));
+
+  xhr.open('POST', url, true);
+  xhr.setRequestHeader('Fiware-Service', 'tourguide');
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.send(JSON.stringify(data));
 }
 
 
@@ -131,35 +100,23 @@ function patch_ajax_petition(url, on_success_callback, on_failure_callback, data
 
   var xhr = new XMLHttpRequest();
 
-  xhr.onload = function (e) {
+  xhr.onload = function(e) {
     if ((201 == this.status) || (204 == this.status)) {
       on_success_callback(this.response);
     }
     else {
-      try {
-        on_failure_callback();
-      }
-      catch (err) {
-        on_failure_callback(this.response);
-      }
+      on_failure_callback(this.response);
     }
   };
 
-  xhr.onerror = function (e) {
-    try {
-      on_failure_callback();
-    }
-    catch (err) {
+  xhr.onerror = function(e) {
       on_failure_callback(this.response);
-    }
-  }
-    xhr.open('PATCH', url, true);
-    xhr.setRequestHeader('Fiware-Service', 'tourguide');
-    xhr.setRequestHeader('Content-type', 'application/json');
-    xhr.send(JSON.stringify(data));
-
+  };
+  xhr.open('PATCH', url, true);
+  xhr.setRequestHeader('Fiware-Service', 'tourguide');
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.send(JSON.stringify(data));
 }
-
 
 Date.prototype.yyyymmdd = function() {
   var yyyy = this.getFullYear().toString();
