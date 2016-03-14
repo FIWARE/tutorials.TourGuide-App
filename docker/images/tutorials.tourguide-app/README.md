@@ -1,6 +1,6 @@
-## FIWARE Developers Guide App - Docker image
+## FIWARE Tour Guide Application - Docker image
 
-[FIWARE Developers Guide App](https://github.com/Fiware/tutorials.TourGuide-App) is the sample application used in the [FIWARE Developers Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
+[FIWARE Tour Guide Application](https://github.com/Fiware/tutorials.TourGuide-App) is the sample application used in the [FIWARE Tour Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
 
 This image is intended to work together with [Orion](https://registry.hub.docker.com/u/bitergia/fiware-orion/).
 
