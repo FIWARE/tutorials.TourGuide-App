@@ -57,7 +57,7 @@ http://tourguide
 
 End to end testing can be done using the [REST interface](http://docs.tourguide.apiary.io). An example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/feeders/restaurantfeeder.js).
 
-**Note**: as retrieving the `<container-ip>` for TourGuide and orion containers can be a bit 'tricky', we've created a set of utilities and useful scripts for handling docker images. You can find them all [here](https://github.com/Bitergia/docker/tree/master/utils).
+**Note**: to access the containers from the host (i.e http://tourguide/) you may need to modify your `hosts` file to add entries for the containers.  To help with this task, you can use the [get-docker-hosts](https://github.com/Bitergia/docker/tree/master/utils#get-docker-hosts) script to add or update the containers info to your `hosts` file.
 
 ## What if I don't want to use docker-compose?
 
