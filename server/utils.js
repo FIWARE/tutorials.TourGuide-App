@@ -760,6 +760,33 @@ function updateOccupancyLevels(occupancyLevel, date) {
   };
 }
 
+function asciiEncode(string) {
+
+  var escapable = /[\\\"\x00-\x1f\x7f-\uffff]/g;
+  var meta = { // table of character substitutions
+    '\b': '\\b',
+    '\t': '\\t',
+    '\n': '\\n',
+    '\f': '\\f',
+    '\r': '\\r',
+    '"': '\\"',
+    '\\': '\\\\'
+  };
+
+  escapable.lastIndex = 0;
+  return escapable.test(string) ?
+  string.replace(escapable, function(a) {
+    var c = meta[a];
+    return typeof c === 'string' ? c :
+    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+  }) : string ;
+}
+
+function stripForbiddenChars(str) {
+  str = str.replace(/[<>"'=;()&?#\s]/g, '_');
+  return str;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -797,5 +824,7 @@ module.exports = {
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
-  updateOccupancyLevels: updateOccupancyLevels
+  updateOccupancyLevels: updateOccupancyLevels,
+  asciiEncode: asciiEncode,
+  stripForbiddenChars: stripForbiddenChars
 };
