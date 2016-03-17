@@ -6,7 +6,7 @@ In this example we are going to define a new project, load it on our CEP server,
 
 ## Create a new project definition
 
-The first step is to create a new project with the help of the [AuthoringTool](http://cep-proton:8080/AuthoringTool/).  You can find and load this example from the file [TemperatureExample.json](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/TemperatureExample.json).  For this example to work we need to define:
+The first step is to create a new project with the help of the [AuthoringTool](http://cep-proton:8080/AuthoringTool/).  You can find and load this example from the file [TemperatureExample.json](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/docker/images/tutorials.tourguide-app/TemperatureExample.json).  For this example to work we need to define:
 
 * Producers: to introduce external events to the system
 * Events: the diferent events that we want to process.
