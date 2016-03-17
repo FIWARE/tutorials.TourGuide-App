@@ -25,7 +25,7 @@ authzforce:
     command: bash -c "rm -rfv /opt/authzforce-ce-server/data/domains/* ; exec catalina.sh run"
 
 idm:
-    image: bitergia/idm-keyrock:5.1.0
+    image: bitergia/idm-keyrock:5.1.0_tourguide-0.5
     hostname: idm
     links:
         - authzforce
@@ -38,7 +38,7 @@ idm:
         - AUTHZFORCE_VERSION=4.4.0
 
 pepwilma:
-    image: bitergia/pep-wilma:4.3.0
+    image: bitergia/pep-wilma:4.3.0_tourguide-0.5
     hostname: pepwilma
     links:
         - orion
@@ -54,7 +54,7 @@ pepwilma:
         - AUTHZFORCE_VERSION=4.4.0
 
 idasiotacpp:
-    image: bitergia/idas-iota-cpp:1.2.0
+    image: bitergia/idas-iota-cpp:1.2.0_tourguide-0.5
     hostname: idasiotacpp
     links:
         - mongodb
@@ -64,7 +64,7 @@ idasiotacpp:
         - "8081"
 
 ul20client:
-    image: bitergia/ul20-client:latest
+    image: bitergia/ul20-client:latest_tourguide-0.5
     hostname: ul20client
     links:
         - orion
@@ -75,7 +75,7 @@ ul20client:
         - UL20_SERVICE_NAME=tourguideul20
 
 cygnus:
-    image: bitergia/cygnus:develop
+    image: bitergia/cygnus:develop_tourguide-0.5
     links:
         - orion
     #    - mariadb
@@ -98,7 +98,7 @@ cygnus:
         - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
 
 cep-proton:
-    image: bitergia/cep-proton:master
+    image: bitergia/cep-proton:master_tourguide-0.5
     hostname: cep-proton
     expose:
         - "8080"
@@ -111,7 +111,7 @@ cep-proton:
         - orion
 
 tourguide:
-    image: fiware/tutorials.tourguide-app:latest
+    image: fiware/tutorials.tourguide-app:0.5
     hostname: tourguide
     links:
         - orion
