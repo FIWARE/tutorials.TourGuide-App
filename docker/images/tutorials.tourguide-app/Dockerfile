@@ -10,7 +10,7 @@ ENV INITRD no
 ENV TOURGUIDE_USER tourguide
 ENV TOURGUIDE_USER_DIR /home/${TOURGUIDE_USER}
 ENV GIT_URL_TOURGUIDE https://github.com/Fiware/tutorials.TourGuide-App.git
-ENV GIT_REV_TOURGUIDE master
+ENV GIT_REV_TOURGUIDE release/0.5
 ENV SUBSCRIPTIONS_PATH /opt/subscribe
 ENV CEP_DEFINITIONS_PATH /opt/cep
 ENV CC_APP_SERVER_PATH ${TOURGUIDE_USER_DIR}/tutorials.TourGuide-App/server
