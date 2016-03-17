@@ -40,7 +40,7 @@ This application is a smart, context-aware application which allows to manage la
 
 ## Architecture
 
-![Architecture diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/archDiagram.png?raw=true "Architecture diagram")
+![Architecture diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/doc/img/archDiagram.png?raw=true "Architecture diagram")
 
 It includes (for the moment) the following components:
 
@@ -58,11 +58,11 @@ This project integrates a set of Generic Enablers using those enablers inside [d
 
 For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required.
 
-![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/img/composeDiagram.png?raw=true "Compose Diagram")
+![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/doc/img/composeDiagram.png?raw=true "Compose Diagram")
 
 ### Installation and Administration Guide
 
-Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app).
+Detailed information of how to start this environment can be found [here](https://github.com/Fiware/tutorials.TourGuide-App/tree/release/0.5/docker/images/tutorials.tourguide-app).
 
 ### Deploying on a Cloud Fiware Lab Instance
 
@@ -78,27 +78,27 @@ The complete user guide of this environment is available at [Readthedocs](http:/
 
 #### How to configure a Context Provider in Orion
 
-[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/ContextProvider.md) you can find a simple example of how to configure a Context Provider using Orion.
+[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/doc/ContextProvider.md) you can find a simple example of how to configure a Context Provider using Orion.
 
 #### How to use CEP to process and generate events
 
-[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/doc/CEP.md) you can find a simple example of how to use CEP to process notifications from Orion and generate new events.
+[Here](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/doc/CEP.md) you can find a simple example of how to use CEP to process notifications from Orion and generate new events.
 
 #### How to configure Cygnus in TourGuide
 
-As Cygnus can publish in several third-party storages, [here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/cygnus/README.md) we explain where you should add your credentials for each source to publish the TourGuide data.
+As Cygnus can publish in several third-party storages, [here](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/docker/cygnus/README.md) we explain where you should add your credentials for each source to publish the TourGuide data.
 
 #### How to generate a new restaurant data image
 
-The image provided is based on [Euskadi Open Data information](http://opendata.euskadi.eus/contenidos/ds_recursos_turisticos/restaurantes_sidrerias_bodegas/opendata/restaurantes.json). The image is already loaded, but we provide information on [how to generate it yourself](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app.restaurant-data/Readme.md).
+The image provided is based on [Euskadi Open Data information](http://opendata.euskadi.eus/contenidos/ds_recursos_turisticos/restaurantes_sidrerias_bodegas/opendata/restaurantes.json). The image is already loaded, but we provide information on [how to generate it yourself](https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/docker/images/tutorials.tourguide-app.restaurant-data/Readme.md).
 
 #### How to run Feeders for the data image generation
 
-Find out how to load information into a new image using the [Tourguide feeders](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/feeders).
+Find out how to load information into a new image using the [Tourguide feeders](https://github.com/Fiware/tutorials.TourGuide-App/tree/release/0.5/server/feeders).
 
 #### How to retrieve an Oauth Token to use the API
 
-Every TourGuide API request must be authenticated. For that purpose, we provide [a simple script](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/server/misc) to generate an Oauth Token based on a username and password of the [preloaded data](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.tourguide-app#idm-users-organizations-apps-roles-and-permissions).
+Every TourGuide API request must be authenticated. For that purpose, we provide [a simple script](https://github.com/Fiware/tutorials.TourGuide-App/tree/release/0.5/server/misc) to generate an Oauth Token based on a username and password of the [preloaded data](https://github.com/Fiware/tutorials.TourGuide-App/tree/release/0.5/docker/images/tutorials.tourguide-app#idm-users-organizations-apps-roles-and-permissions).
 
 ## API Overview
 
@@ -121,8 +121,8 @@ $ grunt
 
 Try and tweak the Tour Guide application and if you have any feedback please contact us at http://ask.fiware.org using the tag 'tour-guide'.
 
-[travis-image]: https://travis-ci.org/Fiware/tutorials.TourGuide-App.svg?branch=master
+[travis-image]: https://travis-ci.org/Fiware/tutorials.TourGuide-App.svg?branch=release/0.5
 [travis-url]: https://travis-ci.org/Fiware/tutorials.TourGuide-App
 
 [license-image]: https://img.shields.io/npm/l/express.svg
-[license-url]: https://github.com/Fiware/tutorials.TourGuide-App/blob/master/LICENSE
+[license-url]: https://github.com/Fiware/tutorials.TourGuide-App/blob/release/0.5/LICENSE
