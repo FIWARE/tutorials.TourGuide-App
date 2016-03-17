@@ -31,8 +31,6 @@ var init_index = function() {
   }).addTo(map);
 
 
-  var d = new Date();
-  d.yyyymmdd();
 
 
   $('#reservation_date').datepicker({

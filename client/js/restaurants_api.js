@@ -1178,10 +1178,6 @@ function calcCurrentReservations(date, restaurant_name) {
   }
 
   var string_date = date.toLocaleDateString();
-  //console.log(string_date);
-  //console.log(reservations_per_date)
-  date = date.yyyymmdd();
-  //console.log(date);
 
   if ('undefined' === typeof(reservations_per_date[string_date])) {
     return [true, 'available_reservations', ''];
@@ -1193,11 +1189,11 @@ function calcCurrentReservations(date, restaurant_name) {
   }
 
   if (5 > reservations_per_date[string_date]) {
-    return [true, 'available_reservations', reservations_per_date[date]];
+    return [true, 'available_reservations', reservations_per_date[string_date]];
   }
 
   if (10 > reservations_per_date[string_date]) {
-    return [true, 'last_reservations', reservations_per_date[date]];
+    return [true, 'last_reservations', reservations_per_date[string_date]];
   }
 
  return [false, 'full_reservations', 'Full reservations'];
