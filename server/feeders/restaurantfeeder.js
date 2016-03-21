@@ -38,12 +38,12 @@ var fiwareHeaders = {
 };
 
 var getAddress = function(restaurant) {
-  var address = restaurant.address.streetAddress + ' ';
-  if (restaurant.address.addressLocality) {
-    address += restaurant.address.addressLocality + ' ';
+  var address = restaurant.address.value.streetAddress + ' ';
+  if (restaurant.address.value.addressLocality) {
+    address += restaurant.address.value.addressLocality + ' ';
   }
-  if (restaurant.address.addressRegion) {
-    address += restaurant.address.addressRegion;
+  if (restaurant.address.value.addressRegion) {
+    address += restaurant.address.value.addressRegion;
   }
   return address;
 };
