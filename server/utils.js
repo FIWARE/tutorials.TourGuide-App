@@ -646,7 +646,7 @@ function getListByType(type, element, headers) {
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'},
+    {'options': 'keyValues', 'type': type,'limit': '1000'},
     headers
   );
 }
