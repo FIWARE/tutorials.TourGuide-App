@@ -132,28 +132,39 @@ var feedOrionRestaurants = function() {
 
     var attr = {
       'type': 'Restaurant',
-      'id': utils.fixedEncodeURIComponent(rname),
+      'id': utils.asciiEncode(utils.stripForbiddenChars(rname)),
       'address': {
-        'type': 'postalAddress'
+        'type': 'PostalAddress',
+        'value': {}
       },
-      'department': utils.randomElement(organization),
+      'name': {
+        'value': utils.fixedEncodeURIComponent(rname)
+      },
+      'department': {
+        'value': utils.randomElement(organization)
+      },
       'capacity': {
         'type': 'PropertyValue',
-        'name': 'capacity',
         'value': utils.randomElement(capacity)
       },
-      'aggregateRating': {},
+      'aggregateRating': {
+        'type': 'AggregateRating',
+        'value': {}
+      },
       'occupancyLevels': {
+        'metadata': {
+          'timestamp': {
+            'type': 'date',
+            'value': new Date().toISOString()
+          }
+        },
         'type': 'PropertyValue',
-        // timestamp in ms
-        'timestamp': new Date().getTime(),
-        'name': 'occupancyLevels',
         'value': 0
       }
     };
 
-    attr.aggregateRating.ratingValue = utils.randomIntInc(1, 5);
-    attr.aggregateRating.reviewCount = utils.randomIntInc(1,
+    attr.aggregateRating.value.ratingValue = utils.randomIntInc(1, 5);
+    attr.aggregateRating.value.reviewCount = utils.randomIntInc(1,
       100);
 
     Object.keys(restaurantsData[pos]).forEach(function(element) {
