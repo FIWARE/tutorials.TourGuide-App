@@ -580,7 +580,7 @@ function getOrgRestaurants(org, listOfElements) {
 function getUserReviews(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.author.name === user;
+      return element.author === user;
     }
   );
 }
@@ -589,7 +589,7 @@ function getUserReviews(user, listOfElements) {
 function getRestaurantReviews(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.itemReviewed.name === restaurant;
+      return element.itemReviewed === restaurant;
     }
   );
 }
@@ -597,13 +597,13 @@ function getRestaurantReviews(restaurant, listOfElements) {
 // filter reviews by organization
 function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
   // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
+  listOfRestaurants = getOrgRestaurants(franchise, listOfRestaurants);
 
   // filter reviews of the restaurants of the franchise
   return objectToArray(listOfReviews).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.itemReviewed.name;
+        return restaurant.name === element.itemReviewed;
       });
     }
   );
@@ -613,7 +613,7 @@ function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
 function getUserReservations(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.underName.name === user;
+      return element.underName === user;
     }
   );
 }
@@ -622,7 +622,7 @@ function getUserReservations(user, listOfElements) {
 function getRestaurantReservations(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.reservationFor.name === restaurant;
+      return element.reservationFor === restaurant;
     }
   );
 }
@@ -635,7 +635,7 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.reservationFor.name;
+        return restaurant.name === element.reservationFor;
       });
     }
   );
