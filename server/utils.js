@@ -494,11 +494,12 @@ function fixAddress(schemaObject, geoObject) {
 }
 
 function addGeolocation(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
-    schemaObject.position = {};
-    schemaObject.position.type = 'coords';
-    schemaObject.position.location = 'WGS84';
-    schemaObject.position.value = geoObject.latitude + ', ' +
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.value = geoObject.latitude + ', ' +
       geoObject.longitude;
   }
   return schemaObject;
