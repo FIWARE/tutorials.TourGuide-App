@@ -174,12 +174,13 @@ var feedOrionRestaurants = function() {
       if (element in addressDictionary) {
 
         if (val !== 'undefined' && val !== '') {
-          element = utils.replaceOnceUsingDictionary(
+          element = utils.fixedEncodeURIComponent(
+            utils.replaceOnceUsingDictionary(
             addressDictionary, element,
             function(key, dictionary) {
               return dictionary[key];
-            });
-          attr.address[utils.fixedEncodeURIComponent(element)] =
+            }));
+          attr.address.value[element] =
           utils.fixedEncodeURIComponent(val);
         }
 
@@ -188,16 +189,19 @@ var feedOrionRestaurants = function() {
 
           if (val !== 'undefined' && val !== '') {
 
-            element = utils.replaceOnceUsingDictionary(
+            element = utils.fixedEncodeURIComponent(
+              utils.replaceOnceUsingDictionary(
               dictionary, element,
               function(key, dictionary) {
                 return dictionary[key];
-              });
+              }));
             if (element == 'priceRange') {
-              attr[utils.fixedEncodeURIComponent(element)] =
+              attr[element] = {};
+              attr[element].value =
               parseFloat(val);
             } else {
-              attr[utils.fixedEncodeURIComponent(element)] =
+              attr[element] = {};
+              attr[element].value =
               utils.fixedEncodeURIComponent(
               utils.convertHtmlToText(val));
             }
