@@ -589,7 +589,7 @@ function getUserReviews(user, listOfElements) {
 function getRestaurantReviews(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.itemReviewed.name === restaurant;
+      return element.itemReviewed === restaurant;
     }
   );
 }
