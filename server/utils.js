@@ -677,26 +677,29 @@ function getAverage(data) {
 }
 
 function getAggregateRating(listOfReviews) {
-
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   var counter = 0;
   var ratingValues = [];
   var newElement = {
-    'aggregateRating': {}
+    'aggregateRating': {
+      'value': {}
+    }
   };
 
   listOfReviews = objectToArray(listOfReviews);
 
   Object.keys(listOfReviews).forEach(function(element, pos) {
 
-    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+    if (listOfReviews[pos].reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      ratingValues.push(listOfReviews[pos].reviewRating);
       counter++;
     }
   });
 
-  newElement.aggregateRating.reviewCount = counter;
-  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+  newElement.aggregateRating.value.reviewCount = counter;
+  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
 
   return newElement;
 }
