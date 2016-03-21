@@ -464,39 +464,42 @@ function dataToSchema(listOfElements) {
 }
 
 function fixAddress(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress =
+      schemaObject.address.value.streetAddress =
       geoObject.streetName +
       ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = geoObject.streetName;
+      schemaObject.address.value.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = geoObject.city;
+      schemaObject.address.value.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality =
+      schemaObject.address.value.addressLocality =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion =
+      schemaObject.address.value.addressRegion =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.zipcode) {
-      schemaObject.address.postalCode = geoObject.zipcode;
+      schemaObject.address.value.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
 }
 
 function addGeolocation(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
-    schemaObject.position = {};
-    schemaObject.position.type = 'coords';
-    schemaObject.position.location = 'WGS84';
-    schemaObject.position.value = geoObject.latitude + ', ' +
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.value = geoObject.latitude + ', ' +
       geoObject.longitude;
   }
   return schemaObject;
@@ -674,26 +677,29 @@ function getAverage(data) {
 }
 
 function getAggregateRating(listOfReviews) {
-
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   var counter = 0;
   var ratingValues = [];
   var newElement = {
-    'aggregateRating': {}
+    'aggregateRating': {
+      'value': {}
+    }
   };
 
   listOfReviews = objectToArray(listOfReviews);
 
   Object.keys(listOfReviews).forEach(function(element, pos) {
 
-    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+    if (listOfReviews[pos].reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      ratingValues.push(listOfReviews[pos].reviewRating);
       counter++;
     }
   });
 
-  newElement.aggregateRating.reviewCount = counter;
-  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+  newElement.aggregateRating.value.reviewCount = counter;
+  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
 
   return newElement;
 }
@@ -752,9 +758,13 @@ function getTimeBetweenDates(from, to) {
 function updateOccupancyLevels(occupancyLevel, date) {
   return {
     'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': date
+        }
+      },
       'type': 'PropertyValue',
-      'timestamp': date,
-      'name': 'occupancyLevels',
       'value': occupancyLevel
     }
   };
