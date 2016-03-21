@@ -109,16 +109,24 @@ var triggerRestaurantsRatings = function() {
   var servicePath;
 
   var q = async.queue(function(task, callback) {
-
+    var restaurantId = utils.asciiEncode(
+      utils.stripForbiddenChars(
+        unescape(task.restaurantName)));
     setTimeout(function() {
-      utils.getListByType('Restaurant', task.restaurantName, fiwareHeaders)
+      utils.getListByType(
+        'Restaurant',
+        restaurantId,
+        fiwareHeaders)
       .then(function(data) {
         var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
         if (typeof data.body.department !== 'undefined') {
           fwHeaders['fiware-servicepath'] = '/' + data.body.department;
         }
-        utils.sendRequest('PATCH', task.aggregateRatings,
-          task.restaurantName, fwHeaders)
+        utils.sendRequest(
+          'PATCH',
+          task.aggregateRatings,
+          restaurantId,
+          fwHeaders)
         .then(callback)
         .catch(function(err) {
           console.log(err.error);
@@ -128,7 +136,6 @@ var triggerRestaurantsRatings = function() {
         console.log(err.error);
       });
     }, delay);
-
   }, apiRestSimtasks);
 
   q.drain = function() {
@@ -139,7 +146,7 @@ var triggerRestaurantsRatings = function() {
   .then(function(data) {
     reviews = data.body;
     Object.keys(restaurantsData).forEach(function(element, pos) {
-      var restaurantName = restaurantsData[pos].id;
+      var restaurantName = restaurantsData[pos].name;
       restaurantReviews = utils.getRestaurantReviews(
         restaurantName,
         reviews);

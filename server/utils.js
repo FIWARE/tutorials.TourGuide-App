@@ -534,7 +534,7 @@ function restaurantToOrion(schemaObject, geoObject) {
     'description': {
       'value': schemaObject.description
     },
-    'id': asciiEncode(stripForbiddenChars(schemaObject.name)),
+    'id': nameToId(schemaObject.name),
     'name': {
       'value': fixedEncodeURIComponent(schemaObject.name)
     },
@@ -569,7 +569,7 @@ function restaurantToOrion(schemaObject, geoObject) {
 function reviewToOrion(userObject, schemaObject) {
 
   if (userObject) {
-    var reviewId = schemaObject.itemReviewed.name += '-' + shortid.generate();
+    var reviewId = schemaObject.itemReviewed.name + '-' + shortid.generate();
     var objectToOrion = {
       'author': {
         'type': 'Person',
@@ -579,7 +579,7 @@ function reviewToOrion(userObject, schemaObject) {
         'type': 'date',
         'value': new Date().toISOString()
       },
-      'id': asciiEncode(reviewId),
+      'id': nameToId(reviewId),
       'itemReviewed': {
         'type': 'Restaurant',
         'value': fixedEncodeURIComponent(schemaObject.itemReviewed.name)
@@ -604,9 +604,10 @@ function reviewToOrion(userObject, schemaObject) {
 function reservationToOrion(userObject, schemaObject) {
 
   if (userObject) {
-    var reservationId = schemaObject.reservationFor.name += '-' + shortid.generate();
+    var reservationId = schemaObject.reservationFor.name +
+    '-' + shortid.generate();
     var objectToOrion = {
-      'id': asciiEncode(reservationId),
+      'id': nameToId(reservationId),
       'partySize': {
         'value': schemaObject.partySize
       },
@@ -880,6 +881,10 @@ function stripForbiddenChars(str) {
   return str;
 }
 
+function nameToId(name) {
+  return asciiEncode(stripForbiddenChars(name));
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -919,5 +924,6 @@ module.exports = {
   getTimeBetweenDates: getTimeBetweenDates,
   updateOccupancyLevels: updateOccupancyLevels,
   asciiEncode: asciiEncode,
-  stripForbiddenChars: stripForbiddenChars
+  stripForbiddenChars: stripForbiddenChars,
+  nameToId: nameToId
 };
