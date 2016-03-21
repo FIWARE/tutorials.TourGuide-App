@@ -17,7 +17,7 @@ orion:
     command: -dbhost mongodb
 
 authzforce:
-    image: fiware/authzforce:4.4.0
+    image: fiware/authzforce-ce-server:latest
     hostname: authzforce
     expose:
         - "8080"
