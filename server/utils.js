@@ -722,17 +722,27 @@ function getListByType(type, element, headers) {
   );
 }
 
-function sendRequest(method, body, identifier, headers) {
+function sendRequest(method, body, identifier, headers, payload) {
   var uri = '/v2/entities';
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
   }
-  return authRequest(
-    uri,
-    method,
-    body,
-    headers
-  );
+  if (typeof payload === 'undefined') {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers
+    );
+  } else {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers,
+      payload
+    );
+  }
 }
 
 function getAverage(data) {
