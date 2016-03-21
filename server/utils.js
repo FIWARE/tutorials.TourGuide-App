@@ -464,28 +464,30 @@ function dataToSchema(listOfElements) {
 }
 
 function fixAddress(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress =
+      schemaObject.address.value.streetAddress =
       geoObject.streetName +
       ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = geoObject.streetName;
+      schemaObject.address.value.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = geoObject.city;
+      schemaObject.address.value.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality =
+      schemaObject.address.value.addressLocality =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion =
+      schemaObject.address.value.addressRegion =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.zipcode) {
-      schemaObject.address.postalCode = geoObject.zipcode;
+      schemaObject.address.value.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
