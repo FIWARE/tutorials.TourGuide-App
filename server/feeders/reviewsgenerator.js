@@ -15,7 +15,7 @@
   - Create more real reviews using templates for comments and random ratings
 */
 
-// jshint node: true
+// jshint node: true, nonstandard: true
 
 'use strict';
 
