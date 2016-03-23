@@ -17,12 +17,10 @@ orion:
     command: -dbhost mongodb
 
 authzforce:
-    image: fiware/authzforce:4.4.0
+    image: fiware/authzforce-ce-server:release-4.4.1b
     hostname: authzforce
     expose:
         - "8080"
-    # remove predefined domains before starting tomcat
-    command: bash -c "rm -rfv /opt/authzforce-ce-server/data/domains/* ; exec catalina.sh run"
 
 idm:
     image: bitergia/idm-keyrock:5.1.0_tourguide-0.5
@@ -35,7 +33,7 @@ idm:
         - "5000"
     environment:
         - APP_NAME=TourGuide
-        - AUTHZFORCE_VERSION=4.4.0
+        - AUTHZFORCE_VERSION=4.4.1b
 
 pepwilma:
     image: bitergia/pep-wilma:4.3.0_tourguide-0.5
@@ -51,7 +49,7 @@ pepwilma:
     environment:
         - APP_HOSTNAME=orion
         - APP_PORT=1026
-        - AUTHZFORCE_VERSION=4.4.0
+        - AUTHZFORCE_VERSION=4.4.1b
 
 idasiotacpp:
     image: bitergia/idas-iota-cpp:1.2.0_tourguide-0.5
