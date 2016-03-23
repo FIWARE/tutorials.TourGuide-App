@@ -603,22 +603,30 @@ function reviewToOrion(userObject, schemaObject) {
 
 function reservationToOrion(userObject, schemaObject) {
 
-  // -- TODO: check automatically if there's enough space at
-  // -- the restaurant, so reservation is accepted automatically
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.reservationFor.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    var newDate = new Date(schemaObject.startTime).getTime();
-    //Time in miliseconds to Orion
-    schemaObject.startTime = newDate;
-    schemaObject.underName = {};
-    schemaObject.partySize = parseInt(schemaObject.partySize, 10);
-    schemaObject.underName.type = 'Person';
-    schemaObject.underName.name = userObject.id;
-    schemaObject.reservationStatus = 'Confirmed';
+    var reservationId = schemaObject.reservationFor.name += '-' + shortid.generate();
+    var objectToOrion = {
+      'id': asciiEncode(reservationId),
+      'partySize': {
+        'value': schemaObject.partySize
+      },
+      'reservationFor': {
+        'type': 'FoodEstablishment',
+        'value': fixedEncodeURIComponent(schemaObject.reservationFor.name)
+      },
+      'reservationStatus': {
+        'value': 'Confirmed'
+      },
+      'startTime': {
+        'type': 'date',
+        'value': getRandomDate().toISOString()
+      },
+      'type': 'FoodEstablishmentReservation',
+      'underName': {
+        'type': 'Person',
+        'value': userObject.id
+      }
+    };
   }
   return sortObject(schemaObject);
 }
