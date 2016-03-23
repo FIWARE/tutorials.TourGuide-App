@@ -84,16 +84,29 @@ module.exports.restaurant = {
         'type': {
           'type': 'string'
         },
-        'timestamp': {
-          'type': 'string',
-          // jshint maxlen: false
-          // jscs:disable maximumLineLength
-          'pattern': '/[0-9]{4,}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+|)(?:[+-][0-9]{2}:[0-9]{2}|Z)/'
-          // jshint maxlen: 80
-          // jscs:enable
-        },
-        'name': {
-          'type': 'string'
+        'metadata': {
+          'type': 'object',
+          'properties': {
+            'type': {
+              'type': 'string'
+            },
+            'timestamp': {
+              'type': 'object',
+              'properties': {
+                'type': {
+                  'type': 'string'
+                },
+                'value': {
+                  'type': 'string',
+                  // jshint maxlen: false
+                  // jscs:disable maximumLineLength
+                  'pattern': '/[0-9]{4,}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+|)(?:[+-][0-9]{2}:[0-9]{2}|Z)/'
+                  // jshint maxlen: 80
+                  // jscs:enable
+                }
+              }
+            }
+          }
         },
         'value': {
           'type': 'number'
