@@ -568,29 +568,37 @@ function restaurantToOrion(schemaObject, geoObject) {
 
 function reviewToOrion(userObject, schemaObject) {
 
-  // -- TODO: check how to implement 'position field'
-  // -- - idea is, whenever a new review is created into
-  // -- - a restaurant, the review position increase;
-  // -- - but the only one able to modify it is the user
-  // -- - We need that way cause we cannot display 'ids'
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.itemReviewed.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    schemaObject.reviewBody = fixedEncodeURIComponent(schemaObject.reviewBody);
-    schemaObject.author = {};
-    schemaObject.author.type = 'Person';
-    schemaObject.author.name = userObject.id;
-    schemaObject.dateCreated = new Date().getTime();
-    if (userObject.organizations[0]) {
-      schemaObject.publisher = {};
-      schemaObject.publisher.type = 'Organization';
-      schemaObject.publisher.name = userObject.organizations[0].name;
-    }
+    var reviewId = schemaObject.itemReviewed.name += '-' + shortid.generate();
+    var objectToOrion = {
+      'author': {
+        'type': 'Person',
+        'value': userObject.id
+      },
+      'dateCreated': {
+        'type': 'date',
+        'value': new Date().toISOString()
+      },
+      'id': asciiEncode(reviewId),
+      'itemReviewed': {
+        'type': 'Restaurant',
+        'value': fixedEncodeURIComponent(schemaObject.itemReviewed.name)
+      },
+      'publisher': {
+        'type': 'Organization',
+        'value': userObject.organizations[0].name
+      },
+      'reviewRating': {
+        'type': 'Rating',
+        'value': schemaObject.reviewRating.ratingValue
+      },
+      'reviewBody': {
+        'value': fixedEncodeURIComponent(schemaObject.reviewBody)
+      },
+      'type': 'Review'
+    };
+    return sortObject(objectToOrion);
   }
-  return sortObject(schemaObject);
 }
 
 function reservationToOrion(userObject, schemaObject) {
