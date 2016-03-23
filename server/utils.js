@@ -822,9 +822,13 @@ function getTimeBetweenDates(from, to) {
 function updateOccupancyLevels(occupancyLevel, date) {
   return {
     'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': date
+        }
+      },
       'type': 'PropertyValue',
-      'timestamp': date,
-      'name': 'occupancyLevels',
       'value': occupancyLevel
     }
   };
