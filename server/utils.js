@@ -507,15 +507,63 @@ function addGeolocation(schemaObject, geoObject) {
 
 function restaurantToOrion(schemaObject, geoObject) {
 
-  schemaObject = replaceTypeForOrion(schemaObject);
-  schemaObject.id = schemaObject.name;
-  delete schemaObject.name;
+  var objectToOrion = {
+    'address': {
+      'type': 'PostalAddress',
+      'value': {
+        'streetAddress': schemaObject.address.streetAddress,
+        'addressLocality': schemaObject.address.addressLocality,
+        'addressRegion': schemaObject.address.addressRegion,
+        'postalCode': schemaObject.address.postalCode
+      }
+    },
+    'aggregateRating': {
+      'type': 'AggregateRating',
+      'value': {
+        'ratingValue': 0,
+        'reviewCount': 0
+      }
+    },
+    'capacity': {
+      'type': 'PropertyValue',
+      'value': schemaObject.capacity.value
+    },
+    'department': {
+      'value': schemaObject.department
+    },
+    'description': {
+      'value': schemaObject.description
+    },
+    'id': asciiEncode(stripForbiddenChars(schemaObject.name)),
+    'name': {
+      'value': fixedEncodeURIComponent(schemaObject.name)
+    },
+    'priceRange': {
+      'value': schemaObject.priceRange
+    },
+    'telephone': {
+      'value': schemaObject.telephone
+    },
+    'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': schemaObject.occupancyLevels.metadata.timestamp.value
+        }
+      },
+      'type': 'PropertyValue',
+      'value': schemaObject.occupancyLevels.value
+    },
+    'type': 'Restaurant',
+    'url': {
+      'value': schemaObject.url
+    },
+  };
 
-  schemaObject = addGeolocation(schemaObject, geoObject);
-  schemaObject = fixAddress(schemaObject, geoObject);
+  objectToOrion = addGeolocation(objectToOrion, geoObject);
+  objectToOrion = fixAddress(objectToOrion, geoObject);
 
-  return sortObject(schemaObject);
-
+  return sortObject(objectToOrion);
 }
 
 function reviewToOrion(userObject, schemaObject) {
