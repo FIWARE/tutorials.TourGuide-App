@@ -15,7 +15,7 @@
   - Create more real reviews using templates for comments and random ratings
 */
 
-// jshint node: true
+// jshint node: true, nonstandard: true
 
 'use strict';
 
@@ -47,7 +47,6 @@ var feedOrionReviews = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-
     utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
@@ -61,33 +60,36 @@ var feedOrionReviews = function() {
   };
 
   Object.keys(restaurantsData).forEach(function(element, pos) {
-    // Call orion to append the entity
-    var rname = restaurantsData[pos].id;
-    rname += '-' + shortid.generate();
-    // Time to add first attribute to orion as first approach
+
+    var reviewId = restaurantsData[pos].id + '-' + shortid.generate();
 
     var attr = {
       'type': 'Review',
-      'id': rname,
-      'itemReviewed': {},
-      'reviewRating': {},
-      'author': {},
-      'reviewBody': 'Body review',
-      'dateCreated': new Date().getTime(),
-      'publisher': {}
+      'id': utils.asciiEncode(reviewId),
+      'itemReviewed': {
+        'type': 'Restaurant',
+        'value': utils.fixedEncodeURIComponent(restaurantsData[pos].name)
+      },
+      'reviewRating': {
+        'type': 'Rating',
+        'value': utils.randomIntInc(1, 5)
+      },
+      'author': {
+        'type': 'Person',
+        'value': 'user' + utils.randomIntInc(1, 10)
+      },
+      'reviewBody': {
+        'value': 'Body review'
+      },
+      'dateCreated': {
+        'type': 'date',
+        'value': new Date().toISOString()
+      },
+      'publisher': {
+        'type': 'Organization',
+        'value': 'Bitergia'
+      }
     };
-
-    attr.itemReviewed.type = 'Restaurant';
-    attr.itemReviewed.name = restaurantsData[pos].id;
-
-    attr.reviewRating.type = 'Rating';
-    attr.reviewRating.ratingValue = utils.randomIntInc(1, 5);
-
-    attr.author.type = 'Person';
-    attr.author.name = 'user' + utils.randomIntInc(1, 10);
-
-    attr.publisher.type = 'Organization';
-    attr.publisher.name = 'Bitergia';
 
     q.push({
       'attributes': attr
@@ -107,16 +109,24 @@ var triggerRestaurantsRatings = function() {
   var servicePath;
 
   var q = async.queue(function(task, callback) {
-
+    var restaurantId = utils.asciiEncode(
+      utils.stripForbiddenChars(
+        unescape(task.restaurantName)));
     setTimeout(function() {
-      utils.getListByType('Restaurant', task.restaurantName, fiwareHeaders)
+      utils.getListByType(
+        'Restaurant',
+        restaurantId,
+        fiwareHeaders)
       .then(function(data) {
         var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
         if (typeof data.body.department !== 'undefined') {
           fwHeaders['fiware-servicepath'] = '/' + data.body.department;
         }
-        utils.sendRequest('PATCH', task.aggregateRatings,
-          task.restaurantName, fwHeaders)
+        utils.sendRequest(
+          'PATCH',
+          task.aggregateRatings,
+          restaurantId,
+          fwHeaders)
         .then(callback)
         .catch(function(err) {
           console.log(err.error);
@@ -126,7 +136,6 @@ var triggerRestaurantsRatings = function() {
         console.log(err.error);
       });
     }, delay);
-
   }, apiRestSimtasks);
 
   q.drain = function() {
@@ -137,7 +146,7 @@ var triggerRestaurantsRatings = function() {
   .then(function(data) {
     reviews = data.body;
     Object.keys(restaurantsData).forEach(function(element, pos) {
-      var restaurantName = restaurantsData[pos].id;
+      var restaurantName = restaurantsData[pos].name;
       restaurantReviews = utils.getRestaurantReviews(
         restaurantName,
         reviews);

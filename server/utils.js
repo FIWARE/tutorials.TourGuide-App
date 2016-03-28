@@ -464,39 +464,42 @@ function dataToSchema(listOfElements) {
 }
 
 function fixAddress(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress =
+      schemaObject.address.value.streetAddress =
       geoObject.streetName +
       ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = geoObject.streetName;
+      schemaObject.address.value.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = geoObject.city;
+      schemaObject.address.value.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality =
+      schemaObject.address.value.addressLocality =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion =
+      schemaObject.address.value.addressRegion =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.zipcode) {
-      schemaObject.address.postalCode = geoObject.zipcode;
+      schemaObject.address.value.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
 }
 
 function addGeolocation(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
-    schemaObject.position = {};
-    schemaObject.position.type = 'coords';
-    schemaObject.position.location = 'WGS84';
-    schemaObject.position.value = geoObject.latitude + ', ' +
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.value = geoObject.latitude + ', ' +
       geoObject.longitude;
   }
   return schemaObject;
@@ -586,7 +589,7 @@ function getUserReviews(user, listOfElements) {
 function getRestaurantReviews(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.itemReviewed.name === restaurant;
+      return element.itemReviewed === restaurant;
     }
   );
 }
@@ -646,7 +649,7 @@ function getListByType(type, element, headers) {
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'},
+    {'options': 'keyValues', 'type': type,'limit': '1000'},
     headers
   );
 }
@@ -674,26 +677,29 @@ function getAverage(data) {
 }
 
 function getAggregateRating(listOfReviews) {
-
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   var counter = 0;
   var ratingValues = [];
   var newElement = {
-    'aggregateRating': {}
+    'aggregateRating': {
+      'value': {}
+    }
   };
 
   listOfReviews = objectToArray(listOfReviews);
 
   Object.keys(listOfReviews).forEach(function(element, pos) {
 
-    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+    if (listOfReviews[pos].reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      ratingValues.push(listOfReviews[pos].reviewRating);
       counter++;
     }
   });
 
-  newElement.aggregateRating.reviewCount = counter;
-  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+  newElement.aggregateRating.value.reviewCount = counter;
+  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
 
   return newElement;
 }
@@ -760,6 +766,33 @@ function updateOccupancyLevels(occupancyLevel, date) {
   };
 }
 
+function asciiEncode(string) {
+
+  var escapable = /[\\\"\x00-\x1f\x7f-\uffff]/g;
+  var meta = { // table of character substitutions
+    '\b': '\\b',
+    '\t': '\\t',
+    '\n': '\\n',
+    '\f': '\\f',
+    '\r': '\\r',
+    '"': '\\"',
+    '\\': '\\\\'
+  };
+
+  escapable.lastIndex = 0;
+  return escapable.test(string) ?
+  string.replace(escapable, function(a) {
+    var c = meta[a];
+    return typeof c === 'string' ? c :
+    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+  }) : string ;
+}
+
+function stripForbiddenChars(str) {
+  str = str.replace(/[<>"'=;()\s]/g, '_');
+  return str;
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -797,5 +830,7 @@ module.exports = {
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
-  updateOccupancyLevels: updateOccupancyLevels
+  updateOccupancyLevels: updateOccupancyLevels,
+  asciiEncode: asciiEncode,
+  stripForbiddenChars: stripForbiddenChars
 };

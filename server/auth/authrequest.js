@@ -56,7 +56,6 @@ function performRequest(endpoint, method, data, fiwareHeaders) {
     };
     break;
   case 'PATCH':
-    endpoint += '?' + querystring.stringify(data);
     options = {
       method: 'PATCH',
       uri: host + ':' + port + endpoint,
