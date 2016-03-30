@@ -17,7 +17,7 @@ var config = require('../config');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
-var username = 'user0@test.com';
+var username = 'user1@test.com';
 var password = 'test';
 var reservationDate = '2015-12-24T10:12:23.396Z';
 var auth = 'Basic ' +
@@ -111,7 +111,7 @@ frisby.create('OAuth2 login')
 
         frisby.create('Patch a Reservation')
           .patch('http://tourguide' + location, {
-            'partySize': '10'
+            'partySize': 10
           }, {
             json: true
           })
