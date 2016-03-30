@@ -10,7 +10,7 @@ ENV INITRD no
 ENV TOURGUIDE_USER tourguide
 ENV TOURGUIDE_USER_DIR /home/${TOURGUIDE_USER}
 ENV GIT_URL_TOURGUIDE https://github.com/Fiware/tutorials.TourGuide-App.git
-ENV GIT_REV_TOURGUIDE release/0.5
+ENV GIT_REV_TOURGUIDE release/0.5.1
 ENV SUBSCRIPTIONS_PATH /opt/subscribe
 ENV CEP_DEFINITIONS_PATH /opt/cep
 ENV CC_APP_SERVER_PATH ${TOURGUIDE_USER_DIR}/tutorials.TourGuide-App/server
@@ -70,7 +70,7 @@ USER ${TOURGUIDE_USER}
 WORKDIR ${TOURGUIDE_USER_DIR}
 
 # get the repository from git and install node dependencies
-RUN git clone ${GIT_URL_TOURGUIDE} && \
+RUN git clone -b ${GIT_REV_TOURGUIDE} ${GIT_URL_TOURGUIDE} && \
     cd ${CC_APP_SERVER_PATH} && \
     npm install --loglevel warn && \
     rm -fr ${TOURGUIDE_USER_DIR}/.npm
