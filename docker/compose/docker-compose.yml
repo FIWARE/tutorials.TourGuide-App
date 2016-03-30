@@ -1,12 +1,12 @@
 mongodb:
-    image: fiware/tutorials.tourguide-app.restaurant-data:20160201
+    image: fiware/tutorials.tourguide-app.restaurant-data:20160329
     hostname: mongodb
     expose:
         - "27017"
     command: --smallfiles
 
 orion:
-    image: fiware/orion:0.26.1
+    image: fiware/orion:0.28
     hostname: orion
     links:
         - mongodb

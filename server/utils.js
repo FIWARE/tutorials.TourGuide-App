@@ -236,13 +236,10 @@ function objectToArray(element) {
   return element;
 }
 
-function restaurantToSchema(element) {
+function restaurantToSchema(element, date) {
 
-  //-- List elements matching
   var restaurantSchemaElements = [
     'address',
-    'aggregateRating',
-    'name',
     'department',
     'description',
     'priceRange',
@@ -250,27 +247,34 @@ function restaurantToSchema(element) {
     'url'
   ];
 
-  // sensors data
-  var additionalProperties = [
-    'Kitchen_temperature',
-    'Kitchen_humidity',
-    'Dining_temperature',
-    'Dining_humidity',
-    'occupancyLevels',
-    'capacity'
-  ];
-
-  restaurantSchemaElements.push.apply(restaurantSchemaElements,
-                                      additionalProperties);
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Restaurant',
+    'aggregateRating': {
+      'reviewCount': element.aggregateRating.reviewCount,
+      'ratingValue': element.aggregateRating.ratingValue
+    },
+    'additionalProperty': [
+      {
+        'value': element.capacity,
+        'name': 'capacity',
+        '@type': 'PropertyValue'
+      },
+      {
+        'value': element.occupancyLevels,
+        'name': 'occupancyLevels',
+        '@type': 'PropertyValue'
+      }
+    ],
+    'name': element.name
   };
 
-  // array for sensors
-  var additionalProperty = [];
+  if (date) {
+    elementToSchema.additionalProperty[1].timestamp = date;
+  } else {
+    elementToSchema.additionalProperty[1].timestamp = new Date().toISOString();
+  }
 
-  // -- Element value
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
@@ -279,127 +283,91 @@ function restaurantToSchema(element) {
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
       if (val !== 'undefined') {
-        if (additionalProperties.indexOf(elementAttribute) !== -1) {
-          if (val.timestamp) {
-            var newDate = new Date(val.timestamp).toISOString();
-            val.timestamp = newDate;
-          }
-          additionalProperty.push(val);
+        if (typeof val === 'string') {
+          elementToSchema[elementAttribute] = unescape(val);
         } else {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
+          elementToSchema[elementAttribute] = val;
         }
       }
     }
   });
 
-  if (additionalProperty.length) {
-    newElement.additionalProperty = additionalProperty;
+  if (elementToSchema.address) {
+    elementToSchema.address['@type'] = 'postalAddress';
   }
 
-  newElement.name = unescape(element.id);
-
-  newElement = replaceTypeForSchema(newElement);
-
-  // -- Display geo-location schema.org like
-
-  if (element.position &&
-      element.position.value &&
-      typeof element.position.value === 'string') {
-    var geoCoords = element.position.value.split(',');
-    newElement.geo = {};
-    newElement.geo['@type'] = 'GeoCoordinates';
-    newElement.geo.latitude = geoCoords[0];
-    newElement.geo.longitude = geoCoords[1];
+  if (element.location) {
+    var geoCoords = element.location.split(',');
+    elementToSchema.geo = {
+      '@type': 'GeoCoordinates',
+      'latitude': geoCoords[0],
+      'longitude': geoCoords[1]
+    };
   }
-  return newElement;
+
+  return sortObject(elementToSchema);
 }
 
 function reviewToSchema(element) {
 
-  var reviewSchemaElements = [
-    'itemReviewed',
-    'reviewRating',
-    'name',
-    'author',
-    'reviewBody',
-    'publisher',
-    'dateCreated'
-  ];
-
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Review',
+    'author': {
+      '@type': 'Person',
+      'name': element.author
+    },
+    'dateCreated': element.dateCreated,
+    'itemReviewed': {
+      '@type': 'Restaurant',
+      'name': element.itemReviewed
+    },
+    'name': unescape(element.id),
+    'publisher': {
+      '@type': 'Organization',
+      'name': element.publisher
+    },
+    'reviewBody': element.reviewBody,
+    'reviewRating': {
+      '@type': 'Rating',
+      'ratingValue': element.reviewRating
+    }
   };
 
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-      val = element[elementAttribute];
-      if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
-        if (val !== 'undefined') {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
-        }
-      }
-    });
-
-  var newDate = new Date(newElement.dateCreated).toISOString();
-  newElement.dateCreated = newDate;
-  newElement.name = unescape(element.id);
-  newElement = replaceTypeForSchema(newElement);
-
-  return newElement;
+  return sortObject(elementToSchema);
 }
 
 function reservationToSchema(element) {
 
-  var reservationSchemaElements = [
-    'reservationStatus',
-    'underName',
-    'reservationFor',
-    'startTime',
-    'partySize'
-  ];
-
-  var newElement = {
-    '@context': 'http://schema.org',
-    '@type': element.type
-  };
-
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-    val = element[elementAttribute];
-    if (reservationSchemaElements.indexOf(elementAttribute) !==
-      -1) {
-      if (val !== 'undefined') {
-        if (typeof val === 'string') {
-          newElement[elementAttribute] = unescape(val);
-        } else {
-          newElement[elementAttribute] = val;
+  var elementToSchema = {
+      '@context': 'http://schema.org',
+      '@type': 'FoodEstablishmentReservation',
+      'partySize': element.partySize,
+      'reservationFor': {
+        '@type': 'FoodEstablishment',
+        'name': element.reservationFor,
+        'address': {
+          '@type': 'postalAddress',
+          'streetAddress': element.address.streetAddress,
+          'addressRegion': element.address.addressRegion,
+          'addressLocality': element.address.addressLocality,
+          'postalCode': element.address.postalCode,
         }
-      }
-    }
-  });
-  var newDate = new Date(newElement.startTime).toISOString();
-  newElement.startTime = newDate;
-  newElement.reservationId = unescape(element.id);
-  newElement.reservationFor.name = unescape(
-    newElement.reservationFor.name);
+      },
+      'reservationStatus': element.reservationStatus,
+      'startTime': element.startTime,
+      'underName': {
+        '@type': 'Person',
+        'name': element.underName
+      },
+      'reservationId': unescape(element.id)
+    };
 
-  newElement = replaceTypeForSchema(newElement);
+  return sortObject(elementToSchema);
 
-  return newElement;
 }
 
-function objectDataToSchema(element) {
+function objectDataToSchema(element, date) {
 
   var newElement;
   var type = element.type;
@@ -408,7 +376,11 @@ function objectDataToSchema(element) {
 
   case 'Restaurant':
 
-    newElement = restaurantToSchema(element);
+    if (typeof date !== 'undefined') {
+      newElement = restaurantToSchema(element, date);
+    } else {
+      newElement = restaurantToSchema(element);
+    }
     return newElement;
 
   case 'Review':
@@ -446,7 +418,7 @@ function sortObject(element) {
   return sorted;
 }
 
-function dataToSchema(listOfElements) {
+function dataToSchema(listOfElements, date) {
 
   var newListOfElements = [];
   var newElement;
@@ -454,49 +426,54 @@ function dataToSchema(listOfElements) {
   listOfElements = objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
-
-    newElement = objectDataToSchema(listOfElements[pos]);
+    if (typeof date !== 'undefined') {
+      newElement = objectDataToSchema(listOfElements[pos], date);
+    } else {
+      newElement = objectDataToSchema(listOfElements[pos]);
+    }
     newListOfElements.push(newElement);
 
   });
-
   return newListOfElements;
 }
 
 function fixAddress(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress =
+      schemaObject.address.value.streetAddress =
       geoObject.streetName +
       ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = geoObject.streetName;
+      schemaObject.address.value.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = geoObject.city;
+      schemaObject.address.value.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality =
+      schemaObject.address.value.addressLocality =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion =
+      schemaObject.address.value.addressRegion =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.zipcode) {
-      schemaObject.address.postalCode = geoObject.zipcode;
+      schemaObject.address.value.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
 }
 
 function addGeolocation(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
-    schemaObject.position = {};
-    schemaObject.position.type = 'coords';
-    schemaObject.position.location = 'WGS84';
-    schemaObject.position.value = geoObject.latitude + ', ' +
+    schemaObject.location = {};
+    schemaObject.location.type = 'geo:point';
+    schemaObject.location.value = geoObject.latitude + ', ' +
       geoObject.longitude;
   }
   return schemaObject;
@@ -504,64 +481,133 @@ function addGeolocation(schemaObject, geoObject) {
 
 function restaurantToOrion(schemaObject, geoObject) {
 
-  schemaObject = replaceTypeForOrion(schemaObject);
-  schemaObject.id = schemaObject.name;
-  delete schemaObject.name;
+  var objectToOrion = {
+    'address': {
+      'type': 'PostalAddress',
+      'value': {
+        'streetAddress': schemaObject.address.streetAddress,
+        'addressLocality': schemaObject.address.addressLocality,
+        'addressRegion': schemaObject.address.addressRegion,
+        'postalCode': schemaObject.address.postalCode
+      }
+    },
+    'aggregateRating': {
+      'type': 'AggregateRating',
+      'value': {
+        'ratingValue': 0,
+        'reviewCount': 0
+      }
+    },
+    'capacity': {
+      'type': 'PropertyValue',
+      'value': schemaObject.capacity.value
+    },
+    'department': {
+      'value': schemaObject.department
+    },
+    'description': {
+      'value': schemaObject.description
+    },
+    'id': nameToId(schemaObject.name),
+    'name': {
+      'value': fixedEncodeURIComponent(schemaObject.name)
+    },
+    'priceRange': {
+      'value': schemaObject.priceRange
+    },
+    'telephone': {
+      'value': schemaObject.telephone
+    },
+    'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': schemaObject.occupancyLevels.metadata.timestamp.value
+        }
+      },
+      'type': 'PropertyValue',
+      'value': schemaObject.occupancyLevels.value
+    },
+    'type': 'Restaurant',
+    'url': {
+      'value': schemaObject.url
+    },
+  };
 
-  schemaObject = addGeolocation(schemaObject, geoObject);
-  schemaObject = fixAddress(schemaObject, geoObject);
+  objectToOrion = addGeolocation(objectToOrion, geoObject);
+  objectToOrion = fixAddress(objectToOrion, geoObject);
 
-  return sortObject(schemaObject);
-
+  return sortObject(objectToOrion);
 }
 
 function reviewToOrion(userObject, schemaObject) {
 
-  // -- TODO: check how to implement 'position field'
-  // -- - idea is, whenever a new review is created into
-  // -- - a restaurant, the review position increase;
-  // -- - but the only one able to modify it is the user
-  // -- - We need that way cause we cannot display 'ids'
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.itemReviewed.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    schemaObject.reviewBody = fixedEncodeURIComponent(schemaObject.reviewBody);
-    schemaObject.author = {};
-    schemaObject.author.type = 'Person';
-    schemaObject.author.name = userObject.id;
-    schemaObject.dateCreated = new Date().getTime();
-    if (userObject.organizations[0]) {
-      schemaObject.publisher = {};
-      schemaObject.publisher.type = 'Organization';
-      schemaObject.publisher.name = userObject.organizations[0].name;
-    }
+    var reviewId = schemaObject.itemReviewed.name + '-' + shortid.generate();
+    var objectToOrion = {
+      'author': {
+        'type': 'Person',
+        'value': userObject.id
+      },
+      'dateCreated': {
+        'type': 'date',
+        'value': new Date().toISOString()
+      },
+      'id': nameToId(reviewId),
+      'itemReviewed': {
+        'type': 'Restaurant',
+        'value': fixedEncodeURIComponent(schemaObject.itemReviewed.name)
+      },
+      'publisher': {
+        'type': 'Organization',
+        'value': userObject.organizations[0].name
+      },
+      'reviewRating': {
+        'type': 'Rating',
+        'value': schemaObject.reviewRating.ratingValue
+      },
+      'reviewBody': {
+        'value': fixedEncodeURIComponent(schemaObject.reviewBody)
+      },
+      'type': 'Review'
+    };
+    return sortObject(objectToOrion);
   }
-  return sortObject(schemaObject);
 }
 
 function reservationToOrion(userObject, schemaObject) {
 
-  // -- TODO: check automatically if there's enough space at
-  // -- the restaurant, so reservation is accepted automatically
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.reservationFor.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    var newDate = new Date(schemaObject.startTime).getTime();
-    //Time in miliseconds to Orion
-    schemaObject.startTime = newDate;
-    schemaObject.underName = {};
-    schemaObject.partySize = parseInt(schemaObject.partySize, 10);
-    schemaObject.underName.type = 'Person';
-    schemaObject.underName.name = userObject.id;
-    schemaObject.reservationStatus = 'Confirmed';
+    var reservationId = schemaObject.reservationFor.name +
+    '-' + shortid.generate();
+    var objectToOrion = {
+      'id': nameToId(reservationId),
+      'partySize': {
+        'value': schemaObject.partySize
+      },
+      'reservationFor': {
+        'type': 'FoodEstablishment',
+        'value': fixedEncodeURIComponent(schemaObject.reservationFor.name)
+      },
+      'reservationStatus': {
+        'value': 'Confirmed'
+      },
+      'startTime': {
+        'type': 'date',
+        'value': new Date(schemaObject.startTime).toISOString()
+      },
+      'address': {
+        'type': 'PostalAddress',
+        'value': schemaObject.address
+      },
+      'type': 'FoodEstablishmentReservation',
+      'underName': {
+        'type': 'Person',
+        'value': userObject.id
+      }
+    };
+    return sortObject(objectToOrion);
   }
-  return sortObject(schemaObject);
 }
 
 // filter restaurants by organization
@@ -577,7 +623,7 @@ function getOrgRestaurants(org, listOfElements) {
 function getUserReviews(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.author.name === user;
+      return element.author === user;
     }
   );
 }
@@ -586,7 +632,7 @@ function getUserReviews(user, listOfElements) {
 function getRestaurantReviews(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.itemReviewed.name === restaurant;
+      return element.itemReviewed === restaurant;
     }
   );
 }
@@ -594,13 +640,13 @@ function getRestaurantReviews(restaurant, listOfElements) {
 // filter reviews by organization
 function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
   // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
+  listOfRestaurants = getOrgRestaurants(franchise, listOfRestaurants);
 
   // filter reviews of the restaurants of the franchise
   return objectToArray(listOfReviews).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.itemReviewed.name;
+        return restaurant.name === element.itemReviewed;
       });
     }
   );
@@ -610,7 +656,7 @@ function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
 function getUserReservations(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.underName.name === user;
+      return element.underName === user;
     }
   );
 }
@@ -619,7 +665,7 @@ function getUserReservations(user, listOfElements) {
 function getRestaurantReservations(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.reservationFor.name === restaurant;
+      return element.reservationFor === restaurant;
     }
   );
 }
@@ -632,36 +678,51 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.reservationFor.name;
+        return restaurant.name === element.reservationFor;
       });
     }
   );
 }
 
-function getListByType(type, element, headers) {
+function getListByType(type, element, headers, raw) {
   var uri = '/v2/entities';
+  var options = {'type': type,'limit': '1000'};
   if (element) {
     uri += '/' + encodeURIComponent(element);
+  }
+
+  if (typeof raw === 'undefined') {
+    options.options = 'keyValues';
   }
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'},
+    options,
     headers
   );
 }
 
-function sendRequest(method, body, identifier, headers) {
+function sendRequest(method, body, identifier, headers, payload) {
   var uri = '/v2/entities';
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
   }
-  return authRequest(
-    uri,
-    method,
-    body,
-    headers
-  );
+  if (typeof payload === 'undefined') {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers
+    );
+  } else {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers,
+      payload
+    );
+  }
 }
 
 function getAverage(data) {
@@ -674,56 +735,39 @@ function getAverage(data) {
 }
 
 function getAggregateRating(listOfReviews) {
-
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   var counter = 0;
   var ratingValues = [];
   var newElement = {
-    'aggregateRating': {}
+    'aggregateRating': {
+      'value': {}
+    }
   };
 
   listOfReviews = objectToArray(listOfReviews);
 
   Object.keys(listOfReviews).forEach(function(element, pos) {
 
-    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+    if (listOfReviews[pos].reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      ratingValues.push(listOfReviews[pos].reviewRating);
       counter++;
     }
   });
 
-  newElement.aggregateRating.reviewCount = counter;
-  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+  newElement.aggregateRating.value.reviewCount = counter;
+  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
 
   return newElement;
 }
 
-function replaceTypeForOrion(schemaObject) {
-  var parsed = JSON.parse(JSON.stringify(schemaObject), function(key, value) {
-    if (key === '@type') {
-      this.type = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
-function replaceTypeForSchema(element) {
-  var parsed = JSON.parse(JSON.stringify(element), function(key, value) {
-    if (key === 'type') {
-      this['@type'] = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
 function getTimeframe(isoTimeString) {
-  var newDate = new Date(isoTimeString).getTime();
-  var frame = newDate - 60 * 60 * 2 * 1000;
-  var frameTime = 'startTime==' + frame + '..' + newDate;
+  var newDate = new Date(isoTimeString);
+  var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
+  var frameDateObject = new Date(frame);
+  var frameTime = 'startTime==' + frameDateObject.toISOString() +
+  '..' + newDate.toISOString();
   return frameTime;
 }
 
@@ -743,8 +787,8 @@ function getOccupancyLevels(listOfReservations, restaurant) {
 }
 
 function getTimeBetweenDates(from, to) {
-  var fromTimestamp = new Date(from).getTime();
-  var toTimestamp = new Date(to).getTime();
+  var fromTimestamp = new Date(from).toISOString();
+  var toTimestamp = new Date(to).toISOString();
   var frameTime = 'startTime==' + fromTimestamp + '..' + toTimestamp;
   return frameTime;
 }
@@ -752,12 +796,47 @@ function getTimeBetweenDates(from, to) {
 function updateOccupancyLevels(occupancyLevel, date) {
   return {
     'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': date
+        }
+      },
       'type': 'PropertyValue',
-      'timestamp': date,
-      'name': 'occupancyLevels',
       'value': occupancyLevel
     }
   };
+}
+
+function asciiEncode(string) {
+
+  var escapable = /[\\\"\x00-\x1f\x7f-\uffff]/g;
+  var meta = { // table of character substitutions
+    '\b': '\\b',
+    '\t': '\\t',
+    '\n': '\\n',
+    '\f': '\\f',
+    '\r': '\\r',
+    '"': '\\"',
+    '\\': '\\\\'
+  };
+
+  escapable.lastIndex = 0;
+  return escapable.test(string) ?
+  string.replace(escapable, function(a) {
+    var c = meta[a];
+    return typeof c === 'string' ? c :
+    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+  }) : string ;
+}
+
+function stripForbiddenChars(str) {
+  str = str.replace(/[<>"'=;()&?#\s]/g, '_');
+  return str;
+}
+
+function nameToId(name) {
+  return asciiEncode(stripForbiddenChars(name));
 }
 
 module.exports = {
@@ -792,10 +871,11 @@ module.exports = {
   sendRequest: sendRequest,
   getAverage: getAverage,
   getAggregateRating: getAggregateRating,
-  replaceTypeForOrion: replaceTypeForOrion,
-  replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
-  updateOccupancyLevels: updateOccupancyLevels
+  updateOccupancyLevels: updateOccupancyLevels,
+  asciiEncode: asciiEncode,
+  stripForbiddenChars: stripForbiddenChars,
+  nameToId: nameToId
 };

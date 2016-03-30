@@ -38,12 +38,12 @@ var fiwareHeaders = {
 };
 
 var getAddress = function(restaurant) {
-  var address = restaurant.address.streetAddress + ' ';
-  if (restaurant.address.addressLocality) {
-    address += restaurant.address.addressLocality + ' ';
+  var address = restaurant.address.value.streetAddress + ' ';
+  if (restaurant.address.value.addressLocality) {
+    address += restaurant.address.value.addressLocality + ' ';
   }
-  if (restaurant.address.addressRegion) {
-    address += restaurant.address.addressRegion;
+  if (restaurant.address.value.addressRegion) {
+    address += restaurant.address.value.addressRegion;
   }
   return address;
 };
@@ -74,8 +74,8 @@ var feedOrionRestaurants = function() {
     .catch(function(err) {
       if (err.statusCode == '404') {
         var address = getAddress(attributes);
-        if (typeof attributes.department !== 'undefined') {
-          fwHeaders['fiware-servicepath'] = '/' + attributes.department;
+        if (typeof attributes.department.value !== 'undefined') {
+          fwHeaders['fiware-servicepath'] = '/' + attributes.department.value;
         }
         setTimeout(function() {
          geocoder.geocode({address: address, country: 'Spain'})
@@ -132,28 +132,39 @@ var feedOrionRestaurants = function() {
 
     var attr = {
       'type': 'Restaurant',
-      'id': utils.fixedEncodeURIComponent(rname),
+      'id': utils.asciiEncode(utils.stripForbiddenChars(rname)),
       'address': {
-        'type': 'postalAddress'
+        'type': 'PostalAddress',
+        'value': {}
       },
-      'department': utils.randomElement(organization),
+      'name': {
+        'value': utils.fixedEncodeURIComponent(rname)
+      },
+      'department': {
+        'value': utils.randomElement(organization)
+      },
       'capacity': {
         'type': 'PropertyValue',
-        'name': 'capacity',
         'value': utils.randomElement(capacity)
       },
-      'aggregateRating': {},
+      'aggregateRating': {
+        'type': 'AggregateRating',
+        'value': {}
+      },
       'occupancyLevels': {
+        'metadata': {
+          'timestamp': {
+            'type': 'date',
+            'value': new Date().toISOString()
+          }
+        },
         'type': 'PropertyValue',
-        // timestamp in ms
-        'timestamp': new Date().getTime(),
-        'name': 'occupancyLevels',
         'value': 0
       }
     };
 
-    attr.aggregateRating.ratingValue = utils.randomIntInc(1, 5);
-    attr.aggregateRating.reviewCount = utils.randomIntInc(1,
+    attr.aggregateRating.value.ratingValue = utils.randomIntInc(1, 5);
+    attr.aggregateRating.value.reviewCount = utils.randomIntInc(1,
       100);
 
     Object.keys(restaurantsData[pos]).forEach(function(element) {
@@ -163,12 +174,13 @@ var feedOrionRestaurants = function() {
       if (element in addressDictionary) {
 
         if (val !== 'undefined' && val !== '') {
-          element = utils.replaceOnceUsingDictionary(
+          element = utils.fixedEncodeURIComponent(
+            utils.replaceOnceUsingDictionary(
             addressDictionary, element,
             function(key, dictionary) {
               return dictionary[key];
-            });
-          attr.address[utils.fixedEncodeURIComponent(element)] =
+            }));
+          attr.address.value[element] =
           utils.fixedEncodeURIComponent(val);
         }
 
@@ -177,16 +189,19 @@ var feedOrionRestaurants = function() {
 
           if (val !== 'undefined' && val !== '') {
 
-            element = utils.replaceOnceUsingDictionary(
+            element = utils.fixedEncodeURIComponent(
+              utils.replaceOnceUsingDictionary(
               dictionary, element,
               function(key, dictionary) {
                 return dictionary[key];
-              });
+              }));
             if (element == 'priceRange') {
-              attr[utils.fixedEncodeURIComponent(element)] =
+              attr[element] = {};
+              attr[element].value =
               parseFloat(val);
             } else {
-              attr[utils.fixedEncodeURIComponent(element)] =
+              attr[element] = {};
+              attr[element].value =
               utils.fixedEncodeURIComponent(
               utils.convertHtmlToText(val));
             }

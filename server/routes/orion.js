@@ -86,7 +86,8 @@ exports.readRestaurant = function(req, res) {
   var occupancyLevelsObject;
   var restaurant;
   var fiwareHeaders;
-  var actualDate = new Date().getTime();
+  var restaurantId = utils.nameToId(req.params.id);
+  var actualDate = new Date().toISOString();
   timeframeQuery = utils.getTimeframe(actualDate);
   utils.sendRequest('GET', {
         'type': 'FoodEstablishmentReservation',
@@ -99,11 +100,10 @@ exports.readRestaurant = function(req, res) {
       restaurantReservations = data.body;
       actualOccupancyLevels = utils.getOccupancyLevels(
         restaurantReservations,
-        req.params.id);
-      console.log(actualOccupancyLevels);
+        restaurantId);
       occupancyLevelsObject = utils.updateOccupancyLevels(
         actualOccupancyLevels, actualDate);
-      utils.getListByType('Restaurant', req.params.id, req.headers)
+      utils.getListByType('Restaurant', restaurantId, req.headers)
         .then(function(data) {
           restaurant = data.body;
           // add service path for the restaurant
@@ -114,13 +114,13 @@ exports.readRestaurant = function(req, res) {
           }
           utils.sendRequest('PATCH',
               occupancyLevelsObject,
-              req.params.id,
+              restaurantId,
               fiwareHeaders)
             .then(function(data) {
-              utils.getListByType('Restaurant', req.params.id, req.headers)
+              utils.getListByType('Restaurant', restaurantId, req.headers)
                 .then(function(data) {
                   res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
+                  res.json(utils.dataToSchema(data.body, actualDate));
                 })
                 .catch(function(err) {
                   res.statusCode = err.statusCode;
@@ -150,6 +150,7 @@ exports.readRestaurantWithDate = function(req, res) {
   var occupancyLevelsObject;
   var restaurant;
   var fiwareHeaders;
+  var restaurantId = utils.nameToId(req.params.id);
   timeframeQuery = utils.getTimeframe(req.params.date);
   utils.sendRequest('GET', {
         'type': 'FoodEstablishmentReservation',
@@ -163,10 +164,9 @@ exports.readRestaurantWithDate = function(req, res) {
       actualOccupancyLevels = utils.getOccupancyLevels(
         restaurantReservations,
         req.params.id);
-      console.log(actualOccupancyLevels);
       occupancyLevelsObject = utils.updateOccupancyLevels(
         actualOccupancyLevels, req.params.date);
-      utils.getListByType('Restaurant', req.params.id, req.headers)
+      utils.getListByType('Restaurant', restaurantId, req.headers)
         .then(function(data) {
           restaurant = data.body;
           // add service path for the restaurant
@@ -180,10 +180,10 @@ exports.readRestaurantWithDate = function(req, res) {
               req.params.id,
               fiwareHeaders)
             .then(function(data) {
-              utils.getListByType('Restaurant', req.params.id, req.headers)
+              utils.getListByType('Restaurant', restaurantId, req.headers)
                 .then(function(data) {
                   res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
+                  res.json(utils.dataToSchema(data.body, req.params.date));
                 })
                 .catch(function(err) {
                   res.statusCode = err.statusCode;
@@ -207,7 +207,12 @@ exports.readRestaurantWithDate = function(req, res) {
 };
 
 exports.updateRestaurant = function(req, res) {
-  utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
+  var restaurantId = utils.nameToId(req.params.id);
+  utils.sendRequest('PATCH',
+                    req.body,
+                    restaurantId,
+                    req.headers,
+                    {'options': 'keyValues'})
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -219,7 +224,8 @@ exports.updateRestaurant = function(req, res) {
 };
 
 exports.deleteRestaurant = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id, req.headers)
+  var restaurantId = utils.nameToId(req.params.id);
+  utils.sendRequest('DELETE', null, restaurantId, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -265,6 +271,7 @@ exports.getOrganizationRestaurants = function(req, res) {
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
   var restaurantName = elementToOrion.itemReviewed.name;
+  var restaurantId = utils.nameToId(restaurantName);
   var restaurantReviews;
   var aggregateRatings;
   var valid = tv4.validate(elementToOrion, 'review');
@@ -274,7 +281,7 @@ exports.createReview = function(req, res) {
     if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
       delete fwHeaders['fiware-servicepath'];
     }
-    utils.getListByType('Restaurant', restaurantName, fwHeaders)
+    utils.getListByType('Restaurant', restaurantId, fwHeaders)
     .then(function(data) {
       auth.getUserDataPromise(req)
       .then(function(data) {
@@ -289,7 +296,7 @@ exports.createReview = function(req, res) {
             aggregateRatings = utils.getAggregateRating(
               restaurantReviews);
             utils.sendRequest('PATCH', aggregateRatings,
-              restaurantName, req.headers)
+              restaurantId, req.headers)
               .then(function(data) {
                 res.end();
               })
@@ -337,7 +344,8 @@ exports.createReview = function(req, res) {
 };
 
 exports.readReview = function(req, res) {
-  utils.getListByType('Review', req.params.id, req.headers)
+  var reviewId = utils.nameToId(req.params.id);
+  utils.getListByType('Review', reviewId, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.json(utils.dataToSchema(data.body));
@@ -352,13 +360,16 @@ exports.updateReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
   var restaurantName;
+  var restaurantId;
   var userId;
   var servicePath;
   var fixedReviewObject;
-  utils.getListByType('Review', req.params.id, req.headers)
+  var reviewId = utils.nameToId(req.params.id);
+  utils.getListByType('Review', reviewId, req.headers)
     .then(function(data) {
-      restaurantName = data.body.itemReviewed.name;
-      userId = data.body.author.name;
+      restaurantName = data.body.itemReviewed;
+      restaurantId = utils.nameToId(restaurantName);
+      userId = data.body.author;
       auth.getUserDataPromise(req)
         .then(function(data) {
           if (userId !== data.id) {
@@ -376,8 +387,8 @@ exports.updateReview = function(req, res) {
               fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
                 fixedReviewObject.reviewBody);
             }
-            utils.sendRequest('PATCH', fixedReviewObject, req.params.id,
-                req.headers)
+            utils.sendRequest('PATCH', fixedReviewObject, reviewId,
+                req.headers, {'options': 'keyValues'})
               .then(function(data) {
                 var fwHeaders = JSON.parse(JSON.stringify(req.headers));
                 if (typeof fwHeaders['fiware-servicepath'] !==
@@ -391,14 +402,14 @@ exports.updateReview = function(req, res) {
                       data.body);
                     aggregateRatings = utils.getAggregateRating(
                       restaurantReviews);
-                    utils.getListByType('Restaurant', restaurantName,
+                    utils.getListByType('Restaurant', restaurantId,
                         req.headers)
                       .then(function(data) {
                         servicePath = data.body.department;
                         req.headers['fiware-servicepath'] = '/' +
                           servicePath;
                         utils.sendRequest('PATCH', aggregateRatings,
-                            restaurantName, req.headers)
+                            restaurantId, req.headers)
                           .then(function(data) {
                             res.end();
                           })
@@ -439,15 +450,18 @@ exports.updateReview = function(req, res) {
 exports.deleteReview = function(req, res) {
   var restaurantReviews;
   var aggregateRatings;
-  var restaurantName;
   var servicePath;
-  utils.getListByType('Review', req.params.id, req.headers)
+  var restaurantName;
+  var restaurantId;
+  var reviewId = utils.nameToId(req.params.id);
+  utils.getListByType('Review', reviewId, req.headers)
     .then(function(data) {
-      restaurantName = data.body.itemReviewed.name;
-      utils.getListByType('Restaurant', restaurantName, req.headers)
+      restaurantName = data.body.itemReviewed;
+      restaurantId = utils.nameToId(restaurantName);
+      utils.getListByType('Restaurant', restaurantId, req.headers)
         .then(function(data) {
           servicePath = data.body.department;
-          utils.sendRequest('DELETE', null, req.params.id, req.headers)
+          utils.sendRequest('DELETE', null, reviewId, req.headers)
             .then(function(data) {
               utils.getListByType('Review', null, req.headers)
                 .then(function(data) {
@@ -458,7 +472,7 @@ exports.deleteReview = function(req, res) {
                     restaurantReviews);
                   req.headers['fiware-servicepath'] = '/' + servicePath;
                   utils.sendRequest('PATCH', aggregateRatings,
-                      restaurantName, req.headers)
+                      restaurantId, req.headers)
                     .then(function(data) {
                       res.end();
                     })
@@ -564,15 +578,16 @@ exports.createReservation = function(req, res) {
   var capacity;
   var actualOccupancyLevels;
   var timeframeQuery;
+  var restaurantId = utils.nameToId(req.body.reservationFor.name);
   var valid = tv4.validate(req.body, 'reservation');
   if (valid) {
     // -- We first get information regarding the restaurant
     utils.getListByType('Restaurant',
-        req.body.reservationFor.name,
+        restaurantId,
         req.headers)
     .then(function(data) {
       elementToOrion = req.body;
-      elementToOrion.reservationFor.address = data.body.address;
+      elementToOrion.address = data.body.address;
       capacity = data.body.capacity.value;
       timeframeQuery = utils.getTimeframe(req.body.startTime);
       utils.sendRequest('GET', {
@@ -644,8 +659,9 @@ exports.createReservation = function(req, res) {
 };
 
 exports.readReservation = function(req, res) {
+  var reservationId = utils.nameToId(req.params.id);
   utils.getListByType('FoodEstablishmentReservation',
-                      req.params.id,
+                      reservationId,
                       req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
@@ -660,11 +676,12 @@ exports.readReservation = function(req, res) {
 exports.updateReservation = function(req, res) {
   var restaurantName;
   var userId;
+  var reservationId = utils.nameToId(req.params.id);
   utils.getListByType('FoodEstablishmentReservation',
-                      req.params.id,
+                      reservationId,
                       req.headers)
   .then(function(data) {
-    userId = data.body.underName.name;
+    userId = data.body.underName;
     auth.getUserDataPromise(req)
     .then(function(data) {
       if (userId !== data.id) {
@@ -677,7 +694,11 @@ exports.updateReservation = function(req, res) {
           }
         });
       } else {
-        utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
+        utils.sendRequest('PATCH',
+                          req.body,
+                          reservationId,
+                          req.headers,
+                          {'options': 'keyValues'})
         .then(function(data) {
           res.statusCode = data.statusCode;
           res.end();
@@ -700,7 +721,8 @@ exports.updateReservation = function(req, res) {
 };
 
 exports.deleteReservation = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id, req.headers)
+  var reservationId = utils.nameToId(req.params.id);
+  utils.sendRequest('DELETE', null, reservationId, req.headers)
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
