@@ -36,7 +36,7 @@ idm:
         - AUTHZFORCE_VERSION=4.4.1b
 
 pepwilma:
-    image: bitergia/pep-wilma:4.3.0
+    image: fiware/pep-proxy:latest
     hostname: pepwilma
     links:
         - orion
@@ -44,12 +44,15 @@ pepwilma:
         - authzforce
     volumes_from:
         - idm
+        - tourguide-config
     expose:
         - "1026"
     environment:
         - APP_HOSTNAME=orion
         - APP_PORT=1026
         - AUTHZFORCE_VERSION=4.4.1b
+        - PEP_RELEASE=5.1
+    entrypoint: /tourguide/pep-wilma/docker-entrypoint.sh
 
 idasiotacpp:
     image: bitergia/idas-iota-cpp:1.2.0
