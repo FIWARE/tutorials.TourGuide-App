@@ -86,8 +86,8 @@ exports.readRestaurant = function(req, res) {
   var occupancyLevelsObject;
   var restaurant;
   var fiwareHeaders;
-  var actualDate = new Date().getTime();
   var restaurantId = utils.nameToId(req.params.id);
+  var actualDate = new Date().toISOString();
   timeframeQuery = utils.getTimeframe(actualDate);
   utils.sendRequest('GET', {
         'type': 'FoodEstablishmentReservation',
@@ -120,7 +120,7 @@ exports.readRestaurant = function(req, res) {
               utils.getListByType('Restaurant', restaurantId, req.headers)
                 .then(function(data) {
                   res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
+                  res.json(utils.dataToSchema(data.body, actualDate));
                 })
                 .catch(function(err) {
                   res.statusCode = err.statusCode;
@@ -183,7 +183,7 @@ exports.readRestaurantWithDate = function(req, res) {
               utils.getListByType('Restaurant', restaurantId, req.headers)
                 .then(function(data) {
                   res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
+                  res.json(utils.dataToSchema(data.body, req.params.date));
                 })
                 .catch(function(err) {
                   res.statusCode = err.statusCode;
