@@ -587,7 +587,7 @@ exports.createReservation = function(req, res) {
         req.headers)
     .then(function(data) {
       elementToOrion = req.body;
-      elementToOrion.reservationFor.address = data.body.address;
+      elementToOrion.address = data.body.address;
       capacity = data.body.capacity.value;
       timeframeQuery = utils.getTimeframe(req.body.startTime);
       utils.sendRequest('GET', {
@@ -681,7 +681,7 @@ exports.updateReservation = function(req, res) {
                       reservationId,
                       req.headers)
   .then(function(data) {
-    userId = data.body.underName.name;
+    userId = data.body.underName;
     auth.getUserDataPromise(req)
     .then(function(data) {
       if (userId !== data.id) {
