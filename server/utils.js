@@ -236,13 +236,10 @@ function objectToArray(element) {
   return element;
 }
 
-function restaurantToSchema(element) {
+function restaurantToSchema(element, date) {
 
-  //-- List elements matching
   var restaurantSchemaElements = [
     'address',
-    'aggregateRating',
-    'name',
     'department',
     'description',
     'priceRange',
@@ -250,27 +247,34 @@ function restaurantToSchema(element) {
     'url'
   ];
 
-  // sensors data
-  var additionalProperties = [
-    'Kitchen_temperature',
-    'Kitchen_humidity',
-    'Dining_temperature',
-    'Dining_humidity',
-    'occupancyLevels',
-    'capacity'
-  ];
-
-  restaurantSchemaElements.push.apply(restaurantSchemaElements,
-                                      additionalProperties);
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Restaurant',
+    'aggregateRating': {
+      'reviewCount': element.aggregateRating.reviewCount,
+      'ratingValue': element.aggregateRating.ratingValue
+    },
+    'additionalProperty': [
+      {
+        'value': element.capacity,
+        'name': 'capacity',
+        '@type': 'PropertyValue'
+      },
+      {
+        'value': element.occupancyLevels,
+        'name': 'occupancyLevels',
+        '@type': 'PropertyValue'
+      }
+    ],
+    'name': element.name
   };
 
-  // array for sensors
-  var additionalProperty = [];
+  if (date) {
+    elementToSchema.additionalProperty[1].timestamp = date;
+  } else {
+    elementToSchema.additionalProperty[1].timestamp = new Date().toISOString();
+  }
 
-  // -- Element value
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
@@ -279,43 +283,29 @@ function restaurantToSchema(element) {
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
       if (val !== 'undefined') {
-        if (additionalProperties.indexOf(elementAttribute) !== -1) {
-          if (val.timestamp) {
-            var newDate = new Date(val.timestamp).toISOString();
-            val.timestamp = newDate;
-          }
-          additionalProperty.push(val);
+        if (typeof val === 'string') {
+          elementToSchema[elementAttribute] = unescape(val);
         } else {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
+          elementToSchema[elementAttribute] = val;
         }
       }
     }
   });
 
-  if (additionalProperty.length) {
-    newElement.additionalProperty = additionalProperty;
+  if (elementToSchema.address) {
+    elementToSchema.address['@type'] = 'postalAddress';
   }
 
-  newElement.name = unescape(element.id);
-
-  newElement = replaceTypeForSchema(newElement);
-
-  // -- Display geo-location schema.org like
-
-  if (element.position &&
-      element.position.value &&
-      typeof element.position.value === 'string') {
-    var geoCoords = element.position.value.split(',');
-    newElement.geo = {};
-    newElement.geo['@type'] = 'GeoCoordinates';
-    newElement.geo.latitude = geoCoords[0];
-    newElement.geo.longitude = geoCoords[1];
+  if (element.location) {
+    var geoCoords = element.location.split(',');
+    elementToSchema.geo = {
+      '@type': 'GeoCoordinates',
+      'latitude': geoCoords[0],
+      'longitude': geoCoords[1]
+    };
   }
-  return newElement;
+
+  return sortObject(elementToSchema);
 }
 
 function reviewToSchema(element) {
