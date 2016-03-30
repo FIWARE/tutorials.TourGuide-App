@@ -21,7 +21,7 @@ var port = 1026;
 
 module.exports = performRequest;
 
-function performRequest(endpoint, method, data, fiwareHeaders) {
+function performRequest(endpoint, method, data, fiwareHeaders, payload) {
 
   var deferred = Q.defer();
   var headers = {};
@@ -54,9 +54,12 @@ function performRequest(endpoint, method, data, fiwareHeaders) {
       resolveWithFullResponse: true,
       json: true // Automatically stringifies the body to JSON
     };
+    if (typeof payload !== 'undefined') {
+      endpoint += '?' + querystring.stringify(payload);
+      options.uri = host + ':' + port + endpoint;
+    }
     break;
   case 'PATCH':
-    endpoint += '?' + querystring.stringify(data);
     options = {
       method: 'PATCH',
       uri: host + ':' + port + endpoint,
@@ -65,6 +68,10 @@ function performRequest(endpoint, method, data, fiwareHeaders) {
       resolveWithFullResponse: true,
       json: true
     };
+    if (typeof payload !== 'undefined') {
+      endpoint += '?' + querystring.stringify(payload);
+      options.uri = host + ':' + port + endpoint;
+    }
     break;
   case 'DELETE':
     endpoint += '?' + querystring.stringify(data);
