@@ -794,28 +794,6 @@ function getAggregateRating(listOfReviews) {
   return newElement;
 }
 
-function replaceTypeForOrion(schemaObject) {
-  var parsed = JSON.parse(JSON.stringify(schemaObject), function(key, value) {
-    if (key === '@type') {
-      this.type = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
-function replaceTypeForSchema(element) {
-  var parsed = JSON.parse(JSON.stringify(element), function(key, value) {
-    if (key === 'type') {
-      this['@type'] = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
 function getTimeframe(isoTimeString) {
   var newDate = new Date(isoTimeString);
   var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
@@ -925,8 +903,6 @@ module.exports = {
   sendRequest: sendRequest,
   getAverage: getAverage,
   getAggregateRating: getAggregateRating,
-  replaceTypeForOrion: replaceTypeForOrion,
-  replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
