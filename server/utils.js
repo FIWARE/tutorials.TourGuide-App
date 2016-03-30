@@ -310,42 +310,31 @@ function restaurantToSchema(element, date) {
 
 function reviewToSchema(element) {
 
-  var reviewSchemaElements = [
-    'itemReviewed',
-    'reviewRating',
-    'name',
-    'author',
-    'reviewBody',
-    'publisher',
-    'dateCreated'
-  ];
-
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Review',
+    'author': {
+      '@type': 'Person',
+      'name': element.author
+    },
+    'dateCreated': element.dateCreated,
+    'itemReviewed': {
+      '@type': 'Restaurant',
+      'name': element.itemReviewed
+    },
+    'name': unescape(element.id),
+    'publisher': {
+      '@type': 'Organization',
+      'name': element.publisher
+    },
+    'reviewBody': element.reviewBody,
+    'reviewRating': {
+      '@type': 'Rating',
+      'ratingValue': element.reviewRating
+    }
   };
 
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-      val = element[elementAttribute];
-      if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
-        if (val !== 'undefined') {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
-        }
-      }
-    });
-
-  var newDate = new Date(newElement.dateCreated).toISOString();
-  newElement.dateCreated = newDate;
-  newElement.name = unescape(element.id);
-  newElement = replaceTypeForSchema(newElement);
-
-  return newElement;
+  return sortObject(elementToSchema);
 }
 
 function reservationToSchema(element) {
