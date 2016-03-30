@@ -872,7 +872,7 @@ function asciiEncode(string) {
 }
 
 function stripForbiddenChars(str) {
-  str = str.replace(/[<>"'=;()\s]/g, '_');
+  str = str.replace(/[<>"'=;()&?#\s]/g, '_');
   return str;
 }
 
