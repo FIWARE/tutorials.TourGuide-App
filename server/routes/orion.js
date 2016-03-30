@@ -207,7 +207,12 @@ exports.readRestaurantWithDate = function(req, res) {
 };
 
 exports.updateRestaurant = function(req, res) {
-  utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
+  var restaurantId = utils.nameToId(req.params.id);
+  utils.sendRequest('PATCH',
+                    req.body,
+                    restaurantId,
+                    req.headers,
+                    {'options': 'keyValues'})
     .then(function(data) {
       res.statusCode = data.statusCode;
       res.end();
@@ -376,8 +381,8 @@ exports.updateReview = function(req, res) {
               fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
                 fixedReviewObject.reviewBody);
             }
-            utils.sendRequest('PATCH', fixedReviewObject, req.params.id,
-                req.headers)
+            utils.sendRequest('PATCH', fixedReviewObject, reviewId,
+                req.headers, {'options': 'keyValues'})
               .then(function(data) {
                 var fwHeaders = JSON.parse(JSON.stringify(req.headers));
                 if (typeof fwHeaders['fiware-servicepath'] !==
@@ -677,7 +682,11 @@ exports.updateReservation = function(req, res) {
           }
         });
       } else {
-        utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
+        utils.sendRequest('PATCH',
+                          req.body,
+                          reservationId,
+                          req.headers,
+                          {'options': 'keyValues'})
         .then(function(data) {
           res.statusCode = data.statusCode;
           res.end();
