@@ -58,15 +58,18 @@ frisby.create('OAuth2 login')
         'telephone': '912345678',
         'url': 'http://www.example.com',
         'capacity': {
-          'type': 'PropertyValue',
-          'name': 'capacity',
+          '@type': 'PropertyValue',
           'value': 200
         },
         'occupancyLevels': {
-          'type': 'PropertyValue',
-          'timestamp': new Date().toISOString(),
-          'name': 'occupancyLevels',
-          'value': 0
+          '@type': 'PropertyValue',
+          'value': 0,
+          'metadata': {
+            'timestamp': {
+              '@type': 'date',
+              'value': new Date().toISOString()
+            }
+          }
         }
       }, {
         json: true
