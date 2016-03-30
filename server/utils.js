@@ -339,43 +339,32 @@ function reviewToSchema(element) {
 
 function reservationToSchema(element) {
 
-  var reservationSchemaElements = [
-    'reservationStatus',
-    'underName',
-    'reservationFor',
-    'startTime',
-    'partySize'
-  ];
-
-  var newElement = {
-    '@context': 'http://schema.org',
-    '@type': element.type
-  };
-
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-    val = element[elementAttribute];
-    if (reservationSchemaElements.indexOf(elementAttribute) !==
-      -1) {
-      if (val !== 'undefined') {
-        if (typeof val === 'string') {
-          newElement[elementAttribute] = unescape(val);
-        } else {
-          newElement[elementAttribute] = val;
+  var elementToSchema = {
+      '@context': 'http://schema.org',
+      '@type': 'FoodEstablishmentReservation',
+      'partySize': element.partySize,
+      'reservationFor': {
+        '@type': 'FoodEstablishment',
+        'name': element.reservationFor,
+        'address': {
+          '@type': 'postalAddress',
+          'streetAddress': element.address.streetAddress,
+          'addressRegion': element.address.addressRegion,
+          'addressLocality': element.address.addressLocality,
+          'postalCode': element.address.postalCode,
         }
-      }
-    }
-  });
-  var newDate = new Date(newElement.startTime).toISOString();
-  newElement.startTime = newDate;
-  newElement.reservationId = unescape(element.id);
-  newElement.reservationFor.name = unescape(
-    newElement.reservationFor.name);
+      },
+      'reservationStatus': element.reservationStatus,
+      'startTime': element.startTime,
+      'underName': {
+        '@type': 'Person',
+        'name': element.underName
+      },
+      'reservationId': unescape(element.id)
+    };
 
-  newElement = replaceTypeForSchema(newElement);
+  return sortObject(elementToSchema);
 
-  return newElement;
 }
 
 function objectDataToSchema(element, date) {
