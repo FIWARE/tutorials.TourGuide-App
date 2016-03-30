@@ -399,7 +399,7 @@ function reservationToSchema(element) {
   return newElement;
 }
 
-function objectDataToSchema(element) {
+function objectDataToSchema(element, date) {
 
   var newElement;
   var type = element.type;
@@ -408,7 +408,11 @@ function objectDataToSchema(element) {
 
   case 'Restaurant':
 
-    newElement = restaurantToSchema(element);
+    if (typeof date !== 'undefined') {
+      newElement = restaurantToSchema(element, date);
+    } else {
+      newElement = restaurantToSchema(element);
+    }
     return newElement;
 
   case 'Review':
@@ -446,7 +450,7 @@ function sortObject(element) {
   return sorted;
 }
 
-function dataToSchema(listOfElements) {
+function dataToSchema(listOfElements, date) {
 
   var newListOfElements = [];
   var newElement;
@@ -454,12 +458,14 @@ function dataToSchema(listOfElements) {
   listOfElements = objectToArray(listOfElements);
 
   Object.keys(listOfElements).forEach(function(element, pos) {
-
-    newElement = objectDataToSchema(listOfElements[pos]);
+    if (typeof date !== 'undefined') {
+      newElement = objectDataToSchema(listOfElements[pos], date);
+    } else {
+      newElement = objectDataToSchema(listOfElements[pos]);
+    }
     newListOfElements.push(newElement);
 
   });
-
   return newListOfElements;
 }
 
@@ -807,9 +813,11 @@ function replaceTypeForSchema(element) {
 }
 
 function getTimeframe(isoTimeString) {
-  var newDate = new Date(isoTimeString).getTime();
-  var frame = newDate - 60 * 60 * 2 * 1000;
-  var frameTime = 'startTime==' + frame + '..' + newDate;
+  var newDate = new Date(isoTimeString);
+  var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
+  var frameDateObject = new Date(frame);
+  var frameTime = 'startTime==' + frameDateObject.toISOString() +
+  '..' + newDate.toISOString();
   return frameTime;
 }
 
@@ -829,8 +837,8 @@ function getOccupancyLevels(listOfReservations, restaurant) {
 }
 
 function getTimeBetweenDates(from, to) {
-  var fromTimestamp = new Date(from).getTime();
-  var toTimestamp = new Date(to).getTime();
+  var fromTimestamp = new Date(from).toISOString();
+  var toTimestamp = new Date(to).toISOString();
   var frameTime = 'startTime==' + fromTimestamp + '..' + toTimestamp;
   return frameTime;
 }
