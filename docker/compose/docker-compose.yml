@@ -131,3 +131,11 @@ tourguide:
         - idm
     # volumes:
     #     - ~/devel/fiware/tutorials.TourGuide-App:/home/tourguide/tutorials.TourGuide-App
+
+tourguide-config:
+    build: ../images/tutorials.tourguide-app.config
+    hostname: tourguide-config
+    volumes:
+        - /tourguide
+    command: /bin/echo 'tourguide configuration'
+    restart: "no"
