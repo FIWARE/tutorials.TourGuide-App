@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -5,99 +6,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
 
-   <!-- FI-WARE styles -->
-    <link href="stylesheets/styles.css" rel="stylesheet">
-  
-    <!-- Addons Styles -->
-    <!--<link href="addons/.../css/file.css" rel="stylesheet"> -->
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="javascripts/bootstrap/bootstrap.min.js"></script>
-    <!-- Addons Javascripts -->
-    <!--<script src="addons/.../js/file.min.js"></script> -->
-
-        <!-- Addons Javascripts -->
-    <script src="javascripts/bootstrap/modal.js"></script>
-    <!-- <script src="javascripts/bootstrap/dropdown.js"></script> -->
-
-
-
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+  <!-- FIWARE styles -->
+  <link href="stylesheets/styles.css" rel="stylesheet">
+  <!-- Addons Styles -->
+  <!-- jequeryui -->
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
+  <!-- leaflet -->
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
+  <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+  <!-- app specific styles -->
+  <link rel=stylesheet type=text/css href="stylesheets/app.css">
 
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <!-- JavaScripts -->
+  <!-- jQuery (necessary for Bootstrap and other JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="js/bootstrap/bootstrap.min.js"></script>
+  <!-- Addons Javascripts -->
+  <!--<script src="addons/.../js/file.min.js"></script> -->
+  <script src="js/bootstrap/modal.js"></script>
+  <!-- <script src="javascripts/bootstrap/dropdown.js"></script> -->
+  <!-- jqueryui -->
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
-    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+  <!-- leaflet JS -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
 
-    <link rel=stylesheet type=text/css href="css/app.css">
+  <!-- app JS -->
+  <script src="js/utils.js"></script>
+  <script src="js/restaurantsAPI.js"></script>
+  <script src="js/connectionsAPI.js"></script>
+  <script src="js/myReservations.js"></script>
 
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
-    <script src="js/js_utils.js"></script>
-    <script src="js/restaurants_api.js"></script>
-    <script src="js/connections_api.js"></script>
-    <script src="js/myReservations.js"></script>
-
-<title> FIWARE TEST</title>
+  <title>My reservations</title>
 
 </head>
 <body>
 
 <div class="container-fluid">
-  <nav id="top_menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
-    <div id='logged_div' class="navbar navbar-default" role="navigation">
-        <p>Checking if logged </p>
-
+  <nav id="topMenu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
+    <div id='loggedDiv' class="navbar navbar-default" role="navigation">
+      <p>Checking if logged </p>
     </div>
   </nav>
-  <!--<div id='map'  class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> -->
-  <div id='reservations_list_div'>
-    <ul id='reservation_list' class="hidden">
+  <div id='reservationsListDiv'>
+    <ul id='reservationList' class="hidden">
     </ul>
-    <!-- <table id="reservations_table" class="table table-hover">-->
     <div class="table-fixed-container">
-      <table id="reservations_table" class="table table-fixed table-hover reservations-table">
-      <thead>
-        <tr>
-          <th>Restaurant</th>
-          <th>Date</th>
-          <th>Commensals</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="reservations_table_body">
-      </tbody>
+      <table id="reservationsTable" class="table table-fixed table-hover reservations-table">
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Date</th>
+            <th>Diners</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="reservationsTableBody">
+        </tbody>
       </table>
     </div>
   </div>
-
-  <div id='pop_window' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="pop_title">
+  <div id='popWindow' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="popTitle">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4  id ="pop_title" class="modal-title">Modal Header</h4>
+          <h4  id ="popTitle" class="modal-title">Modal Header</h4>
         </div>
-        <div id="pop_content" class="modal-body">
+        <div id="popContent" class="modal-body">
         </div>
       </div>
-
     </div>
   </div>
-</div>
-
-
 </div>
 </body>
 </html>
