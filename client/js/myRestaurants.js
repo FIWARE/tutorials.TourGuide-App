@@ -9,8 +9,10 @@
  * MIT Licensed
 
 */
-//initialization
 var map;
+var restaurantsAPI;
+var utils;
+//initialization
 var initIndex = function() {
   map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 

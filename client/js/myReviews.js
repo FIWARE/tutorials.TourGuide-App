@@ -9,6 +9,9 @@
  * MIT Licensed
 
 */
+var connectionsAPI;
+var restaurantsAPI;
+var utils;
 //initialization
 var initReviews = function() {
   //only gets reviews if the user is logged
