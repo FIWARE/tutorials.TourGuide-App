@@ -50,7 +50,6 @@ pepwilma:
     environment:
         - APP_HOSTNAME=orion
         - APP_PORT=1026
-        - AUTHZFORCE_VERSION=4.4.1b
         - PEP_RELEASE=5.1
     entrypoint: /tourguide/pep-wilma/docker-entrypoint.sh
 
