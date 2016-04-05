@@ -49,7 +49,7 @@ if [ $# -eq 0 -o "${1:0:1}" = '-' ] ; then
 
     check_var AUTHZFORCE_HOSTNAME authzforce
     check_var AUTHZFORCE_PORT 8080
-    check_var AUTHZFORCE_VERSION 4.2.0
+    check_var AUTHZFORCE_VERSION 4.4.1b
     case "${AUTHZFORCE_VERSION}" in
         "4.2.0")
             check_var AUTHZFORCE_BASE_PATH authzforce
