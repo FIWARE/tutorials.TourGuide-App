@@ -133,7 +133,7 @@ var feedOrionRestaurants = function() {
 
     var attr = {
       'type': 'Restaurant',
-      'id': rname,
+      'id': utils.generateId(rname),
       'address': {
         'type': 'PostalAddress',
         'value': {}

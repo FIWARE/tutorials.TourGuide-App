@@ -56,13 +56,13 @@ var feedOrionReservations = function() {
 
   Object.keys(restaurantsData).forEach(function(element, index) {
 
-    var reservationId = restaurantsData[index].id + '-' + shortid.generate();
-
+    var reservedRestaurant = restaurantsData[index].name;
+    var date = new Date().toISOString();
     var reservations = ['Cancelled', 'Confirmed', 'Hold', 'Pending'];
 
     var attr = {
       'type': 'FoodEstablishmentReservation',
-      'id': reservationId,
+      'id': utils.generateId(reservedRestaurant, date),
       'reservationStatus': {
         'value': utils.randomElement(reservations)
       },
@@ -72,7 +72,7 @@ var feedOrionReservations = function() {
       },
       'reservationFor': {
         'type': 'FoodEstablishment',
-        'value': utils.fixedEncodeURIComponent(restaurantsData[pos].name)
+        'value': reservedRestaurant
       },
       'address': {
         'type': 'PostalAddress',

@@ -61,14 +61,15 @@ var feedOrionReviews = function() {
 
   Object.keys(restaurantsData).forEach(function(element, index) {
 
-    var reviewId = restaurantsData[index].id + '-' + shortid.generate();
+    var reviewedRestaurant = restaurantsData[index].name;
+    var date = new Date().toISOString();
 
     var attr = {
       'type': 'Review',
-      'id': reviewId,
+      'id': utils.generateId(reviewedRestaurant, date),
       'itemReviewed': {
         'type': 'Restaurant',
-        'value': restaurantsData[index].name
+        'value': reviewedRestaurant
       },
       'reviewRating': {
         'type': 'Rating',
@@ -83,7 +84,7 @@ var feedOrionReviews = function() {
       },
       'dateCreated': {
         'type': 'date',
-        'value': new Date().toISOString()
+        'value': date
       },
       'publisher': {
         'type': 'Organization',
@@ -109,16 +110,15 @@ var triggerRestaurantsRatings = function() {
   var servicePath;
 
   var q = async.queue(function(task, callback) {
-
+    var restaurantId = utils.generateId(task.restaurantName);
     setTimeout(function() {
-      utils.getListByType('Restaurant', task.restaurantName, fiwareHeaders)
+      utils.getListByType('Restaurant', restaurantId, fiwareHeaders)
       .then(function(data) {
         var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
         if (data.body.department) {
           fwHeaders['fiware-servicepath'] = '/' + data.body.department;
         }
-        utils.sendRequest('PATCH', task.aggregateRatings,
-          task.restaurantName, fwHeaders)
+        utils.sendRequest('PATCH', task.aggregateRatings, restaurantId, fwHeaders)
         .then(callback)
         .catch(function(err) {
           console.log(err.error);

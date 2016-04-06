@@ -15,6 +15,7 @@
 var http = require('http');
 var https = require('https');
 var util = require('util');
+var crypto = require('crypto');
 var shortid = require('shortid');
 var authRequest = require('./auth/authrequest');
 
@@ -785,6 +786,14 @@ function updateOccupancyLevels(occupancyLevel, date) {
   };
 }
 
+function generateId(name, date) {
+  if (date) {
+  return crypto.createHash('sha1').update(name + date).digest('hex');
+  } else {
+  return crypto.createHash('sha1').update(name).digest('hex');
+  }
+}
+
 module.exports = {
   doGet: doGet,
   doPost: doPost,
@@ -822,5 +831,6 @@ module.exports = {
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
-  updateOccupancyLevels: updateOccupancyLevels
+  updateOccupancyLevels: updateOccupancyLevels,
+  generateId: generateId
 };
