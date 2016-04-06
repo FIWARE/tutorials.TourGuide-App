@@ -43,7 +43,6 @@ var feedOrionReservations = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-
     utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
@@ -55,29 +54,38 @@ var feedOrionReservations = function() {
     console.log('Total reservations added: ' + reservationsAdded);
   };
 
-  Object.keys(restaurantsData).forEach(function(element, pos) {
-    // Call orion to append the entity
-    var restaurantName = restaurantsData[pos].id + '-' + shortid.generate();
+  Object.keys(restaurantsData).forEach(function(element, index) {
+
+    var reservationId = restaurantsData[index].id + '-' + shortid.generate();
 
     var reservations = ['Cancelled', 'Confirmed', 'Hold', 'Pending'];
 
     var attr = {
       'type': 'FoodEstablishmentReservation',
-      'id': restaurantName,
-      'reservationStatus': utils.randomElement(reservations),
-      'underName': {},
-      'reservationFor': {},
-      'startTime': utils.getRandomDate().getTime(),
-      'partySize': utils.randomIntInc(1, 20)
+      'id': reservationId,
+      'reservationStatus': {
+        'value': utils.randomElement(reservations)
+      },
+      'underName': {
+        'type': 'Person',
+        'value': 'user' + utils.randomIntInc(1, 10)
+      },
+      'reservationFor': {
+        'type': 'FoodEstablishment',
+        'value': utils.fixedEncodeURIComponent(restaurantsData[pos].name)
+      },
+      'address': {
+        'type': 'PostalAddress',
+        'value': restaurantsData[index].address
+      },
+      'startTime': {
+        'type': 'date',
+        'value': utils.getRandomDate().toISOString()
+      },
+      'partySize': {
+        'value': utils.randomIntInc(1, 20)
+      }
     };
-
-    // Time to add first attribute to orion as first approach
-    attr.underName.type = 'Person';
-    attr.underName.name = 'user' + utils.randomIntInc(1, 10);
-
-    attr.reservationFor.type = 'FoodEstablishment';
-    attr.reservationFor.name = restaurantsData[pos].id;
-    attr.reservationFor.address = restaurantsData[pos].address;
 
     q.push({
       'attributes': attr
