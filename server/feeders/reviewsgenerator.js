@@ -47,7 +47,6 @@ var feedOrionReviews = function() {
   // Limit the number of calls to be done in parallel to orion
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
-
     utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
@@ -60,34 +59,37 @@ var feedOrionReviews = function() {
     triggerRestaurantsRatings();
   };
 
-  Object.keys(restaurantsData).forEach(function(element, pos) {
-    // Call orion to append the entity
-    var rname = restaurantsData[pos].id;
-    rname += '-' + shortid.generate();
-    // Time to add first attribute to orion as first approach
+  Object.keys(restaurantsData).forEach(function(element, index) {
+
+    var reviewId = restaurantsData[index].id + '-' + shortid.generate();
 
     var attr = {
       'type': 'Review',
-      'id': rname,
-      'itemReviewed': {},
-      'reviewRating': {},
-      'author': {},
-      'reviewBody': 'Body review',
-      'dateCreated': new Date().getTime(),
-      'publisher': {}
+      'id': reviewId,
+      'itemReviewed': {
+        'type': 'Restaurant',
+        'value': restaurantsData[index].name
+      },
+      'reviewRating': {
+        'type': 'Rating',
+        'value': utils.randomIntInc(1, 5)
+      },
+      'author': {
+        'type': 'Person',
+        'value': 'user' + utils.randomIntInc(1, 10)
+      },
+      'reviewBody': {
+        'value': 'Body review'
+      },
+      'dateCreated': {
+        'type': 'date',
+        'value': new Date().toISOString()
+      },
+      'publisher': {
+        'type': 'Organization',
+        'value': 'Bitergia'
+      }
     };
-
-    attr.itemReviewed.type = 'Restaurant';
-    attr.itemReviewed.name = restaurantsData[pos].id;
-
-    attr.reviewRating.type = 'Rating';
-    attr.reviewRating.ratingValue = utils.randomIntInc(1, 5);
-
-    attr.author.type = 'Person';
-    attr.author.name = 'user' + utils.randomIntInc(1, 10);
-
-    attr.publisher.type = 'Organization';
-    attr.publisher.name = 'Bitergia';
 
     q.push({
       'attributes': attr
@@ -112,7 +114,7 @@ var triggerRestaurantsRatings = function() {
       utils.getListByType('Restaurant', task.restaurantName, fiwareHeaders)
       .then(function(data) {
         var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
-        if (typeof data.body.department !== 'undefined') {
+        if (data.body.department) {
           fwHeaders['fiware-servicepath'] = '/' + data.body.department;
         }
         utils.sendRequest('PATCH', task.aggregateRatings,
@@ -136,8 +138,8 @@ var triggerRestaurantsRatings = function() {
   utils.getListByType('Review', null, fiwareHeaders)
   .then(function(data) {
     reviews = data.body;
-    Object.keys(restaurantsData).forEach(function(element, pos) {
-      var restaurantName = restaurantsData[pos].id;
+    Object.keys(restaurantsData).forEach(function(element, index) {
+      var restaurantName = restaurantsData[index].name;
       restaurantReviews = utils.getRestaurantReviews(
         restaurantName,
         reviews);
