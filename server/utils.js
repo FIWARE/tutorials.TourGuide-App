@@ -641,15 +641,20 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   );
 }
 
-function getListByType(type, element, headers) {
+function getListByType(type, element, headers, normalized) {
   var uri = '/v2/entities';
+  var options = {'type': type,'limit': '1000'};
   if (element) {
     uri += '/' + encodeURIComponent(element);
+  }
+
+  if (typeof normalized === 'undefined') {
+    options.options = 'keyValues';
   }
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'},
+    options,
     headers
   );
 }
