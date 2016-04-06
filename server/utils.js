@@ -464,44 +464,47 @@ function dataToSchema(listOfElements) {
 }
 
 function fixAddress(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
-      schemaObject.address.streetAddress =
+      schemaObject.address.value.streetAddress =
       geoObject.streetName +
       ' ' + geoObject.streetNumber;
     } else if (geoObject.streetName) {
-      schemaObject.address.streetAddress = geoObject.streetName;
+      schemaObject.address.value.streetAddress = geoObject.streetName;
     }
     if (geoObject.city) {
-      schemaObject.address.addressLocality = geoObject.city;
+      schemaObject.address.value.addressLocality = geoObject.city;
     } else if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressLocality =
+      schemaObject.address.value.addressLocality =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.administrativeLevels.level2long) {
-      schemaObject.address.addressRegion =
+      schemaObject.address.value.addressRegion =
       geoObject.administrativeLevels
       .level2long;
     }
     if (geoObject.zipcode) {
-      schemaObject.address.postalCode = geoObject.zipcode;
+      schemaObject.address.value.postalCode = geoObject.zipcode;
     }
   }
   return schemaObject;
 }
 
 function addGeolocation(schemaObject, geoObject) {
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   if (geoObject) {
-    schemaObject.position = {};
-    schemaObject.position.type = 'coords';
-    schemaObject.position.location = 'WGS84';
-    schemaObject.position.value = geoObject.latitude + ', ' +
-      geoObject.longitude;
+    schemaObject.location = {
+      'type': 'geo:point',
+      'value': geoObject.latitude + ', ' +
+        geoObject.longitude
+    };
   }
   return schemaObject;
 }
-
 function restaurantToOrion(schemaObject, geoObject) {
 
   schemaObject = replaceTypeForOrion(schemaObject);
@@ -577,7 +580,7 @@ function getOrgRestaurants(org, listOfElements) {
 function getUserReviews(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.author.name === user;
+      return element.author === user;
     }
   );
 }
@@ -586,7 +589,7 @@ function getUserReviews(user, listOfElements) {
 function getRestaurantReviews(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.itemReviewed.name === restaurant;
+      return element.itemReviewed === restaurant;
     }
   );
 }
@@ -594,13 +597,13 @@ function getRestaurantReviews(restaurant, listOfElements) {
 // filter reviews by organization
 function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
   // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
+  listOfRestaurants = getOrgRestaurants(franchise, listOfRestaurants);
 
   // filter reviews of the restaurants of the franchise
   return objectToArray(listOfReviews).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.itemReviewed.name;
+        return restaurant.name === element.itemReviewed;
       });
     }
   );
@@ -610,7 +613,7 @@ function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
 function getUserReservations(user, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.underName.name === user;
+      return element.underName === user;
     }
   );
 }
@@ -619,7 +622,7 @@ function getUserReservations(user, listOfElements) {
 function getRestaurantReservations(restaurant, listOfElements) {
   return objectToArray(listOfElements).filter(
     function(element) {
-      return element.reservationFor.name === restaurant;
+      return element.reservationFor === restaurant;
     }
   );
 }
@@ -632,36 +635,51 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
-        return restaurant.id === element.reservationFor.name;
+        return restaurant.name === element.reservationFor;
       });
     }
   );
 }
 
-function getListByType(type, element, headers) {
+function getListByType(type, element, headers, normalized) {
   var uri = '/v2/entities';
+  var options = {'type': type,'limit': '1000'};
   if (element) {
     uri += '/' + encodeURIComponent(element);
+  }
+
+  if (typeof normalized === 'undefined') {
+    options.options = 'keyValues';
   }
   return authRequest(
     uri,
     'GET',
-    {'type': type,'limit': '1000'},
+    options,
     headers
   );
 }
 
-function sendRequest(method, body, identifier, headers) {
+function sendRequest(method, body, identifier, headers, queryString) {
   var uri = '/v2/entities';
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
   }
-  return authRequest(
-    uri,
-    method,
-    body,
-    headers
-  );
+  if (queryString) {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers
+    );
+  } else {
+    return authRequest(
+      uri,
+      method,
+      body,
+      headers,
+      queryString
+    );
+  }
 }
 
 function getAverage(data) {
@@ -674,26 +692,29 @@ function getAverage(data) {
 }
 
 function getAggregateRating(listOfReviews) {
-
+  // The returned object will be POST/PATCH(ed),
+  // so we need to add the 'value' field
   var counter = 0;
   var ratingValues = [];
   var newElement = {
-    'aggregateRating': {}
+    'aggregateRating': {
+      'value': {}
+    }
   };
 
   listOfReviews = objectToArray(listOfReviews);
 
-  Object.keys(listOfReviews).forEach(function(element, pos) {
+  Object.keys(listOfReviews).forEach(function(element, index) {
 
-    if (listOfReviews[pos].reviewRating.ratingValue !== undefined) {
+    if (listOfReviews[index].reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[pos].reviewRating.ratingValue);
+      ratingValues.push(listOfReviews[index].reviewRating);
       counter++;
     }
   });
 
-  newElement.aggregateRating.reviewCount = counter;
-  newElement.aggregateRating.ratingValue = getAverage(ratingValues);
+  newElement.aggregateRating.value.reviewCount = counter;
+  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
 
   return newElement;
 }
@@ -752,9 +773,13 @@ function getTimeBetweenDates(from, to) {
 function updateOccupancyLevels(occupancyLevel, date) {
   return {
     'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': date
+        }
+      },
       'type': 'PropertyValue',
-      'timestamp': date,
-      'name': 'occupancyLevels',
       'value': occupancyLevel
     }
   };
