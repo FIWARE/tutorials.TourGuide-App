@@ -1,4 +1,4 @@
-## FIWARE Tour Guide Application - Docker image
+## Installation and administration guide
 
 [FIWARE Tour Guide Application](https://github.com/Fiware/tutorials.TourGuide-App) is the sample application used in the [FIWARE Tour Guide](http://www.fiware.org/tour-guide/) to show real code working with the Generic Enablers integrated.
 
@@ -23,6 +23,7 @@ So for this purpose, we have already a simple file that launches:
    * Authzforce
    * IDAS
    * Cygnus
+   * CEP
    * TourGuide app
 
 The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml).

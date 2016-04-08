@@ -36,7 +36,7 @@ docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeder
 
 ### reservationsgenerator.js
 
-Generates random reservations for the restaurants already loaded in Orion. 
+Generates random reservations for the restaurants already loaded in Orion.
 
 #### Usage
 
@@ -52,7 +52,7 @@ docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/feeder
 
 ### reviewsgenerator.js
 
-Generates random reviews for the restaurants already loaded in Orion. 
+Generates random reviews for the restaurants already loaded in Orion.
 
 #### Usage
 
