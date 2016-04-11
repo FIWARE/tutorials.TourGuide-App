@@ -129,6 +129,7 @@ tourguide:
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false
         - CEP_ENABLED=false
+        - DEFAULT_MAX_TRIES=120
     volumes_from:
         - idm
     # volumes:
