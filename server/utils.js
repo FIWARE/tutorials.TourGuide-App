@@ -464,9 +464,14 @@ function dataToSchema(listOfElements) {
   return newListOfElements;
 }
 
-function fixAddress(schemaObject, geoObject) {
+function completeAddress(schemaObject, geoObject) {
   // The returned object will be POST/PATCH(ed),
   // so we need to add the 'value' field
+  // This function receives the Orion object and
+  // the geocoder object. It will replace the address
+  // values from the geocoder into the schemaObject,
+  // returning the schemaObject with the complete address
+
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
       schemaObject.address.value.streetAddress =
@@ -512,7 +517,7 @@ function restaurantToOrion(schemaObject, geoObject) {
   delete schemaObject.name;
 
   schemaObject = addGeolocation(schemaObject, geoObject);
-  schemaObject = fixAddress(schemaObject, geoObject);
+  schemaObject = completeAddress(schemaObject, geoObject);
 
   return sortObject(schemaObject);
 
@@ -789,7 +794,7 @@ module.exports = {
   objectDataToSchema: objectDataToSchema,
   sortObject: sortObject,
   dataToSchema: dataToSchema,
-  fixAddress: fixAddress,
+  completeAddress: completeAddress,
   addGeolocation: addGeolocation,
   restaurantToOrion: restaurantToOrion,
   reviewToOrion: reviewToOrion,

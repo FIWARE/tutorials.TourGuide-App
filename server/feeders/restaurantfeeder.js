@@ -81,7 +81,7 @@ var feedOrionRestaurants = function() {
          geocoder.geocode({address: address, country: 'Spain'})
          .then(function(geoRes) {
           attributes = utils.addGeolocation(attributes, geoRes[0]);
-          attributes = utils.fixAddress(attributes, geoRes[0]);
+          attributes = utils.completeAddress(attributes, geoRes[0]);
           utils.sendRequest('POST', attributes, null, fwHeaders)
           .then(callback(null))
           .catch(function(err) {
