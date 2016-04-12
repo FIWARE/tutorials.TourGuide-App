@@ -648,16 +648,10 @@ function getListByType(type, element, headers, normalized) {
   if (element) {
     uri += '/' + encodeURIComponent(element);
   }
-
   if (!normalized) {
     options.options = 'keyValues';
   }
-  return authRequest(
-    uri,
-    'GET',
-    options,
-    headers
-  );
+  return authRequest(uri, 'GET', null, headers, options);
 }
 
 function sendRequest(method, body, identifier, headers, queryString) {

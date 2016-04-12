@@ -13,7 +13,7 @@
 'use strict';
 
 var rp = require('request-promise');
-var querystring = require('querystring');
+var qString = require('querystring');
 var Q = require('q');
 var config = require('../config');
 var host = 'http://orion'; // To be changed to PEP for auth
@@ -25,7 +25,7 @@ function performRequest(endpoint, method, data, fiwareHeaders, querystring) {
 
   var deferred = Q.defer();
   var headers = {};
-  var options;
+
   if (typeof fiwareHeaders !== 'undefined') {
     if (typeof fiwareHeaders['fiware-service'] !== 'undefined') {
       headers['fiware-service'] = fiwareHeaders['fiware-service'];
@@ -34,54 +34,33 @@ function performRequest(endpoint, method, data, fiwareHeaders, querystring) {
       headers['fiware-servicepath'] = fiwareHeaders['fiware-servicepath'];
     }
   }
+
+  var options = {
+    uri: host + ':' + port + endpoint,
+    headers: headers,
+    resolveWithFullResponse: true,
+    json: true // Automatically parses the JSON string in the response
+  };
+
+  if (querystring) {
+    endpoint += '?' + qString.stringify(querystring);
+    options.uri = host + ':' + port + endpoint;
+  }
+
   switch (method) {
   case 'GET':
-    endpoint += '?' + querystring.stringify(data);
-    headers['User-Agent'] = 'Request-Promise';
-    options = {
-      uri: host + ':' + port + endpoint,
-      headers: headers,
-      resolveWithFullResponse: true,
-      json: true // Automatically parses the JSON string in the response
-    };
+    options.method = 'GET';
     break;
   case 'POST':
-    options = {
-      method: 'POST',
-      uri: host + ':' + port + endpoint,
-      headers: headers,
-      body: data,
-      resolveWithFullResponse: true,
-      json: true // Automatically stringifies the body to JSON
-    };
-    if (querystring) {
-      endpoint += '?' + querystring.stringify(querystring);
-      options.uri = host + ':' + port + endpoint;
-    }
+    options.method = 'POST';
+    options.body = data;
     break;
   case 'PATCH':
-    options = {
-      method: 'PATCH',
-      uri: host + ':' + port + endpoint,
-      headers: headers,
-      body: data,
-      resolveWithFullResponse: true,
-      json: true
-    };
-    if (querystring) {
-      endpoint += '?' + querystring.stringify(querystring);
-      options.uri = host + ':' + port + endpoint;
-    }
+    options.method = 'PATCH';
+    options.body = data;
     break;
   case 'DELETE':
-    endpoint += '?' + querystring.stringify(data);
-    options = {
-      method: 'DELETE',
-      uri: host + ':' + port + endpoint,
-      headers: headers,
-      resolveWithFullResponse: true,
-      json: true
-    };
+    options.method = 'DELETE';
     break;
   default:
     deferred.reject('The requested method is not available');
