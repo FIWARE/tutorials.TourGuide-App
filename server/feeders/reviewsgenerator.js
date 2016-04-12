@@ -118,7 +118,11 @@ var triggerRestaurantsRatings = function() {
         if (data.body.department) {
           fwHeaders['fiware-servicepath'] = '/' + data.body.department;
         }
-        utils.sendRequest('PATCH', task.aggregateRatings, restaurantId, fwHeaders)
+        utils.sendRequest(
+          'PATCH',
+          task.aggregateRatings,
+          restaurantId,
+          fwHeaders)
         .then(callback)
         .catch(function(err) {
           console.log(err.error);

@@ -500,8 +500,7 @@ function addGeolocation(schemaObject, geoObject) {
   if (geoObject) {
     schemaObject.location = {
       'type': 'geo:point',
-      'value': geoObject.latitude + ', ' +
-        geoObject.longitude
+      'value': geoObject.latitude + ', ' + geoObject.longitude
     };
   }
   return schemaObject;
@@ -644,12 +643,13 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
 
 function getListByType(type, element, headers, normalized) {
   var uri = '/v2/entities';
-  var options = {'type': type,'limit': '1000'};
+  var limit = 1000;
+  var options = {'type': type,'limit': limit};
   if (element) {
     uri += '/' + encodeURIComponent(element);
   }
 
-  if (typeof normalized === 'undefined') {
+  if (!normalized) {
     options.options = 'keyValues';
   }
   return authRequest(
@@ -665,22 +665,7 @@ function sendRequest(method, body, identifier, headers, queryString) {
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
   }
-  if (queryString) {
-    return authRequest(
-      uri,
-      method,
-      body,
-      headers
-    );
-  } else {
-    return authRequest(
-      uri,
-      method,
-      body,
-      headers,
-      queryString
-    );
-  }
+  return authRequest(uri, method, body, headers, queryString);
 }
 
 function getAverage(data) {
@@ -788,9 +773,9 @@ function updateOccupancyLevels(occupancyLevel, date) {
 
 function generateId(name, date) {
   if (date) {
-  return crypto.createHash('sha1').update(name + date).digest('hex');
+    return crypto.createHash('sha1').update(name + date).digest('hex');
   } else {
-  return crypto.createHash('sha1').update(name).digest('hex');
+    return crypto.createHash('sha1').update(name).digest('hex');
   }
 }
 
