@@ -773,11 +773,17 @@ function updateOccupancyLevels(occupancyLevel, date) {
 }
 
 function generateId(name, date) {
+  var id;
+  var inputEncoding;
+
   if (date) {
-    return crypto.createHash('sha1').update(name + date).digest('hex');
+    inputEncoding = name + date;
   } else {
-    return crypto.createHash('sha1').update(name).digest('hex');
+    inputEncoding = name;
   }
+
+  id = crypto.createHash('sha1').update(inputEncoding).digest('hex');
+  return id;
 }
 
 module.exports = {
