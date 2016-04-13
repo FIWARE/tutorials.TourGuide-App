@@ -171,41 +171,31 @@ var feedOrionRestaurants = function() {
 
       var val = restaurantsData[index][element];
 
-      if (element in addressDictionary) {
-
-        if (val !== 'undefined' && val !== '') {
+      if (val) {
+        if (element in addressDictionary) {
           element = utils.fixedEncodeURIComponent(
             utils.replaceOnceUsingDictionary(
-            addressDictionary, element,
-            function(key, dictionary) {
-              return dictionary[key];
-            }));
-          attr.address.value[element] =
-          utils.fixedEncodeURIComponent(val);
-        }
-
-      } else {
-        if (element in dictionary) {
-
-          if (val !== 'undefined' && val !== '') {
-
-            element = utils.fixedEncodeURIComponent(
-              utils.replaceOnceUsingDictionary(
+              addressDictionary, element,
+              function(key, dictionary) {
+                return dictionary[key];
+              }));
+          attr.address.value[element] = utils.fixedEncodeURIComponent(val);
+        } else if (element in dictionary) {
+          element = utils.fixedEncodeURIComponent(
+            utils.replaceOnceUsingDictionary(
               dictionary, element,
               function(key, dictionary) {
                 return dictionary[key];
               }));
-            if (element == 'priceRange') {
-              attr[element] = {
-                'value': parseFloat(val)
-              };
-              attr[element].value = parseFloat(val);
-            } else {
-              attr[element] = {
-                'value': utils.fixedEncodeURIComponent(
-                  utils.convertHtmlToText(val))
-              };
-            }
+          if (element == 'priceRange') {
+            attr[element] = {
+              'value': parseFloat(val)
+            };
+          } else {
+            attr[element] = {
+              'value': utils.fixedEncodeURIComponent(
+                utils.convertHtmlToText(val))
+            };
           }
         }
       }
