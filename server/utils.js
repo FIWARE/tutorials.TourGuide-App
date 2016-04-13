@@ -464,13 +464,15 @@ function dataToSchema(listOfElements) {
   return newListOfElements;
 }
 
+/**
+ * Completes the schemaObject address element
+ *
+ * @param {Object} schemaObject - Object to be added in Orion
+ * @param {Object} geoObject - geocoder object
+ * @return {Object} schemaObject - The schemaObject with the
+ *         fixed address
+*/
 function completeAddress(schemaObject, geoObject) {
-  // The returned object will be POST/PATCH(ed),
-  // so we need to add the 'value' field
-  // This function receives the Orion object and
-  // the geocoder object. It will replace the address
-  // values from the geocoder into the schemaObject,
-  // returning the schemaObject with the complete address
 
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
