@@ -10,6 +10,9 @@
 
 */
 var map;
+var connectionsAPI;
+var restaurantsAPI;
+var utils;
 //initialization
 var initIndex = function() {
 

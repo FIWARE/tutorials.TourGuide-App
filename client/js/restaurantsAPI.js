@@ -10,8 +10,11 @@
 
 */
 
+/*exported restaurantsAPI */
 //global vars
 var map; //map instance
+var connectionsAPI;
+var AJAXRequest;
 var restaurantsAPI = (function() {
   var baseURL = 'http://tourguide/api/orion/';
 

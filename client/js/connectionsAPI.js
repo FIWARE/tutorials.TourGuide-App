@@ -10,16 +10,10 @@
 
 */
 
+/*exported connectionsAPI */
 
-var initConnections = function() {
-  //check if user is logged in
-  AJAXRequest.get('/client/user',
-    connectionsAPI.loggedIn,
-    connectionsAPI.notLoggedIn);
-};
-
-
-utils.addLoadEvent(initConnections);
+var AJAXRequest;
+var utils;
 
 var connectionsAPI = (function() {
 
@@ -233,3 +227,14 @@ var connectionsAPI = (function() {
     rol: rol
   };
 })();
+
+
+var initConnections = function() {
+  //check if user is logged in
+  AJAXRequest.get('/client/user',
+    connectionsAPI.loggedIn,
+    connectionsAPI.notLoggedIn);
+};
+
+
+utils.addLoadEvent(initConnections);

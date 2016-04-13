@@ -9,7 +9,7 @@
  * MIT Licensed
 
 */
-
+/*exported utils, AJAXRequest */
 var utils = (function() {
 
   /* alerType could be alert-warning(default) or alert-danger*/
