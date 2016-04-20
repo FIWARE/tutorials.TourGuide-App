@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
     },
 
-    srcfiles: ['*.js', 'routes/*.js','feeders/*.js', 'idas/*.js', 'auth/*.js', 'misc/*.js'],
+    srcfiles: ['*.js', 'routes/*.js','feeders/*.js', 'idas/*.js', 'auth/*.js', 'misc/*.js', 'schema/*.js'],
     testfiles: ['spec/*.js'],
 
     jshint: {
