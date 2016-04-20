@@ -237,6 +237,12 @@ function objectToArray(element) {
   return element;
 }
 
+/**
+ * Converts restaurant Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function restaurantToSchema(element, date) {
 
   var restaurantSchemaElements = [
@@ -309,6 +315,12 @@ function restaurantToSchema(element, date) {
   return sortObject(elementToSchema);
 }
 
+/**
+ * Converts review Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reviewToSchema(element) {
 
   var elementToSchema = {
@@ -338,6 +350,12 @@ function reviewToSchema(element) {
   return sortObject(elementToSchema);
 }
 
+/**
+ * Converts reservation Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reservationToSchema(element) {
 
   var elementToSchema = {
@@ -368,6 +386,13 @@ function reservationToSchema(element) {
 
 }
 
+/**
+ * Convert elements with Orion format into schema.org ones
+ *
+ * @param {Object} element - Object to convert
+ * @param {String} date - datetime
+ * @return {Object} newElement - Object in schema.org format
+*/
 function objectDataToSchema(element, date) {
 
   var newElement;
@@ -399,6 +424,12 @@ function objectDataToSchema(element, date) {
   }
 }
 
+/**
+ * Order the object elements alphabetically
+ *
+ * @param {Object} element - Object to order
+ * @return {Object} sorted - sorted object
+*/
 function sortObject(element) {
   var sorted = {};
   var key;
@@ -474,6 +505,14 @@ function completeAddress(schemaObject, geoObject) {
   return schemaObject;
 }
 
+/**
+ * Completes the schemaObject location element
+ *
+ * @param {Object} schemaObject - Object to be added in Orion
+ * @param {Object} geoObject - geocoder object
+ * @return {Object} schemaObject - The schemaObject with the
+ *         geocoder latitude and longitude
+*/
 function addGeolocation(schemaObject, geoObject) {
   if (geoObject) {
     schemaObject.location = {
@@ -484,6 +523,14 @@ function addGeolocation(schemaObject, geoObject) {
   return schemaObject;
 }
 
+/**
+ * Generate restaurant data model to be stored in Context Broker
+ *
+ * @param {Object} schemaObject - Object received
+ * @param {Object} geoObject - geocoder object
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function restaurantToOrion(schemaObject, geoObject) {
 
   var objectToOrion = {
@@ -545,6 +592,14 @@ function restaurantToOrion(schemaObject, geoObject) {
   return sortObject(objectToOrion);
 }
 
+/**
+ * Generate review data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reviewToOrion(userObject, schemaObject) {
 
   if (userObject) {
@@ -581,6 +636,14 @@ function reviewToOrion(userObject, schemaObject) {
   }
 }
 
+/**
+ * Generate reservation data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reservationToOrion(userObject, schemaObject) {
 
   if (userObject) {
@@ -617,6 +680,13 @@ function reservationToOrion(userObject, schemaObject) {
   }
 }
 
+/**
+ * Generate a list of reservations of a Franchise
+ *
+ * @param {List} listOfRestaurants - restaurants from a Franchise
+ * @param {List} listOfReservations - list of reservations
+ * @return {List} contains all the reservations of the passed restaurants
+*/
 function getOrgReservations(listOfRestaurants, listOfReservations) {
 
   return objectToArray(listOfReservations).filter(
@@ -628,6 +698,16 @@ function getOrgReservations(listOfRestaurants, listOfReservations) {
   );
 }
 
+/**
+ * Wrapper to send requests (GET) against Orion
+ *
+ * @param {String} type - element type (restaurant, review or reservation)
+ * @param {Object} element - Object received
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - queryString to send
+ * @param {String} normalized - normalized mode
+ * @return {Promise} returns the request response
+*/
 function getListByType(type, element, headers, queryString, normalized) {
   var uri = '/v2/entities';
   var limit = 1000;
@@ -645,6 +725,16 @@ function getListByType(type, element, headers, queryString, normalized) {
   return authRequest(uri, 'GET', null, headers, queryString);
 }
 
+/**
+ * Wrapper to send requests against Orion
+ *
+ * @param {String} method - method to use
+ * @param {Object} body - body to send
+ * @param {String} identifier - identifier of the entity
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - queryString to send
+ * @return {Promise} returns the request response
+*/
 function sendRequest(method, body, identifier, headers, queryString) {
   var uri = '/v2/entities';
   if (identifier) {
@@ -653,6 +743,12 @@ function sendRequest(method, body, identifier, headers, queryString) {
   return authRequest(uri, method, body, headers, queryString);
 }
 
+/**
+ * Calculates the average of a given list
+ *
+ * @param {List} data - List with the elements to calculate
+ * @return {Integer} avg - The average of the elements list
+*/
 function getAverage(data) {
   var sum = data.reduce(function(sum, value) {
     return sum + value;
@@ -662,6 +758,12 @@ function getAverage(data) {
   return avg;
 }
 
+/**
+ * Generates an Element to be patched(updated) in a Restaurant
+ *
+ * @param {List} listOfReviews - List of the reviews
+ * @return {Object} newElement - The average element updated
+*/
 function getAggregateRating(listOfReviews) {
 
   var counter = 0;
@@ -690,6 +792,12 @@ function getAggregateRating(listOfReviews) {
   return newElement;
 }
 
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} isoTimeString - datetime
+ * @return {String} frameTime - string to filter
+*/
 function getTimeframe(isoTimeString) {
   var newDate = new Date(isoTimeString);
   var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
@@ -698,6 +806,13 @@ function getTimeframe(isoTimeString) {
   return frameTime;
 }
 
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} from - datetime from
+ * @param {String} to - datetime to
+ * @return {String} frameTime - string to filter
+*/
 function getTimeBetweenDates(from, to) {
   var fromTimestamp = new Date(from).toISOString();
   var toTimestamp = new Date(to).toISOString();
@@ -705,6 +820,12 @@ function getTimeBetweenDates(from, to) {
   return frameTime;
 }
 
+/**
+ * Calculates the sum of the occupancyLevels
+ *
+ * @param {List} listOfReservations - reservations list
+ * @return {Integer} occupancyLevels - the occupancyLevels
+*/
 function getOccupancyLevels(listOfReservations) {
 
   var occupancyLevels = 0;
@@ -716,6 +837,13 @@ function getOccupancyLevels(listOfReservations) {
   return occupancyLevels;
 }
 
+/**
+ * Generates an occupancyLevels object
+ *
+ * @param {Integer} occupancyLevel - The occupancyLevels
+ * @param {Date} date - date object
+ * @return {Object} occupancyObject - object to update a Restaurant
+*/
 function createOccupancyObject(occupancyLevel, date) {
   var occupancyObject = {
     'occupancyLevels': {
@@ -732,12 +860,26 @@ function createOccupancyObject(occupancyLevel, date) {
   return occupancyObject;
 }
 
+/**
+ * Generates an occupancyLevels object to update a Restaurant
+ *
+ * @param {List} listOfReservations - Reservations list
+ * @param {Date} date - date object
+ * @return {Object} occupancyLevelsObj - object to update a Restaurant
+*/
 function updateOccupancyLevels(listOfReservations, date) {
   var occupancyLevels = getOccupancyLevels(listOfReservations);
   var occupancyLevelsObj = createOccupancyObject(occupancyLevels, date);
   return occupancyLevelsObj;
 }
 
+/**
+ * Generates an sha1 identifier
+ *
+ * @param {String} name - element name
+ * @param {Date} date - date object
+ * @return {String} id - identifier based in the parameters
+*/
 function generateId(name, date) {
   var id;
   var inputEncoding;
@@ -752,6 +894,15 @@ function generateId(name, date) {
   return id;
 }
 
+/**
+ * Wrapper function to generate sql (Simple Query Languange) elements
+ *
+ * @param {List} listOfConditions - conditions
+ * @param {String} key - key to filter
+ * @param {String} operator - operator for the matching
+ * @param {String} value - value
+ * @return {List} listOfConditions - updated list of conditions
+*/
 function addConditionToQuery(listOfConditions, key, operator, value) {
   if (!listOfConditions) {
     listOfConditions = [];
@@ -761,6 +912,13 @@ function addConditionToQuery(listOfConditions, key, operator, value) {
   return listOfConditions;
 }
 
+/**
+ * Adds the fiware-servicepath to the headers
+ *
+ * @param {Object} headers - headers of the request
+ * @param {String} department - fiware-servicepath (FranchiseX)
+ * @return {Object} fiwareHeaders - updated headers
+*/
 function completeHeaders(headers, department) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
   if (department) {
@@ -769,6 +927,12 @@ function completeHeaders(headers, department) {
   return fiwareHeaders;
 }
 
+/**
+ * Removes the fiware-servicepath for reviews and restaurants
+ *
+ * @param {Object} headers - headers of the request
+ * @return {Object} fiwareHeaders - updated headers
+*/
 function removeServicePath(headers) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
   if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
@@ -777,6 +941,12 @@ function removeServicePath(headers) {
   return fiwareHeaders;
 }
 
+/**
+ * Send the response object in schema.org format
+ *
+ * @param {Object} data - object from Orion
+ * @param {Object} res - response to send
+*/
 function returnResponse(data, res) {
   res.statusCode = data.statusCode;
   res.headers = data.headers;
@@ -787,6 +957,12 @@ function returnResponse(data, res) {
   }
 }
 
+/**
+ * Send the response error
+ *
+ * @param {Object} err - error object
+ * @param {Object} res - response to send
+*/
 function responseError(err, res) {
   res.statusCode = err.statusCode;
   res.headers = err.headers;
@@ -799,6 +975,13 @@ function responseError(err, res) {
   }
 }
 
+/**
+ * Send the response from a POST request
+ *
+ * @param {Object} data - data object
+ * @param {String} element - element added
+ * @param {Object} res - response to send
+*/
 function responsePost(data, element, res) {
   res.headers = data.headers;
   if (element.type === 'Restaurant') {
@@ -812,6 +995,12 @@ function responsePost(data, element, res) {
   res.end();
 }
 
+/**
+ * Send error response when the schema is invalid
+ *
+ * @param {Object} res - response to send
+ * @param {Object} tv4 - schema validator object
+*/
 function returnInvalidSchema(res, tv4) {
   res.statusCode = 400;
   res.json({
@@ -825,6 +1014,11 @@ function returnInvalidSchema(res, tv4) {
   });
 }
 
+/**
+ * Send error response when the resource is forbidden
+ *
+ * @param {Object} res - response to send
+*/
 function returnForbidden(res) {
   res.statusCode = 403;
   res.json({
@@ -836,6 +1030,11 @@ function returnForbidden(res) {
   });
 }
 
+/**
+ * Send error response when there's a conflict
+ *
+ * @param {Object} res - response to send
+*/
 function returnConflict(res) {
   res.statusCode = 409;
   res.json({
