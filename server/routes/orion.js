@@ -32,231 +32,141 @@ tv4.addSchema('review', schema.review);
 
 exports.createRestaurant = function(req, res) {
   var elementToOrion = req.body;
-  var valid = tv4.validate(elementToOrion, 'restaurant');
-  if (valid) {
+  var validSchema = tv4.validate(elementToOrion, 'restaurant');
+  if (validSchema) {
     var address = elementToOrion.address.streetAddress + ' ' +
-    elementToOrion.address.addressLocality;
+      elementToOrion.address.addressLocality;
     geocoder.geocode(address)
-    .then(function(geoRes) {
-      if (geoRes !== '[]') {
-        elementToOrion = utils.restaurantToOrion(elementToOrion, geoRes[0]);
-      }
-      utils.sendRequest('POST', elementToOrion, null, req.headers)
-      .then(function(data) {
-        res.headers = data.headers;
-        res.location('/api/orion/restaurant/' + elementToOrion.id);
-        res.statusCode = data.statusCode;
-        res.end();
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.end();
-      });
+    .then(function(geoObject) {
+      elementToOrion = utils.restaurantToOrion(elementToOrion, geoObject[0]);
+      return utils.sendRequest('POST', elementToOrion, null, req.headers);
+    })
+    .then(function(postResponse) {
+      utils.responsePost(postResponse, elementToOrion, res);
     })
     .catch(function(err) {
-      console.log('Geo-location could not be processed. Error: ' + err);
-      utils.sendRequest('POST', elementToOrion, null, req.headers)
-      .then(function(data) {
-        res.statusCode = data.statusCode;
-        res.end();
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.end();
-      });
+      utils.responseError(err, res);
     });
   } else {
-    res.statusCode = 400;
-    res.json({
-      error: {
-        message: tv4.error.message,
-        code: 400,
-        params: tv4.error.params,
-        dataPath: tv4.error.dataPath,
-        title: 'Bad request'
-      }
-    });
+    utils.returnInvalidSchema(res, tv4);
   }
 };
 
 exports.readRestaurant = function(req, res) {
-  var timeframeQuery;
-  var actualOccupancyLevels;
-  var restaurantReservations;
   var occupancyLevelsObject;
-  var restaurant;
+  var servicePath;
   var fiwareHeaders;
-  var actualDate = new Date().getTime();
-  timeframeQuery = utils.getTimeframe(actualDate);
-  utils.sendRequest('GET', {
-        'type': 'FoodEstablishmentReservation',
-        'q': timeframeQuery,
-        'limit': 1000
-      },
-      null,
-      req.headers)
-    .then(function(data) {
-      restaurantReservations = data.body;
-      actualOccupancyLevels = utils.getOccupancyLevels(
-        restaurantReservations,
-        req.params.id);
-      console.log(actualOccupancyLevels);
-      occupancyLevelsObject = utils.updateOccupancyLevels(
-        actualOccupancyLevels, actualDate);
-      utils.getListByType('Restaurant', req.params.id, req.headers)
-        .then(function(data) {
-          restaurant = data.body;
-          // add service path for the restaurant
-          fiwareHeaders = JSON.parse(JSON.stringify(req.headers));
-          if (typeof restaurant.department !== 'undefined' &&
-            restaurant.department !== '') {
-            fiwareHeaders['fiware-servicepath'] = '/' + restaurant.department;
-          }
-          utils.sendRequest('PATCH',
-              occupancyLevelsObject,
-              req.params.id,
-              fiwareHeaders)
-            .then(function(data) {
-              utils.getListByType('Restaurant', req.params.id, req.headers)
-                .then(function(data) {
-                  res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
-                })
-                .catch(function(err) {
-                  res.statusCode = err.statusCode;
-                  res.json(err.error);
-                });
-            })
-            .catch(function(err) {
-              res.statusCode = err.statusCode;
-              res.json(err.error);
-            });
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(err.error);
-        });
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  var restaurantId = utils.generateId(req.params.id);
+  var actualDate = new Date().toISOString();
+  var sqlList = [];
+  var queryString = {};
+  var timeframe = utils.getTimeframe(actualDate);
+  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
+  utils.addConditionToQuery(sqlList, 'reservationFor', '==', req.params.id);
+  utils.addConditionToQuery(sqlList, 'reservationStatus', '==', 'Confirmed');
+  queryString.q = sqlList.join(';');
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
+      queryString)
+  .then(function(reservations) {
+    occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
+      actualDate);
+    return utils.getListByType('Restaurant', restaurantId, req.headers);
+  })
+  .then(function(restaurant) {
+    servicePath = restaurant.body.department;
+    fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
+    return utils.sendRequest('PATCH', occupancyLevelsObject, restaurantId,
+      fiwareHeaders);
+  })
+  .then(function(patchResponse) {
+    return utils.getListByType('Restaurant', restaurantId, req.headers);
+  })
+  .then(function(restaurant) {
+    utils.returnResponse(restaurant, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.readRestaurantWithDate = function(req, res) {
-  var timeframeQuery;
-  var actualOccupancyLevels;
-  var restaurantReservations;
   var occupancyLevelsObject;
-  var restaurant;
+  var servicePath;
   var fiwareHeaders;
-  timeframeQuery = utils.getTimeframe(req.params.date);
-  utils.sendRequest('GET', {
-        'type': 'FoodEstablishmentReservation',
-        'q': timeframeQuery,
-        'limit': 1000
-      },
-      null,
-      req.headers)
-    .then(function(data) {
-      restaurantReservations = data.body;
-      actualOccupancyLevels = utils.getOccupancyLevels(
-        restaurantReservations,
-        req.params.id);
-      console.log(actualOccupancyLevels);
-      occupancyLevelsObject = utils.updateOccupancyLevels(
-        actualOccupancyLevels, req.params.date);
-      utils.getListByType('Restaurant', req.params.id, req.headers)
-        .then(function(data) {
-          restaurant = data.body;
-          // add service path for the restaurant
-          fiwareHeaders = JSON.parse(JSON.stringify(req.headers));
-          if (typeof restaurant.department !== 'undefined' &&
-            restaurant.department !== '') {
-            fiwareHeaders['fiware-servicepath'] = '/' + restaurant.department;
-          }
-          utils.sendRequest('PATCH',
-              occupancyLevelsObject,
-              req.params.id,
-              fiwareHeaders)
-            .then(function(data) {
-              utils.getListByType('Restaurant', req.params.id, req.headers)
-                .then(function(data) {
-                  res.statusCode = data.statusCode;
-                  res.json(utils.dataToSchema(data.body));
-                })
-                .catch(function(err) {
-                  res.statusCode = err.statusCode;
-                  res.json(err.error);
-                });
-            })
-            .catch(function(err) {
-              res.statusCode = err.statusCode;
-              res.json(err.error);
-            });
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(err.error);
-        });
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  var restaurantId = utils.generateId(req.params.id);
+  var sqlList = [];
+  var queryString = {};
+  var timeframe = utils.getTimeframe(req.params.date);
+  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
+      queryString)
+  .then(function(reservations) {
+    occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
+      req.params.date);
+    return utils.getListByType('Restaurant', restaurantId, req.headers);
+  })
+  .then(function(restaurant) {
+    servicePath = restaurant.body.department;
+    fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
+    return utils.sendRequest('PATCH', occupancyLevelsObject, restaurantId,
+      fiwareHeaders);
+  })
+  .then(function(patchResponse) {
+    return utils.getListByType('Restaurant', restaurantId, req.headers);
+  })
+  .then(function(restaurant) {
+    utils.returnResponse(restaurant, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.updateRestaurant = function(req, res) {
-  utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.end();
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var queryString = {'options': 'keyValues'};
+  var restaurantId = utils.generateId(req.params.id);
+  utils.sendRequest('PATCH', req.body, restaurantId, req.headers, queryString)
+  .then(function(patchResponse) {
+    utils.returnResponse(patchResponse, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.deleteRestaurant = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.end();
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var restaurantId = utils.generateId(req.params.id);
+  utils.sendRequest('DELETE', null, restaurantId, req.headers)
+  .then(function(deleteResponse) {
+    utils.returnResponse(deleteResponse, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
-
-// -- TODO: handle pagination over the whole set of restaurants
 
 exports.getRestaurants = function(req, res) {
   utils.getListByType('Restaurant', null, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  .then(function(restaurants) {
+    utils.returnResponse(restaurants, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.getOrganizationRestaurants = function(req, res) {
-  var organizationRestaurants = [];
-  utils.getListByType('Restaurant', null, req.headers)
-  .then(function(data) {
-    organizationRestaurants = utils.getOrgRestaurants(
-      req.params.org,
-      data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(organizationRestaurants));
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'department', '==', req.params.org);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('Restaurant', null, req.headers, queryString)
+  .then(function(restaurants) {
+    utils.returnResponse(restaurants, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
@@ -265,541 +175,390 @@ exports.getOrganizationRestaurants = function(req, res) {
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
   var restaurantName = elementToOrion.itemReviewed.name;
-  var restaurantReviews;
+  var restaurantId = utils.generateId(restaurantName);
+  var sqlList = [];
+  var queryString = {};
+  var servicePath;
+  var fiwareHeaders;
   var aggregateRatings;
-  var valid = tv4.validate(elementToOrion, 'review');
-  if (valid) {
-    // -- We first get information regarding the restaurant
-    var fwHeaders = JSON.parse(JSON.stringify(req.headers));
-    if (typeof fwHeaders['fiware-servicepath'] !== 'undefined') {
-      delete fwHeaders['fiware-servicepath'];
-    }
-    utils.getListByType('Restaurant', restaurantName, fwHeaders)
-    .then(function(data) {
-      auth.getUserDataPromise(req)
-      .then(function(data) {
-        elementToOrion = utils.reviewToOrion(data, elementToOrion);
-        utils.sendRequest('POST', elementToOrion, null, req.headers)
-        .then(function(data) {
-          utils.getListByType('Review', null, fwHeaders)
-          .then(function(data) {
-            restaurantReviews = utils.getRestaurantReviews(
-              restaurantName,
-              data.body);
-            aggregateRatings = utils.getAggregateRating(
-              restaurantReviews);
-            utils.sendRequest('PATCH', aggregateRatings,
-              restaurantName, req.headers)
-              .then(function(data) {
-                res.end();
-              })
-              .catch(function(err) {
-                res.statusCode = err.statusCode;
-                res.json(err.error);
-              });
-          })
-          .catch(function(err) {
-            res.statusCode = err.statusCode;
-            res.json(err.error);
-          });
-          res.headers = data.headers;
-          res.location('/api/orion/review/' + elementToOrion.id);
-          res.statusCode = data.statusCode;
-          res.end();
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.end();
-        });
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.json(JSON.parse(err.data));
-      });
+  var endResponse;
+  var validSchema = tv4.validate(elementToOrion, 'review');
+  if (validSchema) {
+    utils.getListByType('Restaurant', restaurantId, req.headers)
+    .then(function(restaurant) {
+      servicePath = restaurant.body.department;
+      return auth.getUserDataPromise(req);
+    })
+    .then(function(userObject) {
+      fiwareHeaders = utils.removeServicePath(req.headers);
+      elementToOrion = utils.reviewToOrion(userObject, elementToOrion);
+      return utils.sendRequest('POST', elementToOrion, null, fiwareHeaders);
+    })
+    .then(function(postResponse) {
+      endResponse = postResponse;
+      utils.addConditionToQuery(sqlList, 'itemReviewed', '==', restaurantName);
+      queryString.q = sqlList.join(';');
+      return utils.getListByType('Review', null, req.headers, queryString);
+    })
+    .then(function(reviews) {
+      aggregateRatings = utils.getAggregateRating(reviews.body);
+      fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
+      return utils.sendRequest('PATCH', aggregateRatings, restaurantId,
+      fiwareHeaders);
+    })
+    .then(function(patchResponse) {
+      utils.responsePost(endResponse, elementToOrion, res);
     })
     .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
+      utils.responseError(err, res);
     });
   } else {
-    console.log(tv4.error);
-    res.statusCode = 400;
-    res.json({
-      error: {
-        message: tv4.error.message,
-        code: 400,
-        params: tv4.error.params,
-        dataPath: tv4.error.dataPath,
-        title: 'Bad request'
-      }
-    });
+    utils.returnInvalidSchema(res, tv4);
   }
 };
 
 exports.readReview = function(req, res) {
-  utils.getListByType('Review', req.params.id, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var reviewId = req.params.id;
+  utils.getListByType('Review', reviewId, req.headers)
+  .then(function(review) {
+    utils.returnResponse(review, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.updateReview = function(req, res) {
-  var restaurantReviews;
-  var aggregateRatings;
+  var reviewId = req.params.id;
   var restaurantName;
+  var restaurantId;
   var userId;
+  var aggregateRatings;
   var servicePath;
-  var fixedReviewObject;
-  utils.getListByType('Review', req.params.id, req.headers)
-    .then(function(data) {
-      restaurantName = data.body.itemReviewed.name;
-      userId = data.body.author.name;
-      auth.getUserDataPromise(req)
-        .then(function(data) {
-          if (userId !== data.id) {
-            res.statusCode = 403;
-            res.json({
-              error: {
-                message: 'The resource you are trying to access is forbidden',
-                code: 403,
-                title: 'Forbidden'
-              }
-            });
-          } else {
-            fixedReviewObject = req.body;
-            if (fixedReviewObject.reviewBody) {
-              fixedReviewObject.reviewBody = utils.fixedEncodeURIComponent(
-                fixedReviewObject.reviewBody);
-            }
-            utils.sendRequest('PATCH', fixedReviewObject, req.params.id,
-                req.headers)
-              .then(function(data) {
-                var fwHeaders = JSON.parse(JSON.stringify(req.headers));
-                if (typeof fwHeaders['fiware-servicepath'] !==
-                  'undefined') {
-                  delete fwHeaders['fiware-servicepath'];
-                }
-                utils.getListByType('Review', null, fwHeaders)
-                  .then(function(data) {
-                    restaurantReviews = utils.getRestaurantReviews(
-                      restaurantName,
-                      data.body);
-                    aggregateRatings = utils.getAggregateRating(
-                      restaurantReviews);
-                    utils.getListByType('Restaurant', restaurantName,
-                        req.headers)
-                      .then(function(data) {
-                        servicePath = data.body.department;
-                        req.headers['fiware-servicepath'] = '/' +
-                          servicePath;
-                        utils.sendRequest('PATCH', aggregateRatings,
-                            restaurantName, req.headers)
-                          .then(function(data) {
-                            res.end();
-                          })
-                          .catch(function(err) {
-                            res.statusCode = err.statusCode;
-                            res.json(err.error);
-                          });
-                      })
-                      .patch(function(err) {
-                        res.statusCode = err.statusCode;
-                        res.json(err.error);
-                      });
-                  })
-                  .catch(function(err) {
-                    res.statusCode = err.statusCode;
-                    res.json(err.error);
-                  });
-                res.statusCode = data.statusCode;
-                res.end();
-              })
-              .catch(function(err) {
-                res.statusCode = err.statusCode;
-                res.json(err.error);
-              });
-          }
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(JSON.parse(err.data));
-        });
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var fiwareHeaders;
+  var sqlList = [];
+  var queryString = {};
+  var keyValues = {'options': 'keyValues'};
+  utils.getListByType('Review', reviewId, req.headers)
+  .then(function(data) {
+    restaurantName = data.body.itemReviewed;
+    restaurantId = utils.generateId(restaurantName);
+    userId = data.body.author;
+    return auth.getUserDataPromise(req);
+  })
+  .then(function(userObject) {
+    if (userId === userObject.id) {
+      utils.sendRequest('PATCH', req.body, reviewId, req.headers, keyValues)
+      .then(function(patchResponse) {
+        fiwareHeaders = utils.removeServicePath(req.headers);
+        utils.addConditionToQuery(sqlList, 'itemReviewed', '==',
+                                  restaurantName);
+        queryString.q = sqlList.join(';');
+        return utils.getListByType('Review', null, fiwareHeaders, queryString);
+      })
+      .then(function(reviews) {
+        aggregateRatings = utils.getAggregateRating(reviews.body);
+        return utils.getListByType('Restaurant', restaurantId, req.headers);
+      })
+      .then(function(restaurant) {
+        servicePath = restaurant.body.department;
+        fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
+        return utils.sendRequest('PATCH', aggregateRatings, restaurantId,
+                                 fiwareHeaders);
+      })
+      .then(function(patchResponse) {
+        utils.returnResponse(patchResponse, res);
+      })
+      .catch(function(err) {
+        utils.responseError(err, res);
+      });
+    } else {
+      utils.returnForbidden(res);
+    }
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.deleteReview = function(req, res) {
-  var restaurantReviews;
-  var aggregateRatings;
   var restaurantName;
+  var restaurantId;
+  var aggregateRatings;
   var servicePath;
-  utils.getListByType('Review', req.params.id, req.headers)
-    .then(function(data) {
-      restaurantName = data.body.itemReviewed.name;
-      utils.getListByType('Restaurant', restaurantName, req.headers)
-        .then(function(data) {
-          servicePath = data.body.department;
-          utils.sendRequest('DELETE', null, req.params.id, req.headers)
-            .then(function(data) {
-              utils.getListByType('Review', null, req.headers)
-                .then(function(data) {
-                  restaurantReviews = utils.getRestaurantReviews(
-                    restaurantName,
-                    data.body);
-                  aggregateRatings = utils.getAggregateRating(
-                    restaurantReviews);
-                  req.headers['fiware-servicepath'] = '/' + servicePath;
-                  utils.sendRequest('PATCH', aggregateRatings,
-                      restaurantName, req.headers)
-                    .then(function(data) {
-                      res.end();
-                    })
-                    .catch(function(err) {
-                      res.statusCode = err.statusCode;
-                      res.json(err.error);
-                    });
-                })
-                .catch(function(err) {
-                  res.statusCode = err.statusCode;
-                  res.json(err.error);
-                });
-              res.statusCode = data.statusCode;
-              res.end();
-            })
-            .catch(function(err) {
-              res.statusCode = err.statusCode;
-              res.json(err.error);
-            });
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(err.error);
-        });
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var fiwareHeaders;
+  var sqlList = [];
+  var queryString = {};
+  var finalResponse;
+  var reviewId = req.params.id;
+  utils.getListByType('Review', reviewId, req.headers)
+  .then(function(review) {
+    restaurantName = review.body.itemReviewed;
+    restaurantId = utils.generateId(restaurantName);
+    return utils.getListByType('Restaurant', restaurantId, req.headers);
+  })
+  .then(function(restaurant) {
+    servicePath = restaurant.body.department;
+    return utils.sendRequest('DELETE', null, reviewId, req.headers);
+  })
+  .then(function(deleteResponse) {
+    finalResponse = deleteResponse;
+    utils.addConditionToQuery(sqlList, 'itemReviewed', '==', restaurantName);
+    queryString.q = sqlList.join(';');
+    return utils.getListByType('Review', null, req.headers, queryString);
+  })
+  .then(function(reviews) {
+    aggregateRatings = utils.getAggregateRating(reviews.body);
+    fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
+    return utils.sendRequest('PATCH', aggregateRatings, restaurantId,
+      fiwareHeaders);
+  })
+  .then(function(pathResponse) {
+    utils.returnResponse(finalResponse, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.getReviews = function(req, res) {
   utils.getListByType('Review', null, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  .then(function(reviews) {
+    utils.returnResponse(reviews, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.getUserReviews = function(req, res) {
-  var userReviews = [];
-  utils.getListByType('Review', null, req.headers)
-  .then(function(data) {
-    userReviews = utils.getUserReviews(req.params.user, data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(userReviews));
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'author', '==', req.params.user);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('Review', null, req.headers, queryString)
+  .then(function(reviews) {
+    utils.returnResponse(reviews, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 exports.getRestaurantReviews = function(req, res) {
-  var restaurantReviews = [];
-  utils.getListByType('Review', null, req.headers)
-  .then(function(data) {
-    restaurantReviews = utils.getRestaurantReviews(
-      req.params.restaurant,
-      data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(restaurantReviews));
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'itemReviewed', '==',
+                            req.params.restaurant);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('Review', null, req.headers, queryString)
+  .then(function(reviews) {
+    utils.returnResponse(reviews, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 exports.getOrganizationReviews = function(req, res) {
-  var organizationReviews = [];
-  utils.getListByType('Review', null, req.headers)
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'publisher', '==', req.params.org);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('Review', null, req.headers, queryString)
   .then(function(reviews) {
-    utils.getListByType('Restaurant', null, req.headers)
-    .then(function(restaurants) {
-      organizationReviews = utils.getOrgReviews(
-        req.params.org,
-        restaurants.body,
-        reviews.body);
-      res.statusCode = restaurants.statusCode;
-      res.json(utils.dataToSchema(organizationReviews));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+    utils.returnResponse(reviews, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 // Reservations
 
 exports.createReservation = function(req, res) {
-  var elementToOrion;
+  var elementToOrion = req.body;
   var restaurantReservations;
   var capacity;
   var actualOccupancyLevels;
-  var timeframeQuery;
-  var valid = tv4.validate(req.body, 'reservation');
-  if (valid) {
-    // -- We first get information regarding the restaurant
-    utils.getListByType('Restaurant',
-        req.body.reservationFor.name,
-        req.headers)
-    .then(function(data) {
-      elementToOrion = req.body;
-      elementToOrion.reservationFor.address = data.body.address;
-      capacity = data.body.capacity.value;
-      timeframeQuery = utils.getTimeframe(req.body.startTime);
-      utils.sendRequest('GET', {
-            'type': 'FoodEstablishmentReservation',
-            'q': timeframeQuery,
-            'limit': 1000
-          },
-          null,
-          req.headers)
-      .then(function(data) {
-        restaurantReservations = data.body;
-        actualOccupancyLevels = utils.getOccupancyLevels(
-          restaurantReservations,
-          req.body.reservationFor.name);
-        if (actualOccupancyLevels + req.body.partySize > capacity) {
-          res.statusCode = 409;
-          res.json({
-            error: {
-              message: 'The ocuppancy levels have reached its limit',
-              code: 409,
-              title: 'Conflict'
-            }
-          });
-        } else {
-          auth.getUserDataPromise(req)
-          .then(function(data) {
-            elementToOrion = utils.reservationToOrion(data,
-              elementToOrion);
-            utils.sendRequest('POST', elementToOrion, null, req.headers)
-            .then(function(data) {
-              res.headers = data.headers;
-              res.location('/api/orion/reservation/' +
-                elementToOrion.id);
-              res.statusCode = data.statusCode;
-              res.end();
-            })
-            .catch(function(err) {
-              res.statusCode = err.statusCode;
-              res.end();
-            });
-          })
-          .catch(function(err) {
-            res.statusCode = err.statusCode;
-            res.json(JSON.parse(err.data));
-          });
-        }
-      })
-      .catch(function(err) {
-        res.statusCode = err.statusCode;
-        res.json(JSON.parse(err.data));
-      });
+  var timeframe = utils.getTimeframe(req.body.startTime);
+  var sqlList = [];
+  var queryString = {};
+  var restaurantId = utils.generateId(req.body.reservationFor.name);
+  var validSchema = tv4.validate(req.body, 'reservation');
+  if (validSchema) {
+    utils.getListByType('Restaurant', restaurantId, req.headers)
+    .then(function(restaurant) {
+      elementToOrion.address = restaurant.body.address;
+      capacity = restaurant.body.capacity;
+      utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
+      utils.addConditionToQuery(sqlList, 'reservationFor', '==', req.params.id);
+      utils.addConditionToQuery(sqlList, 'reservationStatus', '==',
+                                'Confirmed');
+      queryString.q = sqlList.join(';');
+      return utils.getListByType('FoodEstablishmentReservation', null,
+                                 req.headers, queryString);
+    })
+    .then(function(reservations) {
+      actualOccupancyLevels = utils.getOccupancyLevels(reservations.body);
+      if (actualOccupancyLevels + req.body.partySize < capacity) {
+        auth.getUserDataPromise(req)
+        .then(function(userObject) {
+          elementToOrion = utils.reservationToOrion(userObject, elementToOrion);
+          return utils.sendRequest('POST', elementToOrion, null, req.headers);
+        })
+        .then(function(postResponse) {
+          utils.responsePost(postResponse, elementToOrion, res);
+        })
+        .catch(function(err) {
+          utils.responseError(err, res);
+        });
+      } else {
+        utils.returnConflict(res);
+      }
     })
     .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
+      utils.responseError(err, res);
     });
   } else {
-    res.statusCode = 400;
-    res.json({
-      error: {
-        message: tv4.error.message,
-        code: 400,
-        params: tv4.error.params,
-        dataPath: tv4.error.dataPath,
-        title: 'Bad request'
-      }
-    });
+    utils.returnInvalidSchema(res, tv4);
   }
 };
 
 exports.readReservation = function(req, res) {
-  utils.getListByType('FoodEstablishmentReservation',
-                      req.params.id,
-                      req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var reservationId = req.params.id;
+  utils.getListByType('FoodEstablishmentReservation', reservationId,
+    req.headers)
+  .then(function(reservation) {
+    utils.returnResponse(reservation, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.updateReservation = function(req, res) {
   var restaurantName;
   var userId;
-  utils.getListByType('FoodEstablishmentReservation',
-                      req.params.id,
+  var reservationId = req.params.id;
+  var keyValues = {'options': 'keyValues'};
+  utils.getListByType('FoodEstablishmentReservation', reservationId,
                       req.headers)
-  .then(function(data) {
-    userId = data.body.underName.name;
-    auth.getUserDataPromise(req)
-    .then(function(data) {
-      if (userId !== data.id) {
-        res.statusCode = 403;
-        res.json({
-          error: {
-            message: 'The resource you are trying to access is forbidden',
-            code: 403,
-            title: 'Forbidden'
-          }
-        });
-      } else {
-        utils.sendRequest('PATCH', req.body, req.params.id, req.headers)
-        .then(function(data) {
-          res.statusCode = data.statusCode;
-          res.end();
-        })
-        .catch(function(err) {
-          res.statusCode = err.statusCode;
-          res.json(err.error);
-        });
-      }
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(JSON.parse(err.data));
-    });
+  .then(function(reservation) {
+    userId = reservation.body.underName;
+    return auth.getUserDataPromise(req);
+  })
+  .then(function(userObject) {
+    if (userId === userObject.id) {
+      utils.sendRequest('PATCH', req.body, reservationId, req.headers,
+                        keyValues)
+      .then(function(patchResponse) {
+        utils.returnResponse(patchResponse, res);
+      })
+      .catch(function(err) {
+        utils.responseError(err, res);
+      });
+    } else {
+      utils.returnForbidden(res);
+    }
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.json(err.error);
+    utils.responseError(err, res);
   });
 };
 
 exports.deleteReservation = function(req, res) {
-  utils.sendRequest('DELETE', null, req.params.id, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.end();
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.json(err.error);
-    });
+  var reservationId = req.params.id;
+  utils.sendRequest('DELETE', null, reservationId, req.headers)
+  .then(function(deleteResponse) {
+    utils.returnResponse(deleteResponse, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.getReservations = function(req, res) {
   utils.getListByType('FoodEstablishmentReservation', null, req.headers)
-    .then(function(data) {
-      res.statusCode = data.statusCode;
-      res.json(utils.dataToSchema(data.body));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+  .then(function(reservations) {
+    utils.returnResponse(reservations, res);
+  })
+  .catch(function(err) {
+    utils.responseError(err, res);
+  });
 };
 
 exports.getUserReservations = function(req, res) {
-  var userReservations = [];
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
-  .then(function(data) {
-    userReservations = utils.getUserReservations(
-      req.params.user,
-      data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(userReservations));
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'underName', '==', req.params.user);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
+                      queryString)
+  .then(function(reservations) {
+    utils.returnResponse(reservations, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 exports.getRestaurantReservations = function(req, res) {
-  var restaurantReservations = [];
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
-  .then(function(data) {
-    restaurantReservations = utils.getRestaurantReservations(
-      req.params.restaurant,
-      data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(restaurantReservations));
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'reservationFor', '==',
+                            req.params.restaurant);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
+                      queryString)
+  .then(function(reservations) {
+    utils.returnResponse(reservations, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 exports.getOrganizationReservations = function(req, res) {
-  var organizationsReservations = [];
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
+  var sqlList = [];
+  var queryString = {};
+  var organizationsReservations;
+  var restaurantList;
+  utils.addConditionToQuery(sqlList, 'department', '==', req.params.org);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('Restaurant', null, req.headers, queryString)
+  .then(function(restaurants) {
+    restaurantList = restaurants.body;
+    return utils.getListByType('FoodEstablishmentReservation', null,
+                              req.headers);
+  })
   .then(function(reservations) {
-    utils.getListByType('Restaurant', null, req.headers)
-    .then(function(restaurants) {
-      organizationsReservations = utils.getOrgReservations(
-        req.params.org,
-        restaurants.body,
-        reservations.body);
-      res.statusCode = restaurants.statusCode;
-      res.json(utils.dataToSchema(organizationsReservations));
-    })
-    .catch(function(err) {
-      res.statusCode = err.statusCode;
-      res.end();
-    });
+    organizationsReservations = utils.getOrgReservations(
+                                restaurantList, reservations.body);
+    res.statusCode = reservations.statusCode;
+    res.json(utils.dataToSchema(organizationsReservations));
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
 exports.getReservationsByDate = function(req, res) {
-  var restaurantReservations = [];
-  var timeframeQuery = utils.getTimeBetweenDates(
-    req.params.from,
-    req.params.to);
-  utils.sendRequest('GET',
-    {'type': 'FoodEstablishmentReservation',
-    'q': timeframeQuery,
-    'limit': 1000},
-    null,
-    req.headers)
-  .then(function(data) {
-    restaurantReservations = utils.getRestaurantReservations(
-      req.params.restaurant,
-      data.body);
-    res.statusCode = data.statusCode;
-    res.json(utils.dataToSchema(restaurantReservations));
+  var timeframe = utils.getTimeBetweenDates(
+                  req.params.from, req.params.to);
+  var sqlList = [];
+  var queryString = {};
+  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
+  utils.addConditionToQuery(sqlList, 'reservationFor', '==',
+                            req.params.restaurant);
+  queryString.q = sqlList.join(';');
+  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
+                      queryString)
+  .then(function(reservations) {
+    utils.returnResponse(reservations, res);
   })
   .catch(function(err) {
-    res.statusCode = err.statusCode;
-    res.end();
+    utils.responseError(err, res);
   });
 };
 
