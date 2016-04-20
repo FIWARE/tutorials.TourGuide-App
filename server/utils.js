@@ -237,13 +237,16 @@ function objectToArray(element) {
   return element;
 }
 
-function restaurantToSchema(element) {
+/**
+ * Converts restaurant Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
+function restaurantToSchema(element, date) {
 
-  //-- List elements matching
   var restaurantSchemaElements = [
     'address',
-    'aggregateRating',
-    'name',
     'department',
     'description',
     'priceRange',
@@ -251,27 +254,34 @@ function restaurantToSchema(element) {
     'url'
   ];
 
-  // sensors data
-  var additionalProperties = [
-    'Kitchen_temperature',
-    'Kitchen_humidity',
-    'Dining_temperature',
-    'Dining_humidity',
-    'occupancyLevels',
-    'capacity'
-  ];
-
-  restaurantSchemaElements.push.apply(restaurantSchemaElements,
-                                      additionalProperties);
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Restaurant',
+    'aggregateRating': {
+      'reviewCount': element.aggregateRating.reviewCount,
+      'ratingValue': element.aggregateRating.ratingValue
+    },
+    'additionalProperty': [
+      {
+        'value': element.capacity,
+        'name': 'capacity',
+        '@type': 'PropertyValue'
+      },
+      {
+        'value': element.occupancyLevels,
+        'name': 'occupancyLevels',
+        '@type': 'PropertyValue'
+      }
+    ],
+    'name': element.name
   };
 
-  // array for sensors
-  var additionalProperty = [];
+  if (date) {
+    elementToSchema.additionalProperty[1].timestamp = date;
+  } else {
+    elementToSchema.additionalProperty[1].timestamp = new Date().toISOString();
+  }
 
-  // -- Element value
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
@@ -280,127 +290,110 @@ function restaurantToSchema(element) {
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
       if (val !== 'undefined') {
-        if (additionalProperties.indexOf(elementAttribute) !== -1) {
-          if (val.timestamp) {
-            var newDate = new Date(val.timestamp).toISOString();
-            val.timestamp = newDate;
-          }
-          additionalProperty.push(val);
+        if (typeof val === 'string') {
+          elementToSchema[elementAttribute] = unescape(val);
         } else {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
+          elementToSchema[elementAttribute] = val;
         }
       }
     }
   });
 
-  if (additionalProperty.length) {
-    newElement.additionalProperty = additionalProperty;
+  if (elementToSchema.address) {
+    elementToSchema.address['@type'] = 'postalAddress';
   }
 
-  newElement.name = unescape(element.id);
-
-  newElement = replaceTypeForSchema(newElement);
-
-  // -- Display geo-location schema.org like
-
-  if (element.position &&
-      element.position.value &&
-      typeof element.position.value === 'string') {
-    var geoCoords = element.position.value.split(',');
-    newElement.geo = {};
-    newElement.geo['@type'] = 'GeoCoordinates';
-    newElement.geo.latitude = geoCoords[0];
-    newElement.geo.longitude = geoCoords[1];
+  if (element.location) {
+    var geoCoords = element.location.split(',');
+    elementToSchema.geo = {
+      '@type': 'GeoCoordinates',
+      'latitude': geoCoords[0],
+      'longitude': geoCoords[1]
+    };
   }
-  return newElement;
+
+  return sortObject(elementToSchema);
 }
 
+/**
+ * Converts review Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reviewToSchema(element) {
 
-  var reviewSchemaElements = [
-    'itemReviewed',
-    'reviewRating',
-    'name',
-    'author',
-    'reviewBody',
-    'publisher',
-    'dateCreated'
-  ];
-
-  var newElement = {
+  var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': element.type
+    '@type': 'Review',
+    'author': {
+      '@type': 'Person',
+      'name': element.author
+    },
+    'dateCreated': element.dateCreated,
+    'itemReviewed': {
+      '@type': 'Restaurant',
+      'name': element.itemReviewed
+    },
+    'name': element.id,
+    'publisher': {
+      '@type': 'Organization',
+      'name': element.publisher
+    },
+    'reviewBody': element.reviewBody,
+    'reviewRating': {
+      '@type': 'Rating',
+      'ratingValue': element.reviewRating
+    }
   };
 
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-      val = element[elementAttribute];
-      if (reviewSchemaElements.indexOf(elementAttribute) !== -1) {
-        if (val !== 'undefined') {
-          if (typeof val === 'string') {
-            newElement[elementAttribute] = unescape(val);
-          } else {
-            newElement[elementAttribute] = val;
-          }
-        }
-      }
-    });
-
-  var newDate = new Date(newElement.dateCreated).toISOString();
-  newElement.dateCreated = newDate;
-  newElement.name = unescape(element.id);
-  newElement = replaceTypeForSchema(newElement);
-
-  return newElement;
+  return sortObject(elementToSchema);
 }
 
+/**
+ * Converts reservation Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reservationToSchema(element) {
 
-  var reservationSchemaElements = [
-    'reservationStatus',
-    'underName',
-    'reservationFor',
-    'startTime',
-    'partySize'
-  ];
-
-  var newElement = {
-    '@context': 'http://schema.org',
-    '@type': element.type
-  };
-
-  var val;
-
-  Object.keys(element).forEach(function(elementAttribute) {
-    val = element[elementAttribute];
-    if (reservationSchemaElements.indexOf(elementAttribute) !==
-      -1) {
-      if (val !== 'undefined') {
-        if (typeof val === 'string') {
-          newElement[elementAttribute] = unescape(val);
-        } else {
-          newElement[elementAttribute] = val;
+  var elementToSchema = {
+      '@context': 'http://schema.org',
+      '@type': 'FoodEstablishmentReservation',
+      'partySize': element.partySize,
+      'reservationFor': {
+        '@type': 'FoodEstablishment',
+        'name': element.reservationFor,
+        'address': {
+          '@type': 'postalAddress',
+          'streetAddress': element.address.streetAddress,
+          'addressRegion': element.address.addressRegion,
+          'addressLocality': element.address.addressLocality,
+          'postalCode': element.address.postalCode,
         }
-      }
-    }
-  });
-  var newDate = new Date(newElement.startTime).toISOString();
-  newElement.startTime = newDate;
-  newElement.reservationId = unescape(element.id);
-  newElement.reservationFor.name = unescape(
-    newElement.reservationFor.name);
+      },
+      'reservationStatus': element.reservationStatus,
+      'startTime': element.startTime,
+      'underName': {
+        '@type': 'Person',
+        'name': element.underName
+      },
+      'reservationId': element.id
+    };
 
-  newElement = replaceTypeForSchema(newElement);
+  return sortObject(elementToSchema);
 
-  return newElement;
 }
 
-function objectDataToSchema(element) {
+/**
+ * Convert elements with Orion format into schema.org ones
+ *
+ * @param {Object} element - Object to convert
+ * @param {String} date - datetime
+ * @return {Object} newElement - Object in schema.org format
+*/
+function objectDataToSchema(element, date) {
 
   var newElement;
   var type = element.type;
@@ -409,7 +402,11 @@ function objectDataToSchema(element) {
 
   case 'Restaurant':
 
-    newElement = restaurantToSchema(element);
+    if (date) {
+      newElement = restaurantToSchema(element, date);
+    } else {
+      newElement = restaurantToSchema(element);
+    }
     return newElement;
 
   case 'Review':
@@ -424,10 +421,15 @@ function objectDataToSchema(element) {
 
   default:
     console.log('Undefined type received to convert');
-
   }
 }
 
+/**
+ * Order the object elements alphabetically
+ *
+ * @param {Object} element - Object to order
+ * @return {Object} sorted - sorted object
+*/
 function sortObject(element) {
   var sorted = {};
   var key;
@@ -447,20 +449,22 @@ function sortObject(element) {
   return sorted;
 }
 
-function dataToSchema(listOfElements) {
+function dataToSchema(listOfElements, date) {
 
   var newListOfElements = [];
   var newElement;
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function(element, pos) {
-
-    newElement = objectDataToSchema(listOfElements[pos]);
+  Object.keys(listOfElements).forEach(function(element, index) {
+    if (date) {
+      newElement = objectDataToSchema(listOfElements[index], date);
+    } else {
+      newElement = objectDataToSchema(listOfElements[index]);
+    }
     newListOfElements.push(newElement);
 
   });
-
   return newListOfElements;
 }
 
@@ -501,9 +505,15 @@ function completeAddress(schemaObject, geoObject) {
   return schemaObject;
 }
 
+/**
+ * Completes the schemaObject location element
+ *
+ * @param {Object} schemaObject - Object to be added in Orion
+ * @param {Object} geoObject - geocoder object
+ * @return {Object} schemaObject - The schemaObject with the
+ *         geocoder latitude and longitude
+*/
 function addGeolocation(schemaObject, geoObject) {
-  // The returned object will be POST/PATCH(ed),
-  // so we need to add the 'value' field
   if (geoObject) {
     schemaObject.location = {
       'type': 'geo:point',
@@ -512,133 +522,173 @@ function addGeolocation(schemaObject, geoObject) {
   }
   return schemaObject;
 }
+
+/**
+ * Generate restaurant data model to be stored in Context Broker
+ *
+ * @param {Object} schemaObject - Object received
+ * @param {Object} geoObject - geocoder object
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function restaurantToOrion(schemaObject, geoObject) {
 
-  schemaObject = replaceTypeForOrion(schemaObject);
-  schemaObject.id = schemaObject.name;
-  delete schemaObject.name;
+  var objectToOrion = {
+    'address': {
+      'type': 'PostalAddress',
+      'value': {
+        'streetAddress': schemaObject.address.streetAddress,
+        'addressLocality': schemaObject.address.addressLocality,
+        'addressRegion': schemaObject.address.addressRegion,
+        'postalCode': schemaObject.address.postalCode
+      }
+    },
+    'aggregateRating': {
+      'type': 'AggregateRating',
+      'value': {
+        'ratingValue': 0,
+        'reviewCount': 0
+      }
+    },
+    'capacity': {
+      'type': 'PropertyValue',
+      'value': schemaObject.capacity.value
+    },
+    'department': {
+      'value': schemaObject.department
+    },
+    'description': {
+      'value': schemaObject.description
+    },
+    'id': generateId(schemaObject.name),
+    'name': {
+      'value': fixedEncodeURIComponent(schemaObject.name)
+    },
+    'priceRange': {
+      'value': schemaObject.priceRange
+    },
+    'telephone': {
+      'value': schemaObject.telephone
+    },
+    'occupancyLevels': {
+      'metadata': {
+        'timestamp': {
+          'type': 'date',
+          'value': schemaObject.occupancyLevels.metadata.timestamp.value
+        }
+      },
+      'type': 'PropertyValue',
+      'value': schemaObject.occupancyLevels.value
+    },
+    'type': 'Restaurant',
+    'url': {
+      'value': schemaObject.url
+    },
+  };
 
-  schemaObject = addGeolocation(schemaObject, geoObject);
-  schemaObject = completeAddress(schemaObject, geoObject);
+  objectToOrion = addGeolocation(objectToOrion, geoObject);
+  objectToOrion = completeAddress(objectToOrion, geoObject);
 
-  return sortObject(schemaObject);
-
+  return sortObject(objectToOrion);
 }
 
+/**
+ * Generate review data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reviewToOrion(userObject, schemaObject) {
 
-  // -- TODO: check how to implement 'position field'
-  // -- - idea is, whenever a new review is created into
-  // -- - a restaurant, the review position increase;
-  // -- - but the only one able to modify it is the user
-  // -- - We need that way cause we cannot display 'ids'
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.itemReviewed.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    schemaObject.reviewBody = fixedEncodeURIComponent(schemaObject.reviewBody);
-    schemaObject.author = {};
-    schemaObject.author.type = 'Person';
-    schemaObject.author.name = userObject.id;
-    schemaObject.dateCreated = new Date().getTime();
-    if (userObject.organizations[0]) {
-      schemaObject.publisher = {};
-      schemaObject.publisher.type = 'Organization';
-      schemaObject.publisher.name = userObject.organizations[0].name;
-    }
+    var date = new Date().toISOString();
+    var itemReviewed = fixedEncodeURIComponent(schemaObject.itemReviewed.name);
+    var objectToOrion = {
+      'author': {
+        'type': 'Person',
+        'value': userObject.id
+      },
+      'dateCreated': {
+        'type': 'date',
+        'value': date
+      },
+      'id': generateId(itemReviewed, date),
+      'itemReviewed': {
+        'type': 'Restaurant',
+        'value': itemReviewed
+      },
+      'publisher': {
+        'type': 'Organization',
+        'value': userObject.organizations[0].name
+      },
+      'reviewRating': {
+        'type': 'Rating',
+        'value': schemaObject.reviewRating.ratingValue
+      },
+      'reviewBody': {
+        'value': fixedEncodeURIComponent(schemaObject.reviewBody)
+      },
+      'type': 'Review'
+    };
+    return sortObject(objectToOrion);
   }
-  return sortObject(schemaObject);
 }
 
+/**
+ * Generate reservation data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reservationToOrion(userObject, schemaObject) {
 
-  // -- TODO: check automatically if there's enough space at
-  // -- the restaurant, so reservation is accepted automatically
-
   if (userObject) {
-    schemaObject = replaceTypeForOrion(schemaObject);
-    var rname = schemaObject.reservationFor.name;
-    rname += '-' + shortid.generate();
-    schemaObject.id = rname;
-    var newDate = new Date(schemaObject.startTime).getTime();
-    //Time in miliseconds to Orion
-    schemaObject.startTime = newDate;
-    schemaObject.underName = {};
-    schemaObject.partySize = parseInt(schemaObject.partySize, 10);
-    schemaObject.underName.type = 'Person';
-    schemaObject.underName.name = userObject.id;
-    schemaObject.reservationStatus = 'Confirmed';
+    var date = new Date(schemaObject.startTime).toISOString();
+    var reservationFor = fixedEncodeURIComponent(
+      schemaObject.reservationFor.name);
+    var objectToOrion = {
+      'id': generateId(reservationFor, date),
+      'partySize': {
+        'value': schemaObject.partySize
+      },
+      'reservationFor': {
+        'type': 'FoodEstablishment',
+        'value': reservationFor
+      },
+      'reservationStatus': {
+        'value': 'Confirmed'
+      },
+      'startTime': {
+        'type': 'date',
+        'value': date
+      },
+      'address': {
+        'type': 'PostalAddress',
+        'value': schemaObject.address
+      },
+      'type': 'FoodEstablishmentReservation',
+      'underName': {
+        'type': 'Person',
+        'value': userObject.id
+      }
+    };
+    return sortObject(objectToOrion);
   }
-  return sortObject(schemaObject);
 }
 
-// filter restaurants by organization
-function getOrgRestaurants(org, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.department === org;
-    }
-  );
-}
+/**
+ * Generate a list of reservations of a Franchise
+ *
+ * @param {List} listOfRestaurants - restaurants from a Franchise
+ * @param {List} listOfReservations - list of reservations
+ * @return {List} contains all the reservations of the passed restaurants
+*/
+function getOrgReservations(listOfRestaurants, listOfReservations) {
 
-// filter reviews by author
-function getUserReviews(user, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.author === user;
-    }
-  );
-}
-
-// filter reviews by restaurant
-function getRestaurantReviews(restaurant, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.itemReviewed === restaurant;
-    }
-  );
-}
-
-// filter reviews by organization
-function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
-  // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise, listOfRestaurants);
-
-  // filter reviews of the restaurants of the franchise
-  return objectToArray(listOfReviews).filter(
-    function(element) {
-      return listOfRestaurants.some(function(restaurant) {
-        return restaurant.name === element.itemReviewed;
-      });
-    }
-  );
-}
-
-// filter list of reservations by user
-function getUserReservations(user, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.underName === user;
-    }
-  );
-}
-
-// filter list of reservations by restaurant name
-function getRestaurantReservations(restaurant, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.reservationFor === restaurant;
-    }
-  );
-}
-
-function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
-  // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
-
-  // filter reservations of the restaurants of the franchise
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
@@ -648,19 +698,43 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   );
 }
 
-function getListByType(type, element, headers, normalized) {
+/**
+ * Wrapper to send requests (GET) against Orion
+ *
+ * @param {String} type - element type (restaurant, review or reservation)
+ * @param {Object} element - Object received
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - queryString to send
+ * @param {String} normalized - normalized mode
+ * @return {Promise} returns the request response
+*/
+function getListByType(type, element, headers, queryString, normalized) {
   var uri = '/v2/entities';
   var limit = 1000;
-  var options = {'type': type,'limit': limit};
+  if (!queryString) {
+    queryString = {};
+  }
+  queryString.type = type;
+  queryString.limit = limit;
   if (element) {
     uri += '/' + encodeURIComponent(element);
   }
   if (!normalized) {
-    options.options = 'keyValues';
+    queryString.options = 'keyValues';
   }
-  return authRequest(uri, 'GET', null, headers, options);
+  return authRequest(uri, 'GET', null, headers, queryString);
 }
 
+/**
+ * Wrapper to send requests against Orion
+ *
+ * @param {String} method - method to use
+ * @param {Object} body - body to send
+ * @param {String} identifier - identifier of the entity
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - queryString to send
+ * @return {Promise} returns the request response
+*/
 function sendRequest(method, body, identifier, headers, queryString) {
   var uri = '/v2/entities';
   if (identifier) {
@@ -669,6 +743,12 @@ function sendRequest(method, body, identifier, headers, queryString) {
   return authRequest(uri, method, body, headers, queryString);
 }
 
+/**
+ * Calculates the average of a given list
+ *
+ * @param {List} data - List with the elements to calculate
+ * @return {Integer} avg - The average of the elements list
+*/
 function getAverage(data) {
   var sum = data.reduce(function(sum, value) {
     return sum + value;
@@ -678,16 +758,16 @@ function getAverage(data) {
   return avg;
 }
 
+/**
+ * Generates an Element to be patched(updated) in a Restaurant
+ *
+ * @param {List} listOfReviews - List of the reviews
+ * @return {Object} newElement - The average element updated
+*/
 function getAggregateRating(listOfReviews) {
-  // The returned object will be POST/PATCH(ed),
-  // so we need to add the 'value' field
+
   var counter = 0;
   var ratingValues = [];
-  var newElement = {
-    'aggregateRating': {
-      'value': {}
-    }
-  };
 
   listOfReviews = objectToArray(listOfReviews);
 
@@ -700,65 +780,72 @@ function getAggregateRating(listOfReviews) {
     }
   });
 
-  newElement.aggregateRating.value.reviewCount = counter;
-  newElement.aggregateRating.value.ratingValue = getAverage(ratingValues);
+  var newElement = {
+    'aggregateRating': {
+      'value': {
+        'reviewCount': counter,
+        'ratingValue': getAverage(ratingValues)
+      }
+    }
+  };
 
   return newElement;
 }
 
-function replaceTypeForOrion(schemaObject) {
-  var parsed = JSON.parse(JSON.stringify(schemaObject), function(key, value) {
-    if (key === '@type') {
-      this.type = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
-function replaceTypeForSchema(element) {
-  var parsed = JSON.parse(JSON.stringify(element), function(key, value) {
-    if (key === 'type') {
-      this['@type'] = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} isoTimeString - datetime
+ * @return {String} frameTime - string to filter
+*/
 function getTimeframe(isoTimeString) {
-  var newDate = new Date(isoTimeString).getTime();
-  var frame = newDate - 60 * 60 * 2 * 1000;
-  var frameTime = 'startTime==' + frame + '..' + newDate;
+  var newDate = new Date(isoTimeString);
+  var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
+  var frameDateObject = new Date(frame);
+  var frameTime = frameDateObject.toISOString() + '..' + newDate.toISOString();
   return frameTime;
 }
 
-function getOccupancyLevels(listOfReservations, restaurant) {
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} from - datetime from
+ * @param {String} to - datetime to
+ * @return {String} frameTime - string to filter
+*/
+function getTimeBetweenDates(from, to) {
+  var fromTimestamp = new Date(from).toISOString();
+  var toTimestamp = new Date(to).toISOString();
+  var frameTime = fromTimestamp + '..' + toTimestamp;
+  return frameTime;
+}
+
+/**
+ * Calculates the sum of the occupancyLevels
+ *
+ * @param {List} listOfReservations - reservations list
+ * @return {Integer} occupancyLevels - the occupancyLevels
+*/
+function getOccupancyLevels(listOfReservations) {
 
   var occupancyLevels = 0;
 
-  Object.keys(listOfReservations).forEach(function(element, pos) {
-
-    if (listOfReservations[pos].reservationFor.name == restaurant &&
-        listOfReservations[pos].reservationStatus == 'Confirmed') {
-      occupancyLevels += listOfReservations[pos].partySize;
-    }
+  Object.keys(listOfReservations).forEach(function(element, index) {
+    occupancyLevels += listOfReservations[index].partySize;
   });
 
   return occupancyLevels;
 }
 
-function getTimeBetweenDates(from, to) {
-  var fromTimestamp = new Date(from).getTime();
-  var toTimestamp = new Date(to).getTime();
-  var frameTime = 'startTime==' + fromTimestamp + '..' + toTimestamp;
-  return frameTime;
-}
-
-function updateOccupancyLevels(occupancyLevel, date) {
-  return {
+/**
+ * Generates an occupancyLevels object
+ *
+ * @param {Integer} occupancyLevel - The occupancyLevels
+ * @param {Date} date - date object
+ * @return {Object} occupancyObject - object to update a Restaurant
+*/
+function createOccupancyObject(occupancyLevel, date) {
+  var occupancyObject = {
     'occupancyLevels': {
       'metadata': {
         'timestamp': {
@@ -770,8 +857,29 @@ function updateOccupancyLevels(occupancyLevel, date) {
       'value': occupancyLevel
     }
   };
+  return occupancyObject;
 }
 
+/**
+ * Generates an occupancyLevels object to update a Restaurant
+ *
+ * @param {List} listOfReservations - Reservations list
+ * @param {Date} date - date object
+ * @return {Object} occupancyLevelsObj - object to update a Restaurant
+*/
+function updateOccupancyLevels(listOfReservations, date) {
+  var occupancyLevels = getOccupancyLevels(listOfReservations);
+  var occupancyLevelsObj = createOccupancyObject(occupancyLevels, date);
+  return occupancyLevelsObj;
+}
+
+/**
+ * Generates an sha1 identifier
+ *
+ * @param {String} name - element name
+ * @param {Date} date - date object
+ * @return {String} id - identifier based in the parameters
+*/
 function generateId(name, date) {
   var id;
   var inputEncoding;
@@ -784,6 +892,158 @@ function generateId(name, date) {
 
   id = crypto.createHash('sha1').update(inputEncoding).digest('hex');
   return id;
+}
+
+/**
+ * Wrapper function to generate sql (Simple Query Languange) elements
+ *
+ * @param {List} listOfConditions - conditions
+ * @param {String} key - key to filter
+ * @param {String} operator - operator for the matching
+ * @param {String} value - value
+ * @return {List} listOfConditions - updated list of conditions
+*/
+function addConditionToQuery(listOfConditions, key, operator, value) {
+  if (!listOfConditions) {
+    listOfConditions = [];
+  }
+  var condition = key + operator + value;
+  listOfConditions.push(condition);
+  return listOfConditions;
+}
+
+/**
+ * Adds the fiware-servicepath to the headers
+ *
+ * @param {Object} headers - headers of the request
+ * @param {String} department - fiware-servicepath (FranchiseX)
+ * @return {Object} fiwareHeaders - updated headers
+*/
+function completeHeaders(headers, department) {
+  var fiwareHeaders = JSON.parse(JSON.stringify(headers));
+  if (department) {
+    fiwareHeaders['fiware-servicepath'] = '/' + department;
+  }
+  return fiwareHeaders;
+}
+
+/**
+ * Removes the fiware-servicepath for reviews and restaurants
+ *
+ * @param {Object} headers - headers of the request
+ * @return {Object} fiwareHeaders - updated headers
+*/
+function removeServicePath(headers) {
+  var fiwareHeaders = JSON.parse(JSON.stringify(headers));
+  if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
+    delete fiwareHeaders['fiware-servicepath'];
+  }
+  return fiwareHeaders;
+}
+
+/**
+ * Send the response object in schema.org format
+ *
+ * @param {Object} data - object from Orion
+ * @param {Object} res - response to send
+*/
+function returnResponse(data, res) {
+  res.statusCode = data.statusCode;
+  res.headers = data.headers;
+  if (data.body) {
+    res.json(dataToSchema(data.body));
+  } else {
+    res.end();
+  }
+}
+
+/**
+ * Send the response error
+ *
+ * @param {Object} err - error object
+ * @param {Object} res - response to send
+*/
+function responseError(err, res) {
+  res.statusCode = err.statusCode;
+  res.headers = err.headers;
+  if (err.error) {
+    res.json(err.error);
+  } else if (err.data) {
+    res.json(err.data);
+  } else {
+    res.end();
+  }
+}
+
+/**
+ * Send the response from a POST request
+ *
+ * @param {Object} data - data object
+ * @param {String} element - element added
+ * @param {Object} res - response to send
+*/
+function responsePost(data, element, res) {
+  res.headers = data.headers;
+  if (element.type === 'Restaurant') {
+    res.location('/api/orion/restaurant/' + element.id);
+  } else if (element.type === 'Review') {
+    res.location('/api/orion/review/' + element.id);
+  } else {
+    res.location('/api/orion/reservation/' + element.id);
+  }
+  res.statusCode = data.statusCode;
+  res.end();
+}
+
+/**
+ * Send error response when the schema is invalid
+ *
+ * @param {Object} res - response to send
+ * @param {Object} tv4 - schema validator object
+*/
+function returnInvalidSchema(res, tv4) {
+  res.statusCode = 400;
+  res.json({
+    error: {
+      message: tv4.error.message,
+      code: 400,
+      params: tv4.error.params,
+      dataPath: tv4.error.dataPath,
+      title: 'Bad request'
+    }
+  });
+}
+
+/**
+ * Send error response when the resource is forbidden
+ *
+ * @param {Object} res - response to send
+*/
+function returnForbidden(res) {
+  res.statusCode = 403;
+  res.json({
+    error: {
+      message: 'The resource you are trying to access is forbidden',
+      code: 403,
+      title: 'Forbidden'
+    }
+  });
+}
+
+/**
+ * Send error response when there's a conflict
+ *
+ * @param {Object} res - response to send
+*/
+function returnConflict(res) {
+  res.statusCode = 409;
+  res.json({
+    error: {
+      message: 'The ocuppancy levels have reached its limit',
+      code: 409,
+      title: 'Conflict'
+    }
+  });
 }
 
 module.exports = {
@@ -807,22 +1067,23 @@ module.exports = {
   restaurantToOrion: restaurantToOrion,
   reviewToOrion: reviewToOrion,
   reservationToOrion: reservationToOrion,
-  getOrgRestaurants: getOrgRestaurants,
-  getUserReviews: getUserReviews,
-  getRestaurantReviews: getRestaurantReviews,
-  getOrgReviews: getOrgReviews,
-  getUserReservations: getUserReservations,
-  getRestaurantReservations: getRestaurantReservations,
   getOrgReservations: getOrgReservations,
   getListByType: getListByType,
   sendRequest: sendRequest,
   getAverage: getAverage,
   getAggregateRating: getAggregateRating,
-  replaceTypeForOrion: replaceTypeForOrion,
-  replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
   updateOccupancyLevels: updateOccupancyLevels,
-  generateId: generateId
+  generateId: generateId,
+  addConditionToQuery: addConditionToQuery,
+  completeHeaders: completeHeaders,
+  returnResponse: returnResponse,
+  responseError: responseError,
+  responsePost: responsePost,
+  returnInvalidSchema: returnInvalidSchema,
+  removeServicePath: removeServicePath,
+  returnForbidden: returnForbidden,
+  returnConflict: returnConflict
 };
