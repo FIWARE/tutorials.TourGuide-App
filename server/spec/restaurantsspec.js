@@ -13,6 +13,7 @@
 var frisby = require('frisby');
 var delay = 200; //miliseconds
 var config = require('../config');
+var utils = require('../utils');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -58,15 +59,18 @@ frisby.create('OAuth2 login')
         'telephone': '912345678',
         'url': 'http://www.example.com',
         'capacity': {
-          'type': 'PropertyValue',
-          'name': 'capacity',
+          '@type': 'PropertyValue',
           'value': 200
         },
         'occupancyLevels': {
-          'type': 'PropertyValue',
-          'timestamp': new Date().toISOString(),
-          'name': 'occupancyLevels',
-          'value': 0
+          '@type': 'PropertyValue',
+          'value': 0,
+          'metadata': {
+            'timestamp': {
+              '@type': 'date',
+              'value': new Date().toISOString()
+            }
+          }
         }
       }, {
         json: true
@@ -77,7 +81,7 @@ frisby.create('OAuth2 login')
       .waits(delay)
       .expectStatus(201)
       .expectHeaderContains('location',
-        '/api/orion/restaurant/example')
+        '/api/orion/restaurant/' + utils.generateId('example'))
       .toss();
 
     frisby.create('List all the restaurants')
