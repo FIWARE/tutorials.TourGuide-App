@@ -105,29 +105,17 @@ var triggerRestaurantsRatings = function() {
     console.log(restaurantsModified + '/' + restaurantsData.length);
   };
 
-  var reviews;
-  var restaurantReviews;
-  var servicePath;
-
   var q = async.queue(function(task, callback) {
     var restaurantId = utils.generateId(task.restaurantName);
     setTimeout(function() {
       utils.getListByType('Restaurant', restaurantId, fiwareHeaders)
       .then(function(data) {
-        var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
-        if (data.body.department) {
-          fwHeaders['fiware-servicepath'] = '/' + data.body.department;
-        }
-        utils.sendRequest(
-          'PATCH',
-          task.aggregateRatings,
-          restaurantId,
-          fwHeaders)
-        .then(callback)
-        .catch(function(err) {
-          console.log(err.error);
-        });
+        var fwHeaders = utils.completeHeaders(fiwareHeaders,
+                                              data.body.department);
+        return utils.sendRequest('PATCH', task.aggregateRatings, restaurantId,
+                                fwHeaders);
       })
+      .then(callback)
       .catch(function(err) {
         console.log(err.error);
       });
@@ -139,22 +127,22 @@ var triggerRestaurantsRatings = function() {
     console.log('Total restaurants modified: ' + restaurantsModified);
   };
 
-  utils.getListByType('Review', null, fiwareHeaders)
-  .then(function(data) {
-    reviews = data.body;
-    Object.keys(restaurantsData).forEach(function(element, index) {
-      var restaurantName = restaurantsData[index].name;
-      restaurantReviews = utils.getRestaurantReviews(
-        restaurantName,
-        reviews);
+  Object.keys(restaurantsData).forEach(function(element, index) {
+    var restaurantName = restaurantsData[index].name;
+    var sqlList = [];
+    var queryString = {};
+    utils.addConditionToQuery(sqlList, 'itemReviewed', '==', restaurantName);
+    queryString.q = sqlList.join(';');
+    utils.getListByType('Review', null, fiwareHeaders, queryString)
+    .then(function(restaurantReviews) {
       var ratings = utils.getAggregateRating(
         restaurantReviews);
       q.push({'aggregateRatings': ratings,
         'restaurantName': restaurantName}, returnPost);
+    })
+    .catch(function(err) {
+      console.log(err.error);
     });
-  })
-  .catch(function(err) {
-    console.log(err);
   });
 };
 

@@ -571,74 +571,10 @@ function reservationToOrion(userObject, schemaObject) {
     schemaObject.underName.name = userObject.id;
     schemaObject.reservationStatus = 'Confirmed';
   }
-  return sortObject(schemaObject);
 }
 
-// filter restaurants by organization
-function getOrgRestaurants(org, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.department === org;
-    }
-  );
-}
+function getOrgReservations(listOfRestaurants, listOfReservations) {
 
-// filter reviews by author
-function getUserReviews(user, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.author === user;
-    }
-  );
-}
-
-// filter reviews by restaurant
-function getRestaurantReviews(restaurant, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.itemReviewed === restaurant;
-    }
-  );
-}
-
-// filter reviews by organization
-function getOrgReviews(franchise, listOfRestaurants, listOfReviews) {
-  // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise, listOfRestaurants);
-
-  // filter reviews of the restaurants of the franchise
-  return objectToArray(listOfReviews).filter(
-    function(element) {
-      return listOfRestaurants.some(function(restaurant) {
-        return restaurant.name === element.itemReviewed;
-      });
-    }
-  );
-}
-
-// filter list of reservations by user
-function getUserReservations(user, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.underName === user;
-    }
-  );
-}
-
-// filter list of reservations by restaurant name
-function getRestaurantReservations(restaurant, listOfElements) {
-  return objectToArray(listOfElements).filter(
-    function(element) {
-      return element.reservationFor === restaurant;
-    }
-  );
-}
-
-function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
-  // list of restaurants of the franchise
-  listOfRestaurants = getOrgRestaurants(franchise,listOfRestaurants);
-
-  // filter reservations of the restaurants of the franchise
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
@@ -648,17 +584,21 @@ function getOrgReservations(franchise, listOfRestaurants, listOfReservations) {
   );
 }
 
-function getListByType(type, element, headers, normalized) {
+function getListByType(type, element, headers, queryString, normalized) {
   var uri = '/v2/entities';
   var limit = 1000;
-  var options = {'type': type,'limit': limit};
+  if (!queryString) {
+    queryString = {};
+  }
+  queryString.type = type;
+  queryString.limit = limit;
   if (element) {
     uri += '/' + encodeURIComponent(element);
   }
   if (!normalized) {
-    options.options = 'keyValues';
+    queryString.options = 'keyValues';
   }
-  return authRequest(uri, 'GET', null, headers, options);
+  return authRequest(uri, 'GET', null, headers, queryString);
 }
 
 function sendRequest(method, body, identifier, headers, queryString) {
@@ -706,59 +646,34 @@ function getAggregateRating(listOfReviews) {
   return newElement;
 }
 
-function replaceTypeForOrion(schemaObject) {
-  var parsed = JSON.parse(JSON.stringify(schemaObject), function(key, value) {
-    if (key === '@type') {
-      this.type = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
-function replaceTypeForSchema(element) {
-  var parsed = JSON.parse(JSON.stringify(element), function(key, value) {
-    if (key === 'type') {
-      this['@type'] = value;
-    } else {
-      return value;
-    }
-  });
-  return parsed;
-}
-
 function getTimeframe(isoTimeString) {
-  var newDate = new Date(isoTimeString).getTime();
-  var frame = newDate - 60 * 60 * 2 * 1000;
-  var frameTime = 'startTime==' + frame + '..' + newDate;
+  var newDate = new Date(isoTimeString);
+  var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
+  var frameDateObject = new Date(frame);
+  var frameTime = frameDateObject.toISOString() + '..' + newDate.toISOString();
   return frameTime;
 }
 
-function getOccupancyLevels(listOfReservations, restaurant) {
+function getTimeBetweenDates(from, to) {
+  var fromTimestamp = new Date(from).toISOString();
+  var toTimestamp = new Date(to).toISOString();
+  var frameTime = fromTimestamp + '..' + toTimestamp;
+  return frameTime;
+}
+
+function getOccupancyLevels(listOfReservations) {
 
   var occupancyLevels = 0;
 
-  Object.keys(listOfReservations).forEach(function(element, pos) {
-
-    if (listOfReservations[pos].reservationFor.name == restaurant &&
-        listOfReservations[pos].reservationStatus == 'Confirmed') {
-      occupancyLevels += listOfReservations[pos].partySize;
-    }
+  Object.keys(listOfReservations).forEach(function(element, index) {
+    occupancyLevels += listOfReservations[index].partySize;
   });
 
   return occupancyLevels;
 }
 
-function getTimeBetweenDates(from, to) {
-  var fromTimestamp = new Date(from).getTime();
-  var toTimestamp = new Date(to).getTime();
-  var frameTime = 'startTime==' + fromTimestamp + '..' + toTimestamp;
-  return frameTime;
-}
-
-function updateOccupancyLevels(occupancyLevel, date) {
-  return {
+function createOccupancyObject(occupancyLevel, date) {
+  var occupancyObject = {
     'occupancyLevels': {
       'metadata': {
         'timestamp': {
@@ -770,6 +685,13 @@ function updateOccupancyLevels(occupancyLevel, date) {
       'value': occupancyLevel
     }
   };
+  return occupancyObject;
+}
+
+function updateOccupancyLevels(listOfReservations, date) {
+  var occupancyLevels = getOccupancyLevels(listOfReservations);
+  var occupancyLevelsObj = createOccupancyObject(occupancyLevels, date);
+  return occupancyLevelsObj;
 }
 
 function generateId(name, date) {
@@ -784,6 +706,101 @@ function generateId(name, date) {
 
   id = crypto.createHash('sha1').update(inputEncoding).digest('hex');
   return id;
+}
+
+function addConditionToQuery(listOfConditions, key, operator, value) {
+  if (!listOfConditions) {
+    listOfConditions = [];
+  }
+  var condition = key + operator + value;
+  listOfConditions.push(condition);
+  return listOfConditions;
+}
+
+function completeHeaders(headers, department) {
+  var fiwareHeaders = JSON.parse(JSON.stringify(headers));
+  if (department) {
+    fiwareHeaders['fiware-servicepath'] = '/' + department;
+  }
+  return fiwareHeaders;
+}
+
+function removeServicePath(headers) {
+  var fiwareHeaders = JSON.parse(JSON.stringify(headers));
+  if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
+    delete fiwareHeaders['fiware-servicepath'];
+  }
+  return fiwareHeaders;
+}
+
+function returnResponse(data, res) {
+  res.statusCode = data.statusCode;
+  res.headers = data.headers;
+  if (data.body) {
+    res.json(dataToSchema(data.body));
+  } else {
+    res.end();
+  }
+}
+
+function responseError(err, res) {
+  res.statusCode = err.statusCode;
+  res.headers = err.headers;
+  if (err.error) {
+    res.json(err.error);
+  } else if (err.data) {
+    res.json(err.data);
+  } else {
+    res.end();
+  }
+}
+
+function responsePost(data, element, res) {
+  res.headers = data.headers;
+  if (element.type === 'Restaurant') {
+    res.location('/api/orion/restaurant/' + element.id);
+  } else if (element.type === 'Review') {
+    res.location('/api/orion/review/' + element.id);
+  } else {
+    res.location('/api/orion/reservation/' + element.id);
+  }
+  res.statusCode = data.statusCode;
+  res.end();
+}
+
+function returnInvalidSchema(res, tv4) {
+  res.statusCode = 400;
+  res.json({
+    error: {
+      message: tv4.error.message,
+      code: 400,
+      params: tv4.error.params,
+      dataPath: tv4.error.dataPath,
+      title: 'Bad request'
+    }
+  });
+}
+
+function returnForbidden(res) {
+  res.statusCode = 403;
+  res.json({
+    error: {
+      message: 'The resource you are trying to access is forbidden',
+      code: 403,
+      title: 'Forbidden'
+    }
+  });
+}
+
+function returnConflict(res) {
+  res.statusCode = 409;
+  res.json({
+    error: {
+      message: 'The ocuppancy levels have reached its limit',
+      code: 409,
+      title: 'Conflict'
+    }
+  });
 }
 
 module.exports = {
@@ -807,22 +824,23 @@ module.exports = {
   restaurantToOrion: restaurantToOrion,
   reviewToOrion: reviewToOrion,
   reservationToOrion: reservationToOrion,
-  getOrgRestaurants: getOrgRestaurants,
-  getUserReviews: getUserReviews,
-  getRestaurantReviews: getRestaurantReviews,
-  getOrgReviews: getOrgReviews,
-  getUserReservations: getUserReservations,
-  getRestaurantReservations: getRestaurantReservations,
   getOrgReservations: getOrgReservations,
   getListByType: getListByType,
   sendRequest: sendRequest,
   getAverage: getAverage,
   getAggregateRating: getAggregateRating,
-  replaceTypeForOrion: replaceTypeForOrion,
-  replaceTypeForSchema: replaceTypeForSchema,
   getTimeframe: getTimeframe,
   getOccupancyLevels: getOccupancyLevels,
   getTimeBetweenDates: getTimeBetweenDates,
   updateOccupancyLevels: updateOccupancyLevels,
-  generateId: generateId
+  generateId: generateId,
+  addConditionToQuery: addConditionToQuery,
+  completeHeaders: completeHeaders,
+  returnResponse: returnResponse,
+  responseError: responseError,
+  responsePost: responsePost,
+  returnInvalidSchema: returnInvalidSchema,
+  removeServicePath: removeServicePath,
+  returnForbidden: returnForbidden,
+  returnConflict: returnConflict
 };
