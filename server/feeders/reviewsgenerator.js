@@ -28,6 +28,9 @@ var restaurantsData; // All data for the restaurants to be reviewed
 var delay = 200; //time in ms
 var restaurantsModified = 0;
 
+var RESTAURANT_TYPE = 'Restaurant';
+var REVIEW_TYPE = 'Review';
+
 var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
@@ -59,16 +62,16 @@ var feedOrionReviews = function() {
     triggerRestaurantsRatings();
   };
 
-  Object.keys(restaurantsData).forEach(function(element, index) {
+  restaurantsData.forEach(function(element) {
 
-    var reviewedRestaurant = restaurantsData[index].name;
+    var reviewedRestaurant = element.name;
     var date = new Date().toISOString();
 
     var attr = {
-      'type': 'Review',
+      'type': REVIEW_TYPE,
       'id': utils.generateId(reviewedRestaurant, date),
       'itemReviewed': {
-        'type': 'Restaurant',
+        'type': RESTAURANT_TYPE,
         'value': reviewedRestaurant
       },
       'reviewRating': {
@@ -105,29 +108,17 @@ var triggerRestaurantsRatings = function() {
     console.log(restaurantsModified + '/' + restaurantsData.length);
   };
 
-  var reviews;
-  var restaurantReviews;
-  var servicePath;
-
   var q = async.queue(function(task, callback) {
     var restaurantId = utils.generateId(task.restaurantName);
     setTimeout(function() {
-      utils.getListByType('Restaurant', restaurantId, fiwareHeaders)
+      utils.getListByType(RESTAURANT_TYPE, restaurantId, fiwareHeaders)
       .then(function(data) {
-        var fwHeaders = JSON.parse(JSON.stringify(fiwareHeaders));
-        if (data.body.department) {
-          fwHeaders['fiware-servicepath'] = '/' + data.body.department;
-        }
-        utils.sendRequest(
-          'PATCH',
-          task.aggregateRatings,
-          restaurantId,
-          fwHeaders)
-        .then(callback)
-        .catch(function(err) {
-          console.log(err.error);
-        });
+        var fwHeaders = utils.completeHeaders(fiwareHeaders,
+                                              data.body.department);
+        return utils.sendRequest('PATCH', task.aggregateRatings, restaurantId,
+                                 fwHeaders);
       })
+      .then(callback)
       .catch(function(err) {
         console.log(err.error);
       });
@@ -139,22 +130,21 @@ var triggerRestaurantsRatings = function() {
     console.log('Total restaurants modified: ' + restaurantsModified);
   };
 
-  utils.getListByType('Review', null, fiwareHeaders)
-  .then(function(data) {
-    reviews = data.body;
-    Object.keys(restaurantsData).forEach(function(element, index) {
-      var restaurantName = restaurantsData[index].name;
-      restaurantReviews = utils.getRestaurantReviews(
-        restaurantName,
-        reviews);
-      var ratings = utils.getAggregateRating(
-        restaurantReviews);
-      q.push({'aggregateRatings': ratings,
-        'restaurantName': restaurantName}, returnPost);
+  restaurantsData.forEach(function(element) {
+    var restaurantName = element.name;
+    var filter = [];
+    var queryString = {};
+    utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
+    queryString.q = filter.join(';');
+    utils.getListByType(REVIEW_TYPE, null, fiwareHeaders, queryString)
+    .then(function(restaurantReviews) {
+      var ratings = utils.getAggregateRating(restaurantReviews);
+      q.push({'aggregateRatings': ratings, 'restaurantName': restaurantName},
+             returnPost);
+    })
+    .catch(function(err) {
+      console.log(err.error);
     });
-  })
-  .catch(function(err) {
-    console.log(err);
   });
 };
 
@@ -166,7 +156,7 @@ var loadRestaurantData = function() {
     feedOrionReviews();
   };
 
-  utils.getListByType('Restaurant', null, fiwareHeaders)
+  utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
     console.log(err);
