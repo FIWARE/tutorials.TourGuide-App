@@ -24,6 +24,11 @@ var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
+
+var rstrnt = 'Restaurant';
+var rev = 'Review';
+var resv = 'FoodEstablishmentReservation';
+
 tv4.addSchema('restaurant', schema.restaurant);
 tv4.addSchema('reservation', schema.reservation);
 tv4.addSchema('review', schema.review);
@@ -35,7 +40,7 @@ exports.createRestaurant = function(req, res) {
   var validSchema = tv4.validate(elementToOrion, 'restaurant');
   if (validSchema) {
     var address = elementToOrion.address.streetAddress + ' ' +
-      elementToOrion.address.addressLocality;
+                  elementToOrion.address.addressLocality;
     geocoder.geocode(address)
     .then(function(geoObject) {
       elementToOrion = utils.restaurantToOrion(elementToOrion, geoObject[0]);
@@ -58,28 +63,27 @@ exports.readRestaurant = function(req, res) {
   var fiwareHeaders;
   var restaurantId = utils.generateId(req.params.id);
   var currentDate = new Date().toISOString();
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var timeframe = utils.getTimeframe(currentDate);
-  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
-  utils.addConditionToQuery(sqlList, 'reservationFor', '==', req.params.id);
-  utils.addConditionToQuery(sqlList, 'reservationStatus', '==', 'Confirmed');
-  queryString.q = sqlList.join(';');
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
-      queryString)
+  utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
+  utils.addConditionToQuery(filter, 'reservationFor', '==', req.params.id);
+  utils.addConditionToQuery(filter, 'reservationStatus', '==', 'Confirmed');
+  queryString.q = filter.join(';');
+  utils.getListByType(resv, null, req.headers, queryString)
   .then(function(reservations) {
     occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
-      currentDate);
-    return utils.getListByType('Restaurant', restaurantId, req.headers);
+                                                        currentDate);
+    return utils.getListByType(rstrnt, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
     fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
     return utils.sendRequest('PATCH', occupancyLevelsObject, restaurantId,
-      fiwareHeaders);
+                             fiwareHeaders);
   })
   .then(function(patchResponse) {
-    return utils.getListByType('Restaurant', restaurantId, req.headers);
+    return utils.getListByType(rstrnt, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     utils.returnResponse(restaurant, res);
@@ -94,26 +98,25 @@ exports.readRestaurantWithDate = function(req, res) {
   var servicePath;
   var fiwareHeaders;
   var restaurantId = utils.generateId(req.params.id);
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var timeframe = utils.getTimeframe(req.params.date);
-  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
-      queryString)
+  utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
+  queryString.q = filter.join(';');
+  utils.getListByType(resv, null, req.headers, queryString)
   .then(function(reservations) {
     occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
-      req.params.date);
-    return utils.getListByType('Restaurant', restaurantId, req.headers);
+                                                        req.params.date);
+    return utils.getListByType(rstrnt, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
     fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
     return utils.sendRequest('PATCH', occupancyLevelsObject, restaurantId,
-      fiwareHeaders);
+                             fiwareHeaders);
   })
   .then(function(patchResponse) {
-    return utils.getListByType('Restaurant', restaurantId, req.headers);
+    return utils.getListByType(rstrnt, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     utils.returnResponse(restaurant, res);
@@ -147,7 +150,7 @@ exports.deleteRestaurant = function(req, res) {
 };
 
 exports.getRestaurants = function(req, res) {
-  utils.getListByType('Restaurant', null, req.headers)
+  utils.getListByType(rstrnt, null, req.headers)
   .then(function(restaurants) {
     utils.returnResponse(restaurants, res);
   })
@@ -157,11 +160,11 @@ exports.getRestaurants = function(req, res) {
 };
 
 exports.getOrganizationRestaurants = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'department', '==', req.params.org);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('Restaurant', null, req.headers, queryString)
+  utils.addConditionToQuery(filter, 'department', '==', req.params.org);
+  queryString.q = filter.join(';');
+  utils.getListByType(rstrnt, null, req.headers, queryString)
   .then(function(restaurants) {
     utils.returnResponse(restaurants, res);
   })
@@ -176,7 +179,7 @@ exports.createReview = function(req, res) {
   var elementToOrion = req.body;
   var restaurantName = elementToOrion.itemReviewed.name;
   var restaurantId = utils.generateId(restaurantName);
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var servicePath;
   var fiwareHeaders;
@@ -184,7 +187,7 @@ exports.createReview = function(req, res) {
   var endResponse;
   var validSchema = tv4.validate(elementToOrion, 'review');
   if (validSchema) {
-    utils.getListByType('Restaurant', restaurantId, req.headers)
+    utils.getListByType(rstrnt, restaurantId, req.headers)
     .then(function(restaurant) {
       servicePath = restaurant.body.department;
       return auth.getUserDataPromise(req);
@@ -196,15 +199,15 @@ exports.createReview = function(req, res) {
     })
     .then(function(postResponse) {
       endResponse = postResponse;
-      utils.addConditionToQuery(sqlList, 'itemReviewed', '==', restaurantName);
-      queryString.q = sqlList.join(';');
-      return utils.getListByType('Review', null, req.headers, queryString);
+      utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
+      queryString.q = filter.join(';');
+      return utils.getListByType(rev, null, req.headers, queryString);
     })
     .then(function(reviews) {
       aggregateRatings = utils.getAggregateRating(reviews.body);
       fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
       return utils.sendRequest('PATCH', aggregateRatings, restaurantId,
-      fiwareHeaders);
+                               fiwareHeaders);
     })
     .then(function(patchResponse) {
       utils.responsePost(endResponse, elementToOrion, res);
@@ -219,7 +222,7 @@ exports.createReview = function(req, res) {
 
 exports.readReview = function(req, res) {
   var reviewId = req.params.id;
-  utils.getListByType('Review', reviewId, req.headers)
+  utils.getListByType(rev, reviewId, req.headers)
   .then(function(review) {
     utils.returnResponse(review, res);
   })
@@ -236,10 +239,10 @@ exports.updateReview = function(req, res) {
   var aggregateRatings;
   var servicePath;
   var fiwareHeaders;
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var keyValues = {'options': 'keyValues'};
-  utils.getListByType('Review', reviewId, req.headers)
+  utils.getListByType(rev, reviewId, req.headers)
   .then(function(data) {
     restaurantName = data.body.itemReviewed;
     restaurantId = utils.generateId(restaurantName);
@@ -251,14 +254,13 @@ exports.updateReview = function(req, res) {
       utils.sendRequest('PATCH', req.body, reviewId, req.headers, keyValues)
       .then(function(patchResponse) {
         fiwareHeaders = utils.removeServicePath(req.headers);
-        utils.addConditionToQuery(sqlList, 'itemReviewed', '==',
-                                  restaurantName);
-        queryString.q = sqlList.join(';');
-        return utils.getListByType('Review', null, fiwareHeaders, queryString);
+        utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
+        queryString.q = filter.join(';');
+        return utils.getListByType(rev, null, fiwareHeaders, queryString);
       })
       .then(function(reviews) {
         aggregateRatings = utils.getAggregateRating(reviews.body);
-        return utils.getListByType('Restaurant', restaurantId, req.headers);
+        return utils.getListByType(rstrnt, restaurantId, req.headers);
       })
       .then(function(restaurant) {
         servicePath = restaurant.body.department;
@@ -287,15 +289,15 @@ exports.deleteReview = function(req, res) {
   var aggregateRatings;
   var servicePath;
   var fiwareHeaders;
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var finalResponse;
   var reviewId = req.params.id;
-  utils.getListByType('Review', reviewId, req.headers)
+  utils.getListByType(rev, reviewId, req.headers)
   .then(function(review) {
     restaurantName = review.body.itemReviewed;
     restaurantId = utils.generateId(restaurantName);
-    return utils.getListByType('Restaurant', restaurantId, req.headers);
+    return utils.getListByType(rstrnt, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
@@ -303,15 +305,15 @@ exports.deleteReview = function(req, res) {
   })
   .then(function(deleteResponse) {
     finalResponse = deleteResponse;
-    utils.addConditionToQuery(sqlList, 'itemReviewed', '==', restaurantName);
-    queryString.q = sqlList.join(';');
-    return utils.getListByType('Review', null, req.headers, queryString);
+    utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
+    queryString.q = filter.join(';');
+    return utils.getListByType(rev, null, req.headers, queryString);
   })
   .then(function(reviews) {
     aggregateRatings = utils.getAggregateRating(reviews.body);
     fiwareHeaders = utils.completeHeaders(req.headers, servicePath);
     return utils.sendRequest('PATCH', aggregateRatings, restaurantId,
-      fiwareHeaders);
+                             fiwareHeaders);
   })
   .then(function(pathResponse) {
     utils.returnResponse(finalResponse, res);
@@ -322,7 +324,7 @@ exports.deleteReview = function(req, res) {
 };
 
 exports.getReviews = function(req, res) {
-  utils.getListByType('Review', null, req.headers)
+  utils.getListByType(rev, null, req.headers)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -332,11 +334,11 @@ exports.getReviews = function(req, res) {
 };
 
 exports.getUserReviews = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'author', '==', req.params.user);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('Review', null, req.headers, queryString)
+  utils.addConditionToQuery(filter, 'author', '==', req.params.user);
+  queryString.q = filter.join(';');
+  utils.getListByType(rev, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -346,12 +348,12 @@ exports.getUserReviews = function(req, res) {
 };
 
 exports.getRestaurantReviews = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'itemReviewed', '==',
+  utils.addConditionToQuery(filter, 'itemReviewed', '==',
                             req.params.restaurant);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('Review', null, req.headers, queryString)
+  queryString.q = filter.join(';');
+  utils.getListByType(rev, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -361,11 +363,11 @@ exports.getRestaurantReviews = function(req, res) {
 };
 
 exports.getOrganizationReviews = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'publisher', '==', req.params.org);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('Review', null, req.headers, queryString)
+  utils.addConditionToQuery(filter, 'publisher', '==', req.params.org);
+  queryString.q = filter.join(';');
+  utils.getListByType(rev, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -382,22 +384,20 @@ exports.createReservation = function(req, res) {
   var capacity;
   var currentOccupancyLevels;
   var timeframe = utils.getTimeframe(req.body.startTime);
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var restaurantId = utils.generateId(req.body.reservationFor.name);
   var validSchema = tv4.validate(req.body, 'reservation');
   if (validSchema) {
-    utils.getListByType('Restaurant', restaurantId, req.headers)
+    utils.getListByType(rstrnt, restaurantId, req.headers)
     .then(function(restaurant) {
       elementToOrion.address = restaurant.body.address;
       capacity = restaurant.body.capacity;
-      utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
-      utils.addConditionToQuery(sqlList, 'reservationFor', '==', req.params.id);
-      utils.addConditionToQuery(sqlList, 'reservationStatus', '==',
-                                'Confirmed');
-      queryString.q = sqlList.join(';');
-      return utils.getListByType('FoodEstablishmentReservation', null,
-                                 req.headers, queryString);
+      utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
+      utils.addConditionToQuery(filter, 'reservationFor', '==', req.params.id);
+      utils.addConditionToQuery(filter, 'reservationStatus', '==', 'Confirmed');
+      queryString.q = filter.join(';');
+      return utils.getListByType(resv, null, req.headers, queryString);
     })
     .then(function(reservations) {
       currentOccupancyLevels = utils.getOccupancyLevels(reservations.body);
@@ -427,7 +427,7 @@ exports.createReservation = function(req, res) {
 
 exports.readReservation = function(req, res) {
   var reservationId = req.params.id;
-  utils.getListByType('FoodEstablishmentReservation', reservationId,
+  utils.getListByType(resv, reservationId,
     req.headers)
   .then(function(reservation) {
     utils.returnResponse(reservation, res);
@@ -442,8 +442,7 @@ exports.updateReservation = function(req, res) {
   var userId;
   var reservationId = req.params.id;
   var keyValues = {'options': 'keyValues'};
-  utils.getListByType('FoodEstablishmentReservation', reservationId,
-                      req.headers)
+  utils.getListByType(resv, reservationId, req.headers)
   .then(function(reservation) {
     userId = reservation.body.underName;
     return auth.getUserDataPromise(req);
@@ -479,7 +478,7 @@ exports.deleteReservation = function(req, res) {
 };
 
 exports.getReservations = function(req, res) {
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers)
+  utils.getListByType(resv, null, req.headers)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -489,12 +488,11 @@ exports.getReservations = function(req, res) {
 };
 
 exports.getUserReservations = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'underName', '==', req.params.user);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
-                      queryString)
+  utils.addConditionToQuery(filter, 'underName', '==', req.params.user);
+  queryString.q = filter.join(';');
+  utils.getListByType(resv, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -504,13 +502,12 @@ exports.getUserReservations = function(req, res) {
 };
 
 exports.getRestaurantReservations = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'reservationFor', '==',
+  utils.addConditionToQuery(filter, 'reservationFor', '==',
                             req.params.restaurant);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
-                      queryString)
+  queryString.q = filter.join(';');
+  utils.getListByType(resv, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -520,21 +517,20 @@ exports.getRestaurantReservations = function(req, res) {
 };
 
 exports.getOrganizationReservations = function(req, res) {
-  var sqlList = [];
+  var filter = [];
   var queryString = {};
   var organizationsReservations;
   var restaurantList;
-  utils.addConditionToQuery(sqlList, 'department', '==', req.params.org);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('Restaurant', null, req.headers, queryString)
+  utils.addConditionToQuery(filter, 'department', '==', req.params.org);
+  queryString.q = filter.join(';');
+  utils.getListByType(rstrnt, null, req.headers, queryString)
   .then(function(restaurants) {
     restaurantList = restaurants.body;
-    return utils.getListByType('FoodEstablishmentReservation', null,
-                              req.headers);
+    return utils.getListByType(resv, null, req.headers);
   })
   .then(function(reservations) {
-    organizationsReservations = utils.getOrgReservations(
-                                restaurantList, reservations.body);
+    organizationsReservations = utils.getOrgReservations(restaurantList,
+                                                         reservations.body);
     res.statusCode = reservations.statusCode;
     res.json(utils.dataToSchema(organizationsReservations));
   })
@@ -544,16 +540,14 @@ exports.getOrganizationReservations = function(req, res) {
 };
 
 exports.getReservationsByDate = function(req, res) {
-  var timeframe = utils.getTimeBetweenDates(
-                  req.params.from, req.params.to);
-  var sqlList = [];
+  var timeframe = utils.getTimeBetweenDates(req.params.from, req.params.to);
+  var filter = [];
   var queryString = {};
-  utils.addConditionToQuery(sqlList, 'startTime', '==', timeframe);
-  utils.addConditionToQuery(sqlList, 'reservationFor', '==',
+  utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
+  utils.addConditionToQuery(filter, 'reservationFor', '==',
                             req.params.restaurant);
-  queryString.q = sqlList.join(';');
-  utils.getListByType('FoodEstablishmentReservation', null, req.headers,
-                      queryString)
+  queryString.q = filter.join(';');
+  utils.getListByType(resv, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })

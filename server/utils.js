@@ -454,9 +454,9 @@ function dataToSchema(listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  Object.keys(listOfElements).forEach(function(element, pos) {
+  listOfElements.forEach(function(element, index) {
 
-    newElement = objectDataToSchema(listOfElements[pos]);
+    newElement = objectDataToSchema(listOfElements[index]);
     newListOfElements.push(newElement);
 
   });
@@ -631,7 +631,7 @@ function getAggregateRating(listOfReviews) {
 
   listOfReviews = objectToArray(listOfReviews);
 
-  Object.keys(listOfReviews).forEach(function(element, index) {
+  listOfReviews.forEach(function(element, index) {
 
     if (listOfReviews[index].reviewRating !== undefined) {
 
@@ -665,7 +665,7 @@ function getOccupancyLevels(listOfReservations) {
 
   var occupancyLevels = 0;
 
-  Object.keys(listOfReservations).forEach(function(element, index) {
+  listOfReservations.forEach(function(element, index) {
     occupancyLevels += listOfReservations[index].partySize;
   });
 
