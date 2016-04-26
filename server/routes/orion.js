@@ -12,6 +12,10 @@
 
 'use strict';
 
+var RESTAURANT_TYPE = 'Restaurant';
+var REVIEW_TYPE = 'Review';
+var RESERVATION_TYPE = 'FoodEstablishmentReservation';
+
 var authRequest = require('../auth/authrequest');
 var utils = require('../utils');
 var geocoder = require('node-geocoder')('google', 'http');
@@ -24,10 +28,6 @@ var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
-
-var rstrnt = 'Restaurant';
-var rev = 'Review';
-var resv = 'FoodEstablishmentReservation';
 
 tv4.addSchema('restaurant', schema.restaurant);
 tv4.addSchema('reservation', schema.reservation);
@@ -70,11 +70,11 @@ exports.readRestaurant = function(req, res) {
   utils.addConditionToQuery(filter, 'reservationFor', '==', req.params.id);
   utils.addConditionToQuery(filter, 'reservationStatus', '==', 'Confirmed');
   queryString.q = filter.join(';');
-  utils.getListByType(resv, null, req.headers, queryString)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers, queryString)
   .then(function(reservations) {
     occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
                                                         currentDate);
-    return utils.getListByType(rstrnt, restaurantId, req.headers);
+    return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
@@ -83,7 +83,7 @@ exports.readRestaurant = function(req, res) {
                              fiwareHeaders);
   })
   .then(function(patchResponse) {
-    return utils.getListByType(rstrnt, restaurantId, req.headers);
+    return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     utils.returnResponse(restaurant, res);
@@ -103,11 +103,11 @@ exports.readRestaurantWithDate = function(req, res) {
   var timeframe = utils.getTimeframe(req.params.date);
   utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
   queryString.q = filter.join(';');
-  utils.getListByType(resv, null, req.headers, queryString)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers, queryString)
   .then(function(reservations) {
     occupancyLevelsObject = utils.updateOccupancyLevels(reservations.body,
                                                         req.params.date);
-    return utils.getListByType(rstrnt, restaurantId, req.headers);
+    return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
@@ -116,7 +116,7 @@ exports.readRestaurantWithDate = function(req, res) {
                              fiwareHeaders);
   })
   .then(function(patchResponse) {
-    return utils.getListByType(rstrnt, restaurantId, req.headers);
+    return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     utils.returnResponse(restaurant, res);
@@ -150,7 +150,7 @@ exports.deleteRestaurant = function(req, res) {
 };
 
 exports.getRestaurants = function(req, res) {
-  utils.getListByType(rstrnt, null, req.headers)
+  utils.getListByType(RESTAURANT_TYPE, null, req.headers)
   .then(function(restaurants) {
     utils.returnResponse(restaurants, res);
   })
@@ -164,7 +164,7 @@ exports.getOrganizationRestaurants = function(req, res) {
   var queryString = {};
   utils.addConditionToQuery(filter, 'department', '==', req.params.org);
   queryString.q = filter.join(';');
-  utils.getListByType(rstrnt, null, req.headers, queryString)
+  utils.getListByType(RESTAURANT_TYPE, null, req.headers, queryString)
   .then(function(restaurants) {
     utils.returnResponse(restaurants, res);
   })
@@ -187,7 +187,7 @@ exports.createReview = function(req, res) {
   var endResponse;
   var validSchema = tv4.validate(elementToOrion, 'review');
   if (validSchema) {
-    utils.getListByType(rstrnt, restaurantId, req.headers)
+    utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers)
     .then(function(restaurant) {
       servicePath = restaurant.body.department;
       return auth.getUserDataPromise(req);
@@ -201,7 +201,7 @@ exports.createReview = function(req, res) {
       endResponse = postResponse;
       utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
       queryString.q = filter.join(';');
-      return utils.getListByType(rev, null, req.headers, queryString);
+      return utils.getListByType(REVIEW_TYPE, null, req.headers, queryString);
     })
     .then(function(reviews) {
       aggregateRatings = utils.getAggregateRating(reviews.body);
@@ -222,7 +222,7 @@ exports.createReview = function(req, res) {
 
 exports.readReview = function(req, res) {
   var reviewId = req.params.id;
-  utils.getListByType(rev, reviewId, req.headers)
+  utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
   .then(function(review) {
     utils.returnResponse(review, res);
   })
@@ -242,7 +242,7 @@ exports.updateReview = function(req, res) {
   var filter = [];
   var queryString = {};
   var keyValues = {'options': 'keyValues'};
-  utils.getListByType(rev, reviewId, req.headers)
+  utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
   .then(function(data) {
     restaurantName = data.body.itemReviewed;
     restaurantId = utils.generateId(restaurantName);
@@ -256,11 +256,12 @@ exports.updateReview = function(req, res) {
         fiwareHeaders = utils.removeServicePath(req.headers);
         utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
         queryString.q = filter.join(';');
-        return utils.getListByType(rev, null, fiwareHeaders, queryString);
+        return utils.getListByType(REVIEW_TYPE, null, fiwareHeaders,
+                                   queryString);
       })
       .then(function(reviews) {
         aggregateRatings = utils.getAggregateRating(reviews.body);
-        return utils.getListByType(rstrnt, restaurantId, req.headers);
+        return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
       })
       .then(function(restaurant) {
         servicePath = restaurant.body.department;
@@ -293,11 +294,11 @@ exports.deleteReview = function(req, res) {
   var queryString = {};
   var finalResponse;
   var reviewId = req.params.id;
-  utils.getListByType(rev, reviewId, req.headers)
+  utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
   .then(function(review) {
     restaurantName = review.body.itemReviewed;
     restaurantId = utils.generateId(restaurantName);
-    return utils.getListByType(rstrnt, restaurantId, req.headers);
+    return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
     servicePath = restaurant.body.department;
@@ -307,7 +308,7 @@ exports.deleteReview = function(req, res) {
     finalResponse = deleteResponse;
     utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
     queryString.q = filter.join(';');
-    return utils.getListByType(rev, null, req.headers, queryString);
+    return utils.getListByType(REVIEW_TYPE, null, req.headers, queryString);
   })
   .then(function(reviews) {
     aggregateRatings = utils.getAggregateRating(reviews.body);
@@ -324,7 +325,7 @@ exports.deleteReview = function(req, res) {
 };
 
 exports.getReviews = function(req, res) {
-  utils.getListByType(rev, null, req.headers)
+  utils.getListByType(REVIEW_TYPE, null, req.headers)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -338,7 +339,7 @@ exports.getUserReviews = function(req, res) {
   var queryString = {};
   utils.addConditionToQuery(filter, 'author', '==', req.params.user);
   queryString.q = filter.join(';');
-  utils.getListByType(rev, null, req.headers, queryString)
+  utils.getListByType(REVIEW_TYPE, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -353,7 +354,7 @@ exports.getRestaurantReviews = function(req, res) {
   utils.addConditionToQuery(filter, 'itemReviewed', '==',
                             req.params.restaurant);
   queryString.q = filter.join(';');
-  utils.getListByType(rev, null, req.headers, queryString)
+  utils.getListByType(REVIEW_TYPE, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -367,7 +368,7 @@ exports.getOrganizationReviews = function(req, res) {
   var queryString = {};
   utils.addConditionToQuery(filter, 'publisher', '==', req.params.org);
   queryString.q = filter.join(';');
-  utils.getListByType(rev, null, req.headers, queryString)
+  utils.getListByType(REVIEW_TYPE, null, req.headers, queryString)
   .then(function(reviews) {
     utils.returnResponse(reviews, res);
   })
@@ -389,7 +390,7 @@ exports.createReservation = function(req, res) {
   var restaurantId = utils.generateId(req.body.reservationFor.name);
   var validSchema = tv4.validate(req.body, 'reservation');
   if (validSchema) {
-    utils.getListByType(rstrnt, restaurantId, req.headers)
+    utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers)
     .then(function(restaurant) {
       elementToOrion.address = restaurant.body.address;
       capacity = restaurant.body.capacity;
@@ -397,7 +398,8 @@ exports.createReservation = function(req, res) {
       utils.addConditionToQuery(filter, 'reservationFor', '==', req.params.id);
       utils.addConditionToQuery(filter, 'reservationStatus', '==', 'Confirmed');
       queryString.q = filter.join(';');
-      return utils.getListByType(resv, null, req.headers, queryString);
+      return utils.getListByType(RESERVATION_TYPE, null, req.headers,
+                                 queryString);
     })
     .then(function(reservations) {
       currentOccupancyLevels = utils.getOccupancyLevels(reservations.body);
@@ -427,8 +429,7 @@ exports.createReservation = function(req, res) {
 
 exports.readReservation = function(req, res) {
   var reservationId = req.params.id;
-  utils.getListByType(resv, reservationId,
-    req.headers)
+  utils.getListByType(RESERVATION_TYPE, reservationId, req.headers)
   .then(function(reservation) {
     utils.returnResponse(reservation, res);
   })
@@ -442,7 +443,7 @@ exports.updateReservation = function(req, res) {
   var userId;
   var reservationId = req.params.id;
   var keyValues = {'options': 'keyValues'};
-  utils.getListByType(resv, reservationId, req.headers)
+  utils.getListByType(RESERVATION_TYPE, reservationId, req.headers)
   .then(function(reservation) {
     userId = reservation.body.underName;
     return auth.getUserDataPromise(req);
@@ -478,7 +479,7 @@ exports.deleteReservation = function(req, res) {
 };
 
 exports.getReservations = function(req, res) {
-  utils.getListByType(resv, null, req.headers)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -492,7 +493,7 @@ exports.getUserReservations = function(req, res) {
   var queryString = {};
   utils.addConditionToQuery(filter, 'underName', '==', req.params.user);
   queryString.q = filter.join(';');
-  utils.getListByType(resv, null, req.headers, queryString)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -507,7 +508,7 @@ exports.getRestaurantReservations = function(req, res) {
   utils.addConditionToQuery(filter, 'reservationFor', '==',
                             req.params.restaurant);
   queryString.q = filter.join(';');
-  utils.getListByType(resv, null, req.headers, queryString)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })
@@ -523,10 +524,10 @@ exports.getOrganizationReservations = function(req, res) {
   var restaurantList;
   utils.addConditionToQuery(filter, 'department', '==', req.params.org);
   queryString.q = filter.join(';');
-  utils.getListByType(rstrnt, null, req.headers, queryString)
+  utils.getListByType(RESTAURANT_TYPE, null, req.headers, queryString)
   .then(function(restaurants) {
     restaurantList = restaurants.body;
-    return utils.getListByType(resv, null, req.headers);
+    return utils.getListByType(RESERVATION_TYPE, null, req.headers);
   })
   .then(function(reservations) {
     organizationsReservations = utils.getOrgReservations(restaurantList,
@@ -547,7 +548,7 @@ exports.getReservationsByDate = function(req, res) {
   utils.addConditionToQuery(filter, 'reservationFor', '==',
                             req.params.restaurant);
   queryString.q = filter.join(';');
-  utils.getListByType(resv, null, req.headers, queryString)
+  utils.getListByType(RESERVATION_TYPE, null, req.headers, queryString)
   .then(function(reservations) {
     utils.returnResponse(reservations, res);
   })

@@ -27,8 +27,9 @@ var reviewsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reviewed
 var delay = 200; //time in ms
 var restaurantsModified = 0;
-var rev = 'Review';
-var rstrnt = 'Restaurant';
+
+var RESTAURANT_TYPE = 'Restaurant';
+var REVIEW_TYPE = 'Review';
 
 var config = require('../config');
 var fiwareHeaders = {
@@ -61,16 +62,16 @@ var feedOrionReviews = function() {
     triggerRestaurantsRatings();
   };
 
-  restaurantsData.forEach(function(element, index) {
+  restaurantsData.forEach(function(element) {
 
-    var reviewedRestaurant = restaurantsData[index].name;
+    var reviewedRestaurant = element.name;
     var date = new Date().toISOString();
 
     var attr = {
-      'type': rev,
+      'type': REVIEW_TYPE,
       'id': utils.generateId(reviewedRestaurant, date),
       'itemReviewed': {
-        'type': rstrnt,
+        'type': RESTAURANT_TYPE,
         'value': reviewedRestaurant
       },
       'reviewRating': {
@@ -110,7 +111,7 @@ var triggerRestaurantsRatings = function() {
   var q = async.queue(function(task, callback) {
     var restaurantId = utils.generateId(task.restaurantName);
     setTimeout(function() {
-      utils.getListByType(rstrnt, restaurantId, fiwareHeaders)
+      utils.getListByType(RESTAURANT_TYPE, restaurantId, fiwareHeaders)
       .then(function(data) {
         var fwHeaders = utils.completeHeaders(fiwareHeaders,
                                               data.body.department);
@@ -129,13 +130,13 @@ var triggerRestaurantsRatings = function() {
     console.log('Total restaurants modified: ' + restaurantsModified);
   };
 
-  restaurantsData.forEach(function(element, index) {
-    var restaurantName = restaurantsData[index].name;
+  restaurantsData.forEach(function(element) {
+    var restaurantName = element.name;
     var filter = [];
     var queryString = {};
     utils.addConditionToQuery(filter, 'itemReviewed', '==', restaurantName);
     queryString.q = filter.join(';');
-    utils.getListByType(rev, null, fiwareHeaders, queryString)
+    utils.getListByType(REVIEW_TYPE, null, fiwareHeaders, queryString)
     .then(function(restaurantReviews) {
       var ratings = utils.getAggregateRating(restaurantReviews);
       q.push({'aggregateRatings': ratings, 'restaurantName': restaurantName},
@@ -155,7 +156,7 @@ var loadRestaurantData = function() {
     feedOrionReviews();
   };
 
-  utils.getListByType(rstrnt, null, fiwareHeaders)
+  utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
     console.log(err);

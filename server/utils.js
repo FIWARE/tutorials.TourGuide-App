@@ -454,9 +454,9 @@ function dataToSchema(listOfElements) {
 
   listOfElements = objectToArray(listOfElements);
 
-  listOfElements.forEach(function(element, index) {
+  listOfElements.forEach(function(element) {
 
-    newElement = objectDataToSchema(listOfElements[index]);
+    newElement = objectDataToSchema(element);
     newListOfElements.push(newElement);
 
   });
@@ -631,11 +631,11 @@ function getAggregateRating(listOfReviews) {
 
   listOfReviews = objectToArray(listOfReviews);
 
-  listOfReviews.forEach(function(element, index) {
+  listOfReviews.forEach(function(element) {
 
-    if (listOfReviews[index].reviewRating !== undefined) {
+    if (element.reviewRating !== undefined) {
 
-      ratingValues.push(listOfReviews[index].reviewRating);
+      ratingValues.push(element.reviewRating);
       counter++;
     }
   });
@@ -665,8 +665,8 @@ function getOccupancyLevels(listOfReservations) {
 
   var occupancyLevels = 0;
 
-  listOfReservations.forEach(function(element, index) {
-    occupancyLevels += listOfReservations[index].partySize;
+  listOfReservations.forEach(function(element) {
+    occupancyLevels += element.partySize;
   });
 
   return occupancyLevels;
