@@ -15,6 +15,11 @@ var delay = 200; //miliseconds
 var config = require('../config');
 var utils = require('../utils');
 
+var RESTAURANT_TYPE = 'Restaurant';
+var POSTAL_ADDRESS_TYPE = 'PostalAddress';
+var PROPERTY_VALUE_TYPE = 'PropertyValue';
+var DATE_TYPE = 'Date';
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
@@ -44,10 +49,10 @@ frisby.create('OAuth2 login')
     // jscs:enable
     frisby.create('Post JSON to /api/orion/restaurant')
       .post('http://tourguide/api/orion/restaurant', {
-        '@type': 'Restaurant',
+        '@type': RESTAURANT_TYPE,
         'name': 'example',
         'address': {
-          '@type': 'postalAddress',
+          '@type': POSTAL_ADDRESS_TYPE,
           'streetAddress': 'Av. de la Universidad 30',
           'addressLocality': 'Leganes',
           'addressRegion': 'Madrid',
@@ -59,15 +64,15 @@ frisby.create('OAuth2 login')
         'telephone': '912345678',
         'url': 'http://www.example.com',
         'capacity': {
-          '@type': 'PropertyValue',
+          '@type': PROPERTY_VALUE_TYPE,
           'value': 200
         },
         'occupancyLevels': {
-          '@type': 'PropertyValue',
+          '@type': PROPERTY_VALUE_TYPE,
           'value': 0,
           'metadata': {
             'timestamp': {
-              '@type': 'date',
+              '@type': DATE_TYPE,
               'value': new Date().toISOString()
             }
           }
@@ -93,9 +98,9 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'Restaurant',
+        '@type': RESTAURANT_TYPE,
         address: {
-          '@type': 'postalAddress'
+          '@type': POSTAL_ADDRESS_TYPE
         }
       })
       .toss();
@@ -109,9 +114,9 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'Restaurant',
+        '@type': RESTAURANT_TYPE,
         address: {
-          '@type': 'postalAddress'
+          '@type': POSTAL_ADDRESS_TYPE
         }
       })
       .toss();
@@ -126,9 +131,9 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'Restaurant',
+        '@type': RESTAURANT_TYPE,
         address: {
-          '@type': 'postalAddress'
+          '@type': POSTAL_ADDRESS_TYPE
         }
       })
       .toss();

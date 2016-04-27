@@ -15,6 +15,11 @@ var utils = require('../utils');
 var delay = 200; //miliseconds
 var config = require('../config');
 
+var RESTAURANT_TYPE = 'Restaurant';
+var REVIEW_TYPE = 'Review';
+var PERSON_TYPE = 'Person';
+var RATING_TYPE = 'Rating';
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
@@ -42,15 +47,15 @@ frisby.create('OAuth2 login')
     // jscs:enable
     frisby.create('Post JSON to /api/orion/review')
       .post('http://tourguide/api/orion/review', {
-        '@type': 'Review',
+        '@type': REVIEW_TYPE,
         'itemReviewed': {
-          '@type': 'Restaurant',
+          '@type': RESTAURANT_TYPE,
           'name': 'Araba'
         },
         'name': 'Rating description',
         'reviewBody': 'Body review',
         'reviewRating': {
-          '@type': 'Rating',
+          '@type': RATING_TYPE,
           'ratingValue': 5
         }
       }, {
@@ -72,15 +77,15 @@ frisby.create('OAuth2 login')
           .expectHeaderContains('content-type', 'application/json')
           .expectJSON('*', {
             '@context': 'http://schema.org',
-            '@type': 'Review',
+            '@type': REVIEW_TYPE,
             author: {
-              '@type': 'Person'
+              '@type': PERSON_TYPE
             },
             itemReviewed: {
-              '@type': 'Restaurant'
+              '@type': RESTAURANT_TYPE
             },
             reviewRating: {
-              '@type': 'Rating'
+              '@type': RATING_TYPE
             }
           })
           .toss();
@@ -151,12 +156,12 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'Review',
+        '@type': REVIEW_TYPE,
         author: {
-          '@type': 'Person'
+          '@type': PERSON_TYPE
         },
         itemReviewed: {
-          '@type': 'Restaurant'
+          '@type': RESTAURANT_TYPE
         }
       })
       .toss();
@@ -226,7 +231,7 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         author: {
-          '@type': 'Person',
+          '@type': PERSON_TYPE,
           'name': 'user1'
         }
       })
@@ -242,7 +247,7 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         itemReviewed: {
-          '@type': 'Restaurant',
+          '@type': RESTAURANT_TYPE,
           name: 'Araba'
         }
       })
@@ -258,12 +263,12 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'Review',
+        '@type': REVIEW_TYPE,
         author: {
-          '@type': 'Person'
+          '@type': PERSON_TYPE
         },
         itemReviewed: {
-          '@type': 'Restaurant'
+          '@type': RESTAURANT_TYPE
         }
       })
       .toss();
