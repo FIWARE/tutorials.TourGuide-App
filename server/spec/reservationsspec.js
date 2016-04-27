@@ -14,6 +14,11 @@ var frisby = require('frisby');
 var delay = 200; //miliseconds
 var config = require('../config');
 
+var RESERVATION_TYPE = 'FoodEstablishmentReservation';
+var POSTAL_ADDRESS_TYPE = 'PostalAddress';
+var PERSON_TYPE = 'Person';
+var FOOD_ESTABLISHMENT_TYPE = 'FoodEstablishment';
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var oauthTokenUrl = config.idmUrl + '/oauth2/token';
@@ -42,10 +47,10 @@ frisby.create('OAuth2 login')
     // jscs:enable
     frisby.create('Post JSON to /api/orion/reservation')
       .post('http://tourguide/api/orion/reservation', {
-        '@type': 'FoodEstablishmentReservation',
+        '@type': RESERVATION_TYPE,
         partySize: 5,
         reservationFor: {
-          '@type': 'FoodEstablishment',
+          '@type': FOOD_ESTABLISHMENT_TYPE,
           name: 'Araba'
         },
         startTime: reservationDate
@@ -68,16 +73,16 @@ frisby.create('OAuth2 login')
           .expectHeaderContains('content-type', 'application/json')
           .expectJSON('*', {
             '@context': 'http://schema.org',
-            '@type': 'FoodEstablishmentReservation',
+            '@type': RESERVATION_TYPE,
             reservationFor: {
-              '@type': 'FoodEstablishment',
+              '@type': FOOD_ESTABLISHMENT_TYPE,
               name: 'Araba',
               address: {
-                '@type': 'postalAddress'
+                '@type': POSTAL_ADDRESS_TYPE
               }
             },
             underName: {
-              '@type': 'Person'
+              '@type': PERSON_TYPE
             }
           })
           .toss();
@@ -95,16 +100,16 @@ frisby.create('OAuth2 login')
           .expectHeaderContains('content-type', 'application/json')
           .expectJSON('*', {
             '@context': 'http://schema.org',
-            '@type': 'FoodEstablishmentReservation',
+            '@type': RESERVATION_TYPE,
             reservationFor: {
-              '@type': 'FoodEstablishment',
+              '@type': FOOD_ESTABLISHMENT_TYPE,
               name: 'Araba',
               address: {
-                '@type': 'postalAddress'
+                '@type': POSTAL_ADDRESS_TYPE
               }
             },
             underName: {
-              '@type': 'Person'
+              '@type': PERSON_TYPE
             }
           })
           .toss();
@@ -195,12 +200,12 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         '@context': 'http://schema.org',
-        '@type': 'FoodEstablishmentReservation',
+        '@type': RESERVATION_TYPE,
         reservationFor: {
-          '@type': 'FoodEstablishment'
+          '@type': FOOD_ESTABLISHMENT_TYPE
         },
         underName: {
-          '@type': 'Person'
+          '@type': PERSON_TYPE
         }
       })
       .toss();
@@ -215,7 +220,7 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         'underName': {
-          '@type': 'Person',
+          '@type': PERSON_TYPE,
           'name': 'user1'
         }
       })
@@ -231,7 +236,7 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         reservationFor: {
-          '@type': 'FoodEstablishment',
+          '@type': FOOD_ESTABLISHMENT_TYPE,
           name: 'Araba'
         }
       })
@@ -250,7 +255,7 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON('*', {
         reservationFor: {
-          '@type': 'FoodEstablishment',
+          '@type': FOOD_ESTABLISHMENT_TYPE,
           name: 'Araba'
         }
       })
@@ -266,12 +271,12 @@ frisby.create('OAuth2 login')
     .expectHeaderContains('content-type', 'application/json')
     .expectJSON('*', {
       '@context': 'http://schema.org',
-      '@type': 'FoodEstablishmentReservation',
+      '@type': RESERVATION_TYPE,
       reservationFor: {
-        '@type': 'FoodEstablishment'
+        '@type': FOOD_ESTABLISHMENT_TYPE
       },
       underName: {
-        '@type': 'Person'
+        '@type': PERSON_TYPE
       }
     })
     .toss();

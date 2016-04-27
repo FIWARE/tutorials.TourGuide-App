@@ -19,6 +19,18 @@ var crypto = require('crypto');
 var shortid = require('shortid');
 var authRequest = require('./auth/authrequest');
 
+var RESTAURANT_TYPE = 'Restaurant';
+var REVIEW_TYPE = 'Review';
+var RESERVATION_TYPE = 'FoodEstablishmentReservation';
+var POSTAL_ADDRESS_TYPE = 'PostalAddress';
+var PROPERTY_VALUE_TYPE = 'PropertyValue';
+var PERSON_TYPE = 'Person';
+var ORG_TYPE = 'Organization';
+var RATING_TYPE = 'Rating';
+var FOOD_ESTABLISHMENT_TYPE = 'FoodEstablishment';
+var DATE_TYPE = 'Date';
+var AGGREGATE_RATING_TYPE = 'AggregateRating';
+
 function doGet(options, callback, res, useHttps) {
   var protocol = http;
   if (useHttps) {
@@ -250,7 +262,7 @@ function restaurantToSchema(element, date) {
 
   var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': 'Restaurant',
+    '@type': RESTAURANT_TYPE,
     'aggregateRating': {
       'reviewCount': element.aggregateRating.reviewCount,
       'ratingValue': element.aggregateRating.ratingValue
@@ -259,12 +271,12 @@ function restaurantToSchema(element, date) {
       {
         'value': element.capacity,
         'name': 'capacity',
-        '@type': 'PropertyValue'
+        '@type': PROPERTY_VALUE_TYPE
       },
       {
         'value': element.occupancyLevels,
         'name': 'occupancyLevels',
-        '@type': 'PropertyValue'
+        '@type': PROPERTY_VALUE_TYPE
       }
     ],
     'name': element.name
@@ -294,7 +306,7 @@ function restaurantToSchema(element, date) {
   });
 
   if (elementToSchema.address) {
-    elementToSchema.address['@type'] = 'postalAddress';
+    elementToSchema.address['@type'] = POSTAL_ADDRESS_TYPE;
   }
 
   if (element.location) {
@@ -313,24 +325,24 @@ function reviewToSchema(element) {
 
   var elementToSchema = {
     '@context': 'http://schema.org',
-    '@type': 'Review',
+    '@type': REVIEW_TYPE,
     'author': {
-      '@type': 'Person',
+      '@type': PERSON_TYPE,
       'name': element.author
     },
     'dateCreated': element.dateCreated,
     'itemReviewed': {
-      '@type': 'Restaurant',
+      '@type': RESTAURANT_TYPE,
       'name': element.itemReviewed
     },
     'name': element.id,
     'publisher': {
-      '@type': 'Organization',
+      '@type': ORG_TYPE,
       'name': element.publisher
     },
     'reviewBody': element.reviewBody,
     'reviewRating': {
-      '@type': 'Rating',
+      '@type': RATING_TYPE,
       'ratingValue': element.reviewRating
     }
   };
@@ -342,13 +354,13 @@ function reservationToSchema(element) {
 
   var elementToSchema = {
       '@context': 'http://schema.org',
-      '@type': 'FoodEstablishmentReservation',
+      '@type': RESERVATION_TYPE,
       'partySize': element.partySize,
       'reservationFor': {
-        '@type': 'FoodEstablishment',
+        '@type': FOOD_ESTABLISHMENT_TYPE,
         'name': element.reservationFor,
         'address': {
-          '@type': 'postalAddress',
+          '@type': POSTAL_ADDRESS_TYPE,
           'streetAddress': element.address.streetAddress,
           'addressRegion': element.address.addressRegion,
           'addressLocality': element.address.addressLocality,
@@ -358,7 +370,7 @@ function reservationToSchema(element) {
       'reservationStatus': element.reservationStatus,
       'startTime': element.startTime,
       'underName': {
-        '@type': 'Person',
+        '@type': PERSON_TYPE,
         'name': element.underName
       },
       'reservationId': element.id
@@ -375,7 +387,7 @@ function objectDataToSchema(element, date) {
 
   switch (type) {
 
-  case 'Restaurant':
+  case RESTAURANT_TYPE:
 
     if (date) {
       newElement = restaurantToSchema(element, date);
@@ -384,12 +396,12 @@ function objectDataToSchema(element, date) {
     }
     return newElement;
 
-  case 'Review':
+  case REVIEW_TYPE:
 
     newElement = reviewToSchema(element);
     return newElement;
 
-  case 'FoodEstablishmentReservation':
+  case RESERVATION_TYPE:
 
     newElement = reservationToSchema(element);
     return newElement;
@@ -488,7 +500,7 @@ function restaurantToOrion(schemaObject, geoObject) {
 
   var objectToOrion = {
     'address': {
-      'type': 'PostalAddress',
+      'type': POSTAL_ADDRESS_TYPE,
       'value': {
         'streetAddress': schemaObject.address.streetAddress,
         'addressLocality': schemaObject.address.addressLocality,
@@ -497,14 +509,14 @@ function restaurantToOrion(schemaObject, geoObject) {
       }
     },
     'aggregateRating': {
-      'type': 'AggregateRating',
+      'type': AGGREGATE_RATING_TYPE,
       'value': {
         'ratingValue': 0,
         'reviewCount': 0
       }
     },
     'capacity': {
-      'type': 'PropertyValue',
+      'type': PROPERTY_VALUE_TYPE,
       'value': schemaObject.capacity.value
     },
     'department': {
@@ -526,14 +538,14 @@ function restaurantToOrion(schemaObject, geoObject) {
     'occupancyLevels': {
       'metadata': {
         'timestamp': {
-          'type': 'date',
+          'type': DATE_TYPE,
           'value': schemaObject.occupancyLevels.metadata.timestamp.value
         }
       },
-      'type': 'PropertyValue',
+      'type': PROPERTY_VALUE_TYPE,
       'value': schemaObject.occupancyLevels.value
     },
-    'type': 'Restaurant',
+    'type': RESTAURANT_TYPE,
     'url': {
       'value': schemaObject.url
     },
@@ -552,30 +564,30 @@ function reviewToOrion(userObject, schemaObject) {
     var itemReviewed = fixedEncodeURIComponent(schemaObject.itemReviewed.name);
     var objectToOrion = {
       'author': {
-        'type': 'Person',
+        'type': PERSON_TYPE,
         'value': userObject.id
       },
       'dateCreated': {
-        'type': 'date',
+        'type': DATE_TYPE,
         'value': date
       },
       'id': generateId(itemReviewed, date),
       'itemReviewed': {
-        'type': 'Restaurant',
+        'type': RESTAURANT_TYPE,
         'value': itemReviewed
       },
       'publisher': {
-        'type': 'Organization',
+        'type': ORG_TYPE,
         'value': userObject.organizations[0].name
       },
       'reviewRating': {
-        'type': 'Rating',
+        'type': RATING_TYPE,
         'value': schemaObject.reviewRating.ratingValue
       },
       'reviewBody': {
         'value': fixedEncodeURIComponent(schemaObject.reviewBody)
       },
-      'type': 'Review'
+      'type': REVIEW_TYPE
     };
     return sortObject(objectToOrion);
   }
@@ -593,23 +605,23 @@ function reservationToOrion(userObject, schemaObject) {
         'value': schemaObject.partySize
       },
       'reservationFor': {
-        'type': 'FoodEstablishment',
+        'type': FOOD_ESTABLISHMENT_TYPE,
         'value': reservationFor
       },
       'reservationStatus': {
         'value': 'Confirmed'
       },
       'startTime': {
-        'type': 'date',
+        'type': DATE_TYPE,
         'value': date
       },
       'address': {
-        'type': 'PostalAddress',
+        'type': POSTAL_ADDRESS_TYPE,
         'value': schemaObject.address
       },
-      'type': 'FoodEstablishmentReservation',
+      'type': RESERVATION_TYPE,
       'underName': {
-        'type': 'Person',
+        'type': PERSON_TYPE,
         'value': userObject.id
       }
     };
@@ -721,11 +733,11 @@ function createOccupancyObject(occupancyLevel, date) {
     'occupancyLevels': {
       'metadata': {
         'timestamp': {
-          'type': 'date',
+          'type': DATE_TYPE,
           'value': date
         }
       },
-      'type': 'PropertyValue',
+      'type': PROPERTY_VALUE_TYPE,
       'value': occupancyLevel
     }
   };
