@@ -6,7 +6,7 @@ mongodb:
     command: --smallfiles
 
 orion:
-    image: fiware/orion:0.28
+    image: fiware/orion:latest
     hostname: orion
     links:
         - mongodb
