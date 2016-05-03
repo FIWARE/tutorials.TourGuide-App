@@ -28,12 +28,6 @@ check_var IDAS_API_KEY tourguideidas
 
 check_var ORION_SUBSCRIPTIONS_ENABLED true
 
-check_var CEP_ENABLED false
-check_var CEP_HOSTNAME cep-proton
-check_var CEP_PORT 8080
-check_var CEP_DEFINITION TemperatureExample
-check_var CEP_DEFINITION_FILE /opt/cep/TemperatureExample.json
-
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
 fi
@@ -117,68 +111,6 @@ function tail_logs () {
     tail -F ${apache_logs}
 }
 
-function cep_setup () {
-
-    local cep_definitions_url="http://${CEP_HOSTNAME}:${CEP_PORT}/ProtonOnWebServerAdmin/resources/definitions"
-    local cep_instances_url="http://${CEP_HOSTNAME}:${CEP_PORT}/ProtonOnWebServerAdmin/resources/instances/ProtonOnWebServer"
-    check_host_port ${CEP_HOSTNAME} ${CEP_PORT}
-    check_url ${cep_instances_url} "started"
-    check_file ${CEP_DEFINITION_FILE}
-
-    # upload definition to cep server, overwrite if exists
-    local http_status=$( curl --silent \
-                              --output /dev/null \
-                              --write-out "%{http_code}" \
-                              --request PUT \
-                              --header 'Content-Type: application/json' \
-                              "${cep_definitions_url}/${CEP_DEFINITION}" \
-                              --data @"${CEP_DEFINITION_FILE}" )
-    if [ $http_status != 200 ] ; then
-        echo "Failed to upload CEP definition file '${CEP_DEFINITION_FILE}'."
-        exit 1
-    fi
-
-    # stop CEP instance
-    local http_status=$( curl --silent \
-                              --output /dev/null \
-                              --write-out "%{http_code}" \
-                              --request PUT \
-                              --header 'Content-Type: application/json' \
-                              "${cep_instances_url}" \
-                              --data '{"action":"ChangeState","state":"stop"}' )
-    if [ $http_status != 200 ] ; then
-        echo "Failed to stop CEP instance."
-        exit 1
-    fi
-
-    # select new definition file
-    local http_status=$( curl --silent \
-                              --output /dev/null \
-                              --write-out "%{http_code}" \
-                              --request PUT \
-                              --header 'Content-Type: application/json' \
-                              "${cep_instances_url}" \
-                              --data "{\"action\": \"ChangeDefinitions\",\"definitions-url\": \"/ProtonOnWebServerAdmin/resources/definitions/${CEP_DEFINITION}\"}" )
-    if [ $http_status != 200 ] ; then
-        echo "Failed to start CEP instance."
-        exit 1
-    fi
-
-    # start CEP instance
-    local http_status=$( curl --silent \
-                              --output /dev/null \
-                              --write-out "%{http_code}" \
-                              --request PUT \
-                              --header 'Content-Type: application/json' \
-                              "${cep_instances_url}" \
-                              --data '{"action":"ChangeState","state":"start"}' )
-    if [ $http_status != 200 ] ; then
-        echo "Failed to start CEP instance."
-        exit 1
-    fi
-
-}
-
 # Move the provision file to /config to make it available for IdM
 
 mv ${TOURGUIDE_USER_DIR}/keystone_provision.py /config/keystone_provision.py
@@ -191,11 +123,6 @@ check_file ${CONFIG_FILE}
 _configure_params
 # enable new virtualhosts
 a2ensite tourguide-app
-
-# Setup CEP project
-if [ "${CEP_ENABLED}" = "true" ] ; then
-    cep_setup
-fi
 
 # Subscribe to receive temperatures from orion
 if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then

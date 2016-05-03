@@ -95,19 +95,6 @@ cygnus:
         - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/subscriptions:/opt/subscribe
         - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
 
-cep-proton:
-    image: bitergia/cep-proton:master
-    hostname: cep-proton
-    expose:
-        - "8080"
-        - "8686"
-        - "3002"
-        - "3302"
-    ports:
-        - "8080:8080"
-    links:
-        - orion
-
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
     hostname: tourguide
@@ -116,7 +103,6 @@ tourguide:
         - idm
         - pepwilma
         - idasiotacpp:idas
-        - cep-proton
     environment:
         - ORION_HOSTNAME=pepwilma
         - ORION_NO_PROXY_HOSTNAME=orion
@@ -126,7 +112,6 @@ tourguide:
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false
-        - CEP_ENABLED=false
     volumes_from:
         - idm
     # volumes:
