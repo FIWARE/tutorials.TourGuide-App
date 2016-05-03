@@ -5,7 +5,7 @@
 - [Activate subscriptions and uncoupled configuration file](#activate-subscriptions-and-uncoupled-configuration-file)
 - [Persist Context Data](#presist-context-data)
 	- [CKAN](#ckan)
-	- [HDFS](#HDFS) 
+	- [HDFS](#HDFS)
 	- [MySQL](#mysql)
 
 ## Activate subscriptions and uncoupled configuration file
@@ -33,9 +33,9 @@ Publishing in CKAN (http://demo.ckan.org) should be as simple as modifying the `
 
 ```
 # CKAN API key: the same for both
-cygnusagent.sinks.ckan-sink-temp.api_key = 
-cygnusagent.sinks.ckan-sink-humidity.api_key = 
-cygnusagent.sinks.ckan-sink-occupancy.api_key = 
+cygnusagent.sinks.ckan-sink-temp.api_key =
+cygnusagent.sinks.ckan-sink-humidity.api_key =
+cygnusagent.sinks.ckan-sink-occupancy.api_key =
 ```
 
 ### HDFS
@@ -45,10 +45,10 @@ To public in HDFS you will need credential for the fiware [Cosmos](https://githu
 ```
 ...
 # Account in https://cosmos.lab.fiware.org/ allowed to write in HDFS
-cygnusagent.sinks.hdfs-sink.hdfs_username = 
-cygnusagent.sinks.hdfs-sink.hdfs_password = 
+cygnusagent.sinks.hdfs-sink.hdfs_username =
+cygnusagent.sinks.hdfs-sink.hdfs_password =
 # Follow http://stackoverflow.com/questions/31187977/oauth2-access-to-cosmos-webhdfs-in-fiware-lab
-cygnusagent.sinks.hdfs-sink.oauth2_token = 
+cygnusagent.sinks.hdfs-sink.oauth2_token =
 ...
 ```
 
