@@ -765,10 +765,18 @@ function generateId(name, date) {
 }
 
 function addConditionToQuery(listOfConditions, key, operator, value) {
+  var condition;
+
   if (!listOfConditions) {
     listOfConditions = [];
   }
-  var condition = key + operator + value;
+  if (typeof value === 'string' && key !== 'startTime') {
+    var quotedValue = '\'' + value + '\'';
+    condition = key + operator + quotedValue;
+  } else {
+    condition = key + operator + value;
+  }
+
   listOfConditions.push(condition);
   return listOfConditions;
 }
