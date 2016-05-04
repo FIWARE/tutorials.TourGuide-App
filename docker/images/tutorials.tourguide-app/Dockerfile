@@ -12,7 +12,6 @@ ENV TOURGUIDE_USER_DIR /home/${TOURGUIDE_USER}
 ENV GIT_URL_TOURGUIDE https://github.com/Fiware/tutorials.TourGuide-App.git
 ENV GIT_REV_TOURGUIDE develop
 ENV SUBSCRIPTIONS_PATH /opt/subscribe
-ENV CEP_DEFINITIONS_PATH /opt/cep
 ENV CC_APP_SERVER_PATH ${TOURGUIDE_USER_DIR}/tutorials.TourGuide-App/server
 
 # create tourguide user
@@ -51,7 +50,6 @@ RUN apt-get update && \
     cd .. && \
     rm -rf fix-node-passenger && \
     mkdir ${SUBSCRIPTIONS_PATH} && \
-    mkdir ${CEP_DEFINITIONS_PATH} && \
     # enable apache modules and disable default site
     a2enmod ssl && \
     a2enmod passenger && \
@@ -79,10 +77,6 @@ RUN git clone -b ${GIT_REV_TOURGUIDE} ${GIT_URL_TOURGUIDE} && \
 COPY subscription-humidity-sensors.sh ${SUBSCRIPTIONS_PATH}/
 COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 COPY cpr-registration.sh ${SUBSCRIPTIONS_PATH}/
-COPY cep-subscription-ul20-temp.sh ${SUBSCRIPTIONS_PATH}/
-
-# copy cep project definition
-COPY TemperatureExample.json ${CEP_DEFINITIONS_PATH}/
 
 # Add provision script for IdM
 COPY keystone_provision.py ${TOURGUIDE_USER_DIR}/keystone_provision.py
