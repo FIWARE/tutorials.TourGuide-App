@@ -770,12 +770,12 @@ function addConditionToQuery(listOfConditions, key, operator, value) {
   if (!listOfConditions) {
     listOfConditions = [];
   }
+
+  var finalValue = value;
   if (typeof value === 'string' && key !== 'startTime') {
-    var quotedValue = '\'' + value + '\'';
-    condition = key + operator + quotedValue;
-  } else {
-    condition = key + operator + value;
+    finalValue = '\'' + value + '\'';
   }
+  condition = key + operator + finalValue;
 
   listOfConditions.push(condition);
   return listOfConditions;
