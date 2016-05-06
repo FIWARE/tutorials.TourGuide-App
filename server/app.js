@@ -51,7 +51,9 @@ app.get('/logout', auth.logout);
 
 // Auth Middleware - This will check if the token exists and is valid
 // Only the requests that start with /api/orion/* will be checked
-app.all('/api/orion/*', auth.validateRequest);
+app.post('/api/orion/*', auth.validateRequest);
+app.patch('/api/orion/*', auth.validateRequest);
+app.delete('/api/orion/*', auth.validateRequest);
 
 // API REST definition
 
