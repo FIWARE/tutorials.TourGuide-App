@@ -395,8 +395,9 @@ exports.createReservation = function(req, res) {
       elementToOrion.address = restaurant.body.address;
       capacity = restaurant.body.capacity;
       utils.addConditionToQuery(filter, 'startTime', '==', timeframe);
-      utils.addConditionToQuery(filter, 'reservationFor', '==', req.params.id);
       utils.addConditionToQuery(filter, 'reservationStatus', '==', 'Confirmed');
+      utils.addConditionToQuery(filter, 'reservationFor', '==',
+                                req.body.reservationFor.name);
       queryString.q = filter.join(';');
       return utils.getListByType(RESERVATION_TYPE, null, req.headers,
                                  queryString);

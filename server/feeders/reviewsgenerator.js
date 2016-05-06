@@ -138,7 +138,7 @@ var triggerRestaurantsRatings = function() {
     queryString.q = filter.join(';');
     utils.getListByType(REVIEW_TYPE, null, fiwareHeaders, queryString)
     .then(function(restaurantReviews) {
-      var ratings = utils.getAggregateRating(restaurantReviews);
+      var ratings = utils.getAggregateRating(restaurantReviews.body);
       q.push({'aggregateRatings': ratings, 'restaurantName': restaurantName},
              returnPost);
     })

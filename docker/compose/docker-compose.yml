@@ -1,5 +1,5 @@
 mongodb:
-    image: fiware/tutorials.tourguide-app.restaurant-data:20160420
+    image: fiware/tutorials.tourguide-app.restaurant-data:20160504
     hostname: mongodb
     expose:
         - "27017"
