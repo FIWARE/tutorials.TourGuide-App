@@ -662,6 +662,9 @@ function sendRequest(method, body, identifier, headers, queryString) {
   if (identifier) {
     uri += '/' + encodeURIComponent(identifier);
   }
+  if (method === 'PATCH') {
+    uri += '/attrs';
+  }
   return authRequest(uri, method, body, headers, queryString);
 }
 
