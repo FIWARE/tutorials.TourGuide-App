@@ -83,8 +83,8 @@ cygnus:
         - "5050"
         - "6001"
     volumes:
-        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/subscriptions:/opt/subscribe
-        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
+        - ../cygnus/subscriptions:/opt/subscribe
+        - ../cygnus/conf:/config
 
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
