@@ -119,7 +119,7 @@ exports.readRestaurantWithDate = function(req, res) {
     return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
-    utils.returnResponse(restaurant, res);
+    utils.returnResponse(restaurant, res, req.params.date);
   })
   .catch(function(err) {
     utils.responseError(err, res);

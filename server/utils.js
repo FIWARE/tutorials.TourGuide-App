@@ -800,11 +800,15 @@ function removeServicePath(headers) {
   return fiwareHeaders;
 }
 
-function returnResponse(data, res) {
+function returnResponse(data, res, date) {
   res.statusCode = data.statusCode;
   res.headers = data.headers;
   if (data.body) {
-    res.json(dataToSchema(data.body));
+    if (date) {
+      res.json(dataToSchema(data.body, date));
+    } else {
+      res.json(dataToSchema(data.body));
+    }
   } else {
     res.end();
   }
