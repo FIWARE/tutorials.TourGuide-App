@@ -1,3 +1,5 @@
+# misc
+
 ## oauthToken.js
 
 Simple Node.js script that retrieves a fresh token from IDM-Keyrock to allow users make requests against the [FIWARE TourGuide RESTful API](http://docs.tourguide.apiary.io)
