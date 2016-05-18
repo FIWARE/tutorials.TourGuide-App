@@ -35,22 +35,6 @@ idm:
         - APP_NAME=TourGuide
         - AUTHZFORCE_VERSION=4.4.1b
 
-pepwilma:
-    image: bitergia/pep-wilma:4.3.0
-    hostname: pepwilma
-    links:
-        - orion
-        - idm
-        - authzforce
-    volumes_from:
-        - idm
-    expose:
-        - "1026"
-    environment:
-        - APP_HOSTNAME=orion
-        - APP_PORT=1026
-        - AUTHZFORCE_VERSION=4.4.1b
-
 idasiotacpp:
     image: bitergia/idas-iota-cpp:1.2.0
     hostname: idasiotacpp
@@ -92,13 +76,12 @@ tourguide:
     links:
         - orion
         - idm
-        - pepwilma
         - idasiotacpp:idas
     environment:
-        - ORION_HOSTNAME=pepwilma
+        - ORION_HOSTNAME=orion
         - ORION_NO_PROXY_HOSTNAME=orion
         - ORION_PORT=1026
-        - ORION_PEP_ENABLED=true
+        - ORION_PEP_ENABLED=false
         - IDAS_PORT=8080
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
