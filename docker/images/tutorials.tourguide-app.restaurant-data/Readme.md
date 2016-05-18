@@ -4,8 +4,10 @@ Start TourGuide with a clean database (use mongo:2.6 instead of fiware/tutorials
 Load the data as usual with the restaurant_feeder.js script and any other script neccessary.
 Locate the data volume inside /var/lib/docker:
 ```
-docker inspect compose_mongodb_1 | grep -Po '(?<="Source": ")[^"]*'
+docker inspect <mongodb-container> | grep -Po '(?<="Source": ")[^"]*'
 ```
+with `<mongodb-container>` being the `ID` or the `name` of the mongodb container.
+
 Stop (not kill) the containers.
 Generate tar from volume data (i.e.):
 ```

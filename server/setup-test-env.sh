@@ -10,7 +10,7 @@ _local_path=$( dirname $(pwd) )
 popd > /dev/null
 cd ${_local_path}
 
-_compose_path="docker/compose"
+_compose_path="."
 _yml="${_compose_path}/docker-compose.yml"
 
 function start_test_env() {
