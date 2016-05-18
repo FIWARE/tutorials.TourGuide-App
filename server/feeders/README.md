@@ -16,7 +16,7 @@
 
 Set of scripts to generate context information to Orion Context Broker.
 
-**Note**: By default the image provided in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker-compose.yml) has already restaurants, reservations and reviews loaded. The usage of the restaurant feeder is intended for usage in a clean Orion image with any preloaded context data. Reviews and reservations feeders can be used as many times as wanted (they generates one review/reservation for restaurant).
+**Note**: By default the image provided in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/develop/docker-compose.yml) has already restaurants, reservations and reviews loaded. The usage of the restaurant feeder is intended for usage in a clean Orion image with any preloaded context data. Reviews and reservations feeders can be used as many times as wanted (they generates one review/reservation for restaurant).
 
 ### restaurantfeeder.js
 
