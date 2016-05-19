@@ -217,6 +217,7 @@ function sendObservation(name, type, data) {
   ];
 
   headers['Content-Length'] = data.length;
+  headers['Content-Type'] = 'text/plain';
 
   var options = {
     host: idasHostname,
