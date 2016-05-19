@@ -14,6 +14,7 @@ var Q = require('q');
 var config = require('../config');
 var idasHostname = config.idasHostname;
 var idasPort = config.idasPort;
+var idasAdminPort = config.idasAdminPort;
 var idasFiwareService = config.idasFiwareService;
 var idasFiwareServicePath = config.idasFiwareServicePath;
 var idasApiKey = config.idasApiKey;
@@ -94,7 +95,7 @@ function createService() {
 
   var options = {
     host: idasHostname,
-    port: idasPort,
+    port: idasAdminPort,
     path: idasUrl,
     method: 'POST',
     headers: headers
@@ -157,7 +158,7 @@ function registerSensor(name, type) {
 
   var options = {
     host: idasHostname,
-    port: idasPort,
+    port: idasAdminPort,
     path: idasUrl,
     method: 'POST',
     headers: headers
