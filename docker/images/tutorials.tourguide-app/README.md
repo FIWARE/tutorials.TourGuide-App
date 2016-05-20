@@ -25,7 +25,7 @@ So for this purpose, we have already a simple file that launches:
    * Cygnus
    * TourGuide app
 
-The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml).
+The file `docker-compose.yml` can be downloaded from [here](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/develop/docker-compose.yml).
 
 Once you get it, you just have to pull the images:
 ```
@@ -38,7 +38,7 @@ docker-compose up -d
 
 Note that even though the `docker-compose up -d` does also pull the images, we suggest to do it separately to avoid synchronization issues.
 
-Also, there are several environment variables that you can configure in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/master/docker/compose/docker-compose.yml):
+Also, there are several environment variables that you can configure in the [docker-compose.yml](https://raw.githubusercontent.com/Fiware/tutorials.TourGuide-App/develop/docker-compose.yml):
 
    * `ORION_HOSTNAME`. Hostname of the Orion application protected by a proxy. By default the value is `pepwilma`
    * `ORION_NO_PROXY_HOSTNAME`. Hostname of the Orion application without proxy. By default the value is `orion`
@@ -55,7 +55,7 @@ And all the services will be up. The client will be reachable at:
 http://tourguide
 ```
 
-End to end testing can be done using the [REST interface](http://docs.tourguide.apiary.io). An example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/server/feeders/restaurantfeeder.js).
+End to end testing can be done using the [REST interface](http://docs.tourguide.apiary.io). An example application is [the restaurant data feeder](https://github.com/Fiware/tutorials.TourGuide-App/blob/develop/server/feeders/restaurantfeeder.js).
 
 **Note**: to access the containers from the host (i.e http://tourguide/) you may need to modify your `hosts` file to add entries for the containers.  To help with this task, you can use the [get-docker-hosts](https://github.com/Bitergia/docker/tree/master/utils#get-docker-hosts) script to add or update the containers info to your `hosts` file.
 
@@ -71,7 +71,7 @@ If you need to run another command in the same container, you can use the `docke
 
 ## IdM Users, Organizations, Apps, Roles and Permissions
 
-This IdM image is intended to work with [Fiware TourGuide-App](https://github.com/Fiware/tutorials.TourGuide-App). Due to this, we've generated Users, Organizations, Apps, Roles and Permissions adapted to it in this uncoupled  [file](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/keystone_provision.py).
+This IdM image is intended to work with [Fiware TourGuide-App](https://github.com/Fiware/tutorials.TourGuide-App). Due to this, we've generated Users, Organizations, Apps, Roles and Permissions adapted to it in this uncoupled  [file](https://github.com/Fiware/tutorials.TourGuide-App/blob/develop/docker/images/tutorials.tourguide-app/keystone_provision.py).
 
 **Note** the following provision is intended just for testing purposes. To add/remove information to this image, you can always use the [Identity API](http://developer.openstack.org/api-ref-identity-v3.html)
 
@@ -122,13 +122,13 @@ This IdM image is intended to work with [Fiware TourGuide-App](https://github.co
 
 ### Permissions
 
-We've added several permissions for Orion Operations. You can check all of them by accessing the IdM or [here](https://github.com/Fiware/tutorials.TourGuide-App/blob/master/docker/images/tutorials.tourguide-app/keystone_provision.py#L186)
+We've added several permissions for Orion Operations. You can check all of them by accessing the IdM or [here](https://github.com/Fiware/tutorials.TourGuide-App/blob/develop/docker/images/tutorials.tourguide-app/keystone_provision.py#L186)
 
 ## User feedback
 
 ### Documentation
 
-All the information regarding the image generation is hosted publicly on [Github](https://github.com/Fiware/tutorials.TourGuide-App/tree/master/docker/images/tutorials.TourGuide-App).
+All the information regarding the image generation is hosted publicly on [Github](https://github.com/Fiware/tutorials.TourGuide-App/tree/develop/docker/images/tutorials.TourGuide-App).
 
 ### Issues
 

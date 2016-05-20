@@ -19,5 +19,7 @@ node oauthToken.js <username> <password>
 Also, you can run it from inside the container in a Docker environment:
 
 ```
-docker exec -i -t compose_tourguide_1 node tutorials.TourGuide-App/server/misc/oauthToken.js <username> <password>
+docker exec -i -t <tourguide-container> node tutorials.TourGuide-App/server/misc/oauthToken.js <username> <password>
 ```
+
+with `<tourguide-container>` being the `ID` or the `name` of the tourguide container.

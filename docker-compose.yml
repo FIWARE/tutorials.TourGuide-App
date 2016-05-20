@@ -76,24 +76,15 @@ cygnus:
     image: bitergia/cygnus:develop
     links:
         - orion
-    #    - mariadb
     expose:
         - "5001"
         - "5002"
         - "5003"
         - "5050"
         - "6001"
-    environment:
-        - CKAN_API_KEY=648b4204-feb6-4f5c-b9c4-813c48319669
-        - COSMOS_USER=acs
-        - COSMOS_PASSWORD=
-    #    - MYSQL_HOST=mariadb
-    #    - MYSQL_PORT=3306
-    #    - MYSQL_USER=root
-    #    - MYSQL_PASSWORD=bitergia
     volumes:
-        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/subscriptions:/opt/subscribe
-        - ~/devel/fiware/tutorials.TourGuide-App/docker/cygnus/conf:/config
+        - ./docker/cygnus/subscriptions:/opt/subscribe
+        - ./docker/cygnus/conf:/config
 
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
@@ -114,5 +105,3 @@ tourguide:
         - SENSORS_FORCED_UPDATE_ENABLED=false
     volumes_from:
         - idm
-    # volumes:
-    #     - ~/devel/fiware/tutorials.TourGuide-App:/home/tourguide/tutorials.TourGuide-App
