@@ -74,8 +74,6 @@ RUN git clone -b ${GIT_REV_TOURGUIDE} ${GIT_URL_TOURGUIDE} && \
     rm -fr ${TOURGUIDE_USER_DIR}/.npm
 
 # copy default subscriptions
-COPY subscription-humidity-sensors.sh ${SUBSCRIPTIONS_PATH}/
-COPY subscription-therm-sensors.sh ${SUBSCRIPTIONS_PATH}/
 COPY cpr-registration.sh ${SUBSCRIPTIONS_PATH}/
 
 # Add provision script for IdM
