@@ -35,26 +35,32 @@ idm:
         - APP_NAME=TourGuide
         - AUTHZFORCE_VERSION=4.4.1b
 
-idasiotacpp:
-    image: bitergia/idas-iota-cpp:1.2.0
-    hostname: idasiotacpp
+idas:
+    image: fiware/iotagent-ul:develop
+    hostname: idas
     links:
-        - mongodb
+        - mongodb:mongo
         - orion
     expose:
-        - "8080"
-        - "8081"
+        - "7896"
+        - "4041"
+    ports:
+        - "7896:7896"
+        - "4041:4041"
 
 ul20client:
     image: bitergia/ul20-client:latest
     hostname: ul20client
     links:
         - orion
-        - idasiotacpp:iota
+        - idas
     command: --acpi
     environment:
-        - IOTA_PORT=8080
-        - UL20_SERVICE_NAME=tourguideul20
+        - UL20_IOTA_HOST=idas
+        - UL20_IOTA_PORT=7896
+        - UL20_IOTA_ADMIN_PORT=4041
+        - UL20_API_KEY=tourguide-devices
+        - UL20_SERVICE_NAME=tourguide
 
 cygnus:
     image: bitergia/cygnus:develop
@@ -76,13 +82,17 @@ tourguide:
     links:
         - orion
         - idm
-        - idasiotacpp:idas
+        - idas
     environment:
         - ORION_HOSTNAME=orion
         - ORION_NO_PROXY_HOSTNAME=orion
         - ORION_PORT=1026
         - ORION_PEP_ENABLED=false
-        - IDAS_PORT=8080
+        - IDAS_PORT=7896
+        - IDAS_ADMIN_PORT=4041
+        - IDAS_FIWARE_SERVICE=tourguide
+        - IDAS_FIWARE_SERVICE_PATH=/
+        - IDAS_API_KEY=tourguide-devices
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false

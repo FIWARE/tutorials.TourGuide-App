@@ -21,10 +21,11 @@ check_var ORION_PORT 1026
 check_var ORION_PEP_ENABLED false
 
 check_var IDAS_HOSTNAME idas
-check_var IDAS_PORT 8080
-check_var IDAS_FIWARE_SERVICE tourguideidas
+check_var IDAS_PORT 7896
+check_var IDAS_ADMIN_PORT 4041
+check_var IDAS_FIWARE_SERVICE tourguide
 check_var IDAS_FIWARE_SERVICE_PATH /
-check_var IDAS_API_KEY tourguideidas
+check_var IDAS_API_KEY tourguide-devices
 
 check_var ORION_SUBSCRIPTIONS_ENABLED true
 
@@ -72,6 +73,7 @@ function _configure_params () {
         -e "s|ORION_PORT|${ORION_PORT}|g" \
         -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g" \
         -e "s|IDAS_HOSTNAME|${IDAS_HOSTNAME}|g" \
+        -e "s|IDAS_ADMIN_PORT|${IDAS_ADMIN_PORT}|g" \
         -e "s|IDAS_PORT|${IDAS_PORT}|g" \
         -e "s|IDAS_FIWARE_SERVICE_PATH|${IDAS_FIWARE_SERVICE_PATH}|g" \
         -e "s|IDAS_FIWARE_SERVICE|${IDAS_FIWARE_SERVICE}|g" \

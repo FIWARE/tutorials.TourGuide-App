@@ -33,6 +33,7 @@ config.orionPepEnabled = 'ORION_PEP_ENABLED';
 // IDAS
 config.idasHostname = 'IDAS_HOSTNAME';
 config.idasPort = 'IDAS_PORT';
+config.idasAdminPort = 'IDAS_ADMIN_PORT';
 config.idasFiwareService = 'IDAS_FIWARE_SERVICE';
 config.idasFiwareServicePath = 'IDAS_FIWARE_SERVICE_PATH';
 config.idasApiKey = 'IDAS_API_KEY';
