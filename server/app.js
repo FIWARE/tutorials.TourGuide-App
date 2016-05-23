@@ -92,10 +92,6 @@ app.get('/api/orion/reservations/organization/:org',
 app.get('/api/orion/reservations/restaurant/:restaurant/from/:from/to/:to',
   orion.getReservationsByDate);
 
-// Sensors
-
-app.post('/api/sensors', orion.updateSensors);
-
 // END API REST
 
 app.get('*', function(req, res, next) {
