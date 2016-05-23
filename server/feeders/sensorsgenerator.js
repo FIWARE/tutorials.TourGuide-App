@@ -16,86 +16,54 @@
 'use strict';
 
 var utils = require('../utils');
-var async = require('async');
 var idas = require('../idas/ul20');
-
 var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 
-var apiRestSimtasks = 10;
 var restaurantsData;
 var sensorsAdded = 0;
 var sensorsInitialized = 0;
 
 /* There will be 4 sensors for each restaurant:
  * - Temperature of the Kitchen
- * - Temperature of the Dinner
+ * - Temperature of the Dining room
  * - Humidity of the Kitchen
- * - Humidity of the Dinner
+ * - Humidity of the Dining room
  */
 
 var sensorsPerRestaurant = 4;
-var sensorTypes = ['SENSOR_TEMP', 'SENSOR_HUM'];
-var sensorPlaces = ['Kitchen', 'Dining'];
+var sensorTypes = ['temperature', 'humidity'];
+var sensorRooms = ['kitchen', 'dining'];
 
 var feedIDASSensors = function() {
 
   var totalSensors = restaurantsData.length * sensorsPerRestaurant;
 
-  var cbShowProgress = function() {
-    console.log('Total Sensors:', totalSensors,
-                ', Created:', sensorsAdded,
-                ', Initialized:', sensorsInitialized);
-  };
-
   console.log('Registering sensors on IDAS.');
   console.log('Number of restaurants: ' + restaurantsData.length);
 
-  // Limit the number of calls to be done in parallel
-  var q = async.queue(function(task, callback) {
-    idas.registerSensor(task.name, task.type)
-      .then(
-        function(response) {
-          sensorsAdded++;
-          return idas.initializeSensor(task.name, task.type)
-            .delay(1000) // This is to avoid clogging iotagent with requests.
-            .then(
-              function(response) {
-                sensorsInitialized++;
-              },
-              function(error) {
-                console.log('initializeSensor Error:', error);
-              });
-        },
-        function(error) {
-          console.log('createSensor Error:', error);
-        })
-      .done(
-        function(response) {
-          callback();
-        });
-  }, apiRestSimtasks);
-
-  // Display totals when queue is empty
-  q.drain = function() {
-    console.log('Total sensors added:', sensorsAdded,
-                '/', totalSensors);
-    console.log('Total sensors initialized:', sensorsInitialized,
-                '/', totalSensors);
-  };
-
-  // For each restaurant, generate a new temperature sensor
-  Object.keys(restaurantsData).forEach(function(element, pos) {
-    // generate sensor base name
-    var sensorBaseName = restaurantsData[pos].id;
-    sensorPlaces.forEach(function(place) {
+  // For each restaurant, generate new sensors
+  Object.keys(restaurantsData).forEach(function(index) {
+    var restaurant = restaurantsData[index];
+    sensorRooms.forEach(function(room) {
       sensorTypes.forEach(function(type) {
-        q.push({
-          'name': sensorBaseName + '_' + place,
-          'type': type
-        }, cbShowProgress);
+        idas.registerSensor(restaurant, room, type)
+          .then(function(response) {
+            sensorsAdded++;
+            console.log('Total sensors added:', sensorsAdded,
+                        '/', totalSensors);
+            return idas.initializeSensor(restaurant, room, type);
+          })
+          .then(function(response) {
+            sensorsInitialized++;
+            console.log('Total sensors initialized:', sensorsInitialized,
+                        '/', totalSensors);
+          })
+          .catch(function(error) {
+            console.log('Sensor Error:', error);
+          });
       });
     });
   });
