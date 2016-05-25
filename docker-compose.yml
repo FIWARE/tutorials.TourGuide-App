@@ -25,10 +25,10 @@ authzforce:
     expose:
         - "8080"
 
-idm:
+keyrock:
     image: bitergia/idm-keyrock:5.1.0
-    hostname: idm
-    container_name: idm
+    hostname: keyrock
+    container_name: keyrock
     links:
         - authzforce
     volumes:
@@ -90,7 +90,7 @@ tourguide:
     container_name: tourguide
     links:
         - orion
-        - idm
+        - keyrock
         - idas
     environment:
         - ORION_HOSTNAME=orion
@@ -105,5 +105,6 @@ tourguide:
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false
+        - IDM_HOSTNAME=keyrock
     volumes_from:
-        - idm
+        - keyrock
