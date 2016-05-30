@@ -1,6 +1,7 @@
 mongodb:
     image: fiware/tutorials.tourguide-app.restaurant-data:20160504
     hostname: mongodb
+    container_name: mongodb
     expose:
         - "27017"
     command: --smallfiles
@@ -8,6 +9,7 @@ mongodb:
 orion:
     image: fiware/orion:latest
     hostname: orion
+    container_name: orion
     links:
         - mongodb
     expose:
@@ -19,12 +21,14 @@ orion:
 authzforce:
     image: fiware/authzforce-ce-server:release-4.4.1b
     hostname: authzforce
+    container_name: authzforce
     expose:
         - "8080"
 
-idm:
+keyrock:
     image: bitergia/idm-keyrock:5.1.0
-    hostname: idm
+    hostname: keyrock
+    container_name: keyrock
     links:
         - authzforce
     volumes:
@@ -38,6 +42,7 @@ idm:
 idas:
     image: fiware/iotagent-ul:develop
     hostname: idas
+    container_name: idas
     links:
         - mongodb:mongo
         - orion
@@ -51,6 +56,7 @@ idas:
 ul20client:
     image: bitergia/ul20-client:latest
     hostname: ul20client
+    container_name: ul20client
     links:
         - orion
         - idas
@@ -64,6 +70,8 @@ ul20client:
 
 cygnus:
     image: bitergia/cygnus:develop
+    hostname: cygnus
+    container_name: cygnus
     links:
         - orion
     expose:
@@ -79,9 +87,10 @@ cygnus:
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
     hostname: tourguide
+    container_name: tourguide
     links:
         - orion
-        - idm
+        - keyrock
         - idas
     environment:
         - ORION_HOSTNAME=orion
@@ -96,5 +105,6 @@ tourguide:
         - ORION_SUBSCRIPTIONS_ENABLED=false
         - SENSORS_GENERATION_ENABLED=false
         - SENSORS_FORCED_UPDATE_ENABLED=false
+        - IDM_HOSTNAME=keyrock
     volumes_from:
-        - idm
+        - keyrock

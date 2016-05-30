@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 
       tests: {
         // execute jasmine_node tests inside testing container
-        command: 'docker exec -u tourguide tests_tourguide_1 bash -c "cd ~/tutorials.TourGuide-App/server ; grunt do-test"'
+        command: 'docker exec -u tourguide test_tourguide bash -c "cd ~/tutorials.TourGuide-App/server ; grunt do-test"'
       }
 
     },
