@@ -249,6 +249,22 @@ function objectToArray(element) {
   return element;
 }
 
+function setSchemaUnits(sensor) {
+  switch (sensor.additionalType) {
+  case 'temperature':
+    sensor.unitCode = 'CEL';
+    sensor.unitText = '°C';
+    break;
+  case 'relativeHumidity':
+    sensor.unitCode = 'P1';
+    sensor.unitText = '%';
+    break;
+  default:
+    console.log('Uknown type:', sensor.additionalType);
+  }
+  return sensor;
+}
+
 function restaurantToSchema(element, date) {
 
   var restaurantSchemaElements = [
@@ -258,6 +274,13 @@ function restaurantToSchema(element, date) {
     'priceRange',
     'telephone',
     'url'
+  ];
+
+  var sensorsSchemaElements = [
+    'temperature:kitchen',
+    'relativeHumidity:kitchen',
+    'temperature:dining',
+    'relativeHumidity:dining'
   ];
 
   var elementToSchema = {
@@ -295,11 +318,23 @@ function restaurantToSchema(element, date) {
     val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
-      if (val !== 'undefined') {
-        if (typeof val === 'string') {
-          elementToSchema[elementAttribute] = unescape(val);
-        } else {
-          elementToSchema[elementAttribute] = val;
+      if (val) {
+        elementToSchema[elementAttribute] = val;
+      }
+    } else if (sensorsSchemaElements.indexOf(elementAttribute) !== -1) {
+      if (val) {
+        var type = {
+          Pattern: /^(temperature|relativeHumidity):.*$/
+        };
+        if (elementAttribute.search(type.Pattern) != -1) {
+          var sensor = {
+            '@type': PROPERTY_VALUE_TYPE,
+            'value': val,
+            'additionalType': type.Pattern.exec(elementAttribute)[1],
+            'name': elementAttribute,
+          };
+          sensor = setSchemaUnits(sensor);
+          elementToSchema.additionalProperty.push(sensor);
         }
       }
     }
@@ -318,6 +353,7 @@ function restaurantToSchema(element, date) {
     };
   }
 
+  elementToSchema = JSON.parse(unescape(JSON.stringify(elementToSchema)));
   return sortObject(elementToSchema);
 }
 
