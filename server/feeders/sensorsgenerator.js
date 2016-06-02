@@ -34,7 +34,7 @@ var sensorsInitialized = 0;
  */
 
 var sensorsPerRestaurant = 4;
-var sensorTypes = ['temperature', 'humidity'];
+var sensorTypes = ['temperature', 'relativeHumidity'];
 var sensorRooms = ['kitchen', 'dining'];
 
 var feedIDASSensors = function() {
@@ -45,8 +45,7 @@ var feedIDASSensors = function() {
   console.log('Number of restaurants: ' + restaurantsData.length);
 
   // For each restaurant, generate new sensors
-  Object.keys(restaurantsData).forEach(function(index) {
-    var restaurant = restaurantsData[index];
+  restaurantsData.forEach(function(restaurant) {
     sensorRooms.forEach(function(room) {
       sensorTypes.forEach(function(type) {
         idas.registerSensor(restaurant, room, type)
@@ -62,7 +61,7 @@ var feedIDASSensors = function() {
                         '/', totalSensors);
           })
           .catch(function(error) {
-            console.log('Sensor Error:', error);
+            console.error('Sensor Error:', error);
           });
       });
     });

@@ -255,7 +255,7 @@ function setSchemaUnits(sensor) {
     sensor.unitCode = 'CEL';
     sensor.unitText = '°C';
     break;
-  case 'humidity':
+  case 'relativeHumidity':
     sensor.unitCode = 'P1';
     sensor.unitText = '%';
     break;
@@ -278,9 +278,9 @@ function restaurantToSchema(element, date) {
 
   var sensorsSchemaElements = [
     'temperature:kitchen',
-    'humidity:kitchen',
+    'relativeHumidity:kitchen',
     'temperature:dining',
-    'humidity:dining'
+    'relativeHumidity:dining'
   ];
 
   var elementToSchema = {
@@ -318,13 +318,14 @@ function restaurantToSchema(element, date) {
     val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
-      if (val !== 'undefined') {
+      if (val) {
         elementToSchema[elementAttribute] = val;
       }
     } else if (sensorsSchemaElements.indexOf(elementAttribute) !== -1) {
-      if (val !== 'undefined') {
-        var type = {};
-        type.Pattern = /^(temperature|humidity):.*$/;
+      if (val) {
+        var type = {
+          Pattern: /^(temperature|relativeHumidity):.*$/
+        };
         if (elementAttribute.search(type.Pattern) != -1) {
           var sensor = {
             '@type': PROPERTY_VALUE_TYPE,

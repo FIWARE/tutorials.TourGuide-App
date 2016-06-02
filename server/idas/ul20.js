@@ -21,6 +21,8 @@ var idasFiwareServicePath = config.idasFiwareServicePath;
 var idasApiKey = config.idasApiKey;
 var orionHostname = config.idasContextBrokerHostname;
 var orionPort = config.orionPort;
+var TEMPERATURE = '25';
+var RELATIVEHUMIDITY = '0.2';
 
 var defaultHeaders = {
   'content-type': 'application/json',
@@ -45,7 +47,7 @@ var sensorsTemplates = {
       }
     ]
   },
-  'humidity': {
+  'relativeHumidity': {
     'devices': [
       {'device_id': 'DEV_ID',
        'entity_name': 'ENTITY_ID',
@@ -54,7 +56,7 @@ var sensorsTemplates = {
        'timezone': 'Europe/Madrid',
        'attributes': [
          {'object_id': 'h',
-           'name': 'humidity',
+           'name': 'relativeHumidity',
            'type': 'Number'
          }]
       }
@@ -65,7 +67,7 @@ var sensorsTemplates = {
 function createService() {
   var idasUrl = '/iot/services';
   var headers = JSON.parse(JSON.stringify(defaultHeaders));
-  var resource = '/iot/d';
+  var RESOURCE = '/iot/d';
 
   // build payload
   var data = {
@@ -73,7 +75,7 @@ function createService() {
       {
         'apikey': '' + idasApiKey + '',
         'cbroker': 'http://' + orionHostname + ':' + orionPort + '',
-        'resource': resource
+        'resource': RESOURCE
       }
     ]
   };
@@ -263,10 +265,10 @@ function updateTemperatureSensor(deviceId, value, servicePath) {
     });
 }
 
-function updateHumiditySensor(deviceId, value, servicePath) {
+function updateRelativeHumiditySensor(deviceId, value, servicePath) {
   return sendObservation(deviceId, 'h|' + value, servicePath)
     .then(function(res) {
-      console.log('Updated humidity for ' + deviceId + ': ' + value);
+      console.log('Updated relative humidity for ' + deviceId + ': ' + value);
     });
 }
 
@@ -274,9 +276,11 @@ function initializeSensor(restaurant, room, type) {
   var deviceId = getDeviceId(restaurant, room, type);
   switch (type) {
   case 'temperature':
-    return updateTemperatureSensor(deviceId, '25', restaurant.department);
-  case 'humidity':
-    return updateHumiditySensor(deviceId, '20', restaurant.department);
+    return updateTemperatureSensor(deviceId, TEMPERATURE,
+                                   restaurant.department);
+  case 'relativeHumidity':
+    return updateRelativeHumiditySensor(deviceId, RELATIVEHUMIDITY,
+                                        restaurant.department);
   default:
     return Q.reject('Unsupported sensor type: ' + type);
   }
@@ -286,8 +290,8 @@ function updateSensor(deviceId, type, value, servicePath) {
   switch (type) {
   case 'temperature':
     return updateTemperatureSensor(deviceId, value, servicePath);
-  case 'humidity':
-    return updateHumiditySensor(deviceId, value, servicePath);
+  case 'relativeHumidity':
+    return updateRelativeHumiditySensor(deviceId, value, servicePath);
   default:
     return Q.reject('Unsupported sensor type: ' + type);
   }
@@ -303,7 +307,7 @@ module.exports = {
   sendObservation: sendObservation,
   initializeSensor: initializeSensor,
   updateTemperatureSensor: updateTemperatureSensor,
-  updateHumiditySensor: updateHumiditySensor,
+  updateRelativeHumiditySensor: updateRelativeHumiditySensor,
   updateSensor: updateSensor,
   getDeviceId: getDeviceId
 };

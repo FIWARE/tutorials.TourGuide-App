@@ -33,7 +33,7 @@ var sensorsUpdated = 0;
  */
 
 var sensorsPerRestaurant = 4;
-var sensorTypes = ['temperature', 'humidity'];
+var sensorTypes = ['temperature', 'relativeHumidity'];
 var sensorRooms = ['kitchen', 'dining'];
 
 var feedIDASSensors = function() {
@@ -44,15 +44,13 @@ var feedIDASSensors = function() {
   console.log('Number of restaurants: ' + restaurantsData.length);
 
   // For each restaurant, generate a new sensors
-  Object.keys(restaurantsData).forEach(function(index) {
-    var restaurant = restaurantsData[index];
+  restaurantsData.forEach(function(restaurant) {
     sensorRooms.forEach(function(room) {
       sensorTypes.forEach(function(type) {
         var attrName = type + ':' + room;
-        if (restaurant[attrName]) {
-          var newValue = generateRandomValue(
-            restaurant[attrName],0,100
-          );
+        var oldValue = restaurant[attrName];
+        if (oldValue) {
+          var newValue = generateRandomValue(oldValue,type);
           var deviceId = idas.getDeviceId(restaurant, room, type);
           idas.updateSensor(deviceId, type, newValue, restaurant.department)
             .then(function(response) {
@@ -62,7 +60,7 @@ var feedIDASSensors = function() {
                          );
             })
             .catch(function(error) {
-              console.log('updateSensor Error:', error);
+              console.error('updateSensor Error:', error);
             });
         }
       });
@@ -70,8 +68,14 @@ var feedIDASSensors = function() {
   });
 };
 
-function generateRandomValue(oldValue, min, max) {
+function generateRandomValue(oldValue, type) {
   var newValue;
+  var MIN = 0;
+  var MAX = 100;
+
+  if (type === 'relativeHumidity') {
+    oldValue *= 100;
+  }
 
   if (oldValue) {
     // generate a new value using the old value as base
@@ -79,14 +83,19 @@ function generateRandomValue(oldValue, min, max) {
     var variance = Date.now() % 3;
     if (sign === 0) {
       newValue = parseInt(oldValue) + variance;
-      newValue = newValue > max ? max : newValue;
+      newValue = newValue > MAX ? MAX : newValue;
     } else {
       newValue = parseInt(oldValue) - variance;
-      newValue = newValue < min ? min : newValue;
+      newValue = newValue < MIN ? MIN : newValue;
     }
   } else {
-    newValue = Date.now() % max;
+    newValue = Date.now() % MAX;
   }
+
+  if (type === 'relativeHumidity') {
+    newValue /= 100;
+  }
+
   return newValue;
 }
 
