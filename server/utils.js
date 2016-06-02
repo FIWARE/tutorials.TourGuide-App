@@ -74,50 +74,6 @@ function doGet(options, callback, res, useHttps) {
   });
 }
 
-function doPost(options, data, callback, res, useHttps) {
-
-  try {
-    var protocol = http;
-    if (useHttps) {
-      protocol = https;
-    }
-
-    var postReq = protocol.request(options, function(response) {
-      // console.log("DOING POST");
-
-      response.setEncoding('utf8');
-
-      var buffer = '';
-
-      response.on('data', function(chunk) {
-        buffer += chunk;
-
-      });
-
-      response.on('end', function() {
-        // console.log(buffer);
-        callback(res, buffer, response.headers);
-      });
-    });
-
-    // console.log("POST Request created");
-
-    postReq.on('error', function(e) {
-      // TODO: handle error.
-      callback(res, e);
-      console.log(e);
-    });
-
-    // post the data
-    postReq.write(data);
-    postReq.end();
-
-  } catch (error) {
-    callback(res, error);
-    console.log(error);
-  }
-}
-
 function replaceOnceUsingDictionary(dictionary, content,
   replacehandler) {
   if (typeof replacehandler !== 'function') {
@@ -1107,7 +1063,6 @@ function returnConflict(res) {
 
 module.exports = {
   doGet: doGet,
-  doPost: doPost,
   replaceOnceUsingDictionary: replaceOnceUsingDictionary,
   randomIntInc: randomIntInc,
   randomElement: randomElement,
