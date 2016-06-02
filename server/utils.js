@@ -31,6 +31,14 @@ var FOOD_ESTABLISHMENT_TYPE = 'FoodEstablishment';
 var DATE_TYPE = 'DateTime';
 var AGGREGATE_RATING_TYPE = 'AggregateRating';
 
+/**
+ * Function used in restaurantfeeder.js to download the json restaurant data
+ *
+ * @param {Object} options - Options of the request
+ * @param {Function} callback - Callback function
+ * @param {Object} res - Response object
+ * @param {Boolean} useHttps - Boolean to use https
+*/
 function doGet(options, callback, res, useHttps) {
   var protocol = http;
   if (useHttps) {
@@ -74,6 +82,14 @@ function doGet(options, callback, res, useHttps) {
   });
 }
 
+/**
+ * Replaces the key of an element with its match
+ *
+ * @param {Object} dictionary - The dictionary with the content
+ * @param {Object} content - The element itself
+ * @param {Object} replacehandler - The function to replace them
+ * @return {Object} the element replaced
+*/
 function replaceOnceUsingDictionary(dictionary, content,
   replacehandler) {
   if (typeof replacehandler !== 'function') {
@@ -133,14 +149,33 @@ function replaceOnceUsingDictionary(dictionary, content,
   return output.join('');
 }
 
+/**
+ * Returns a random integer between the given numbers
+ *
+ * @param {Integer} low - List of elements
+ * @param {Integer} high - List of elements
+ * @return {Integer} a random element from the given array
+*/
 function randomIntInc(low, high) {
   return Math.floor(Math.random() * (high - low + 1) + low);
 }
 
+/**
+ * Returns a random element from a given array
+ *
+ * @param {Object} elements - List of elements
+ * @return {Object} a random element from the array
+*/
 function randomElement(elements) {
   return elements[Math.floor(Math.random() * elements.length)];
 }
 
+/**
+ * Removes forbidden characters in Orion
+ *
+ * @param {String} str - String with the forbidden characters
+ * @return {String} String without the forbidden characters
+*/
 function fixedEncodeURIComponent(str) {
   str = str.replace(/["]/g, '\\"');
   str = str.replace(/\n/g, '\\n');
@@ -151,6 +186,13 @@ function fixedEncodeURIComponent(str) {
   });
 }
 
+/**
+ * Returns a random date between given dates
+ *
+ * @param {String} from - datetime from
+ * @param {String} to - datetime to
+ * @return {Date} datetime object with the random date
+*/
 function getRandomDate(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
@@ -165,6 +207,12 @@ function getRandomDate(from, to) {
   return new Date(from + Math.random() * (to - from));
 }
 
+/**
+ * Removes html code tags
+ *
+ * @param {String} str - String to clean
+ * @return {String} str - String without the html tags
+*/
 function convertHtmlToText(str) {
 
   //-- remove BR tags and replace them with line break
@@ -194,6 +242,12 @@ function convertHtmlToText(str) {
   return str;
 }
 
+/**
+ * Pushes single objects into an array
+ *
+ * @param {Object} element - Object to push
+ * @return {Object} element - Array with the element
+*/
 function objectToArray(element) {
 
   if (util.isArray(element) === false) {
@@ -453,6 +507,14 @@ function sortObject(element) {
   return sorted;
 }
 
+/**
+ * Receives an element (or list of elements) and converts each
+ * element into Schema format
+ *
+ * @param {Object} listOfElements - Element or list of elements
+ * @param {String} date - datetime
+ * @return {Object} newListOfElements - The new list with schema format
+*/
 function dataToSchema(listOfElements, date) {
 
   var newListOfElements = [];

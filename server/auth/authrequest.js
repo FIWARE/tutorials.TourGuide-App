@@ -21,6 +21,16 @@ var port = 1026;
 
 module.exports = performRequest;
 
+/**
+ * Helper function to perform requests against Orion
+ *
+ * @param {Object} endpoint - Endpoint to perform the request
+ * @param {Object} method - HTTP method to use
+ * @param {Object} data - Data to send
+ * @param {Object} fiwareHeaders - Headers to use
+ * @param {Object} querystring - querystring data
+ * @return {Promise} promise with the result of the request
+*/
 function performRequest(endpoint, method, data, fiwareHeaders, querystring) {
 
   var deferred = Q.defer();
