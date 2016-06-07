@@ -259,6 +259,12 @@ function objectToArray(element) {
   return element;
 }
 
+/**
+ * Adds the measurements units to the sensor's schema
+ *
+ * @param {Object} sensor - sensor to add the units to
+ * @return {Object} sensor - sensor with the units added
+*/
 function setSchemaUnits(sensor) {
   switch (sensor.additionalType) {
   case 'temperature':
