@@ -53,7 +53,7 @@ var feedOrionReviews = function() {
     utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
-      console.log(err);
+      console.error(err);
     });
   }, apiRestSimtasks);
 
@@ -120,7 +120,7 @@ var triggerRestaurantsRatings = function() {
       })
       .then(callback)
       .catch(function(err) {
-        console.log(err.error);
+        console.error(err.error);
       });
     }, delay);
 
@@ -143,7 +143,7 @@ var triggerRestaurantsRatings = function() {
              returnPost);
     })
     .catch(function(err) {
-      console.log(err.error);
+      console.error(err.error);
     });
   });
 };
@@ -159,7 +159,7 @@ var loadRestaurantData = function() {
   utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
-    console.log(err);
+    console.error(err);
   });
 };
 

@@ -123,7 +123,7 @@ function createService() {
   });
 
   req.on('error', function(error) {
-    console.log('Error on request: ' + error.message);
+    console.error('Error on request: ' + error.message);
     q.reject(error);
   });
 
@@ -200,7 +200,7 @@ function registerSensor(restaurant, room, type) {
   });
 
   req.on('error', function(error) {
-    console.log('Error on request: ' + error.message);
+    console.error('Error on request: ' + error.message);
     q.reject(error);
   });
 
@@ -265,7 +265,7 @@ function sendObservation(deviceId, data, servicePath) {
   });
 
   req.on('error', function(error) {
-    console.log('Error on request: ' + error.message);
+    console.error('Error on request: ' + error.message);
     q.reject(error);
   });
 

@@ -62,7 +62,7 @@ function doGet(options, callback, res, useHttps) {
         // console.log(data);
       } catch (err) {
         console.log('Can\'t decode JSON response.');
-        console.log(err);
+        console.error(err);
         msg = 'Can\'t decode JSON response.';
       }
       if (data === undefined) {
@@ -78,7 +78,7 @@ function doGet(options, callback, res, useHttps) {
     err = new Error();
     err.status = 502; // Bad gateway
     callback(res, err);
-    console.log(err);
+    console.error(err);
   });
 }
 

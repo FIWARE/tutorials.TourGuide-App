@@ -47,5 +47,5 @@ rp(options)
     console.log(data);
   })
   .catch(function(err) {
-    console.log(err.error);
+    console.error(err.error);
   });

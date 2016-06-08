@@ -132,7 +132,7 @@ function getRestaurantReservationsByDate(restaurant, from, to) {
         })
       .catch(
         function(err) {
-          console.log('ERROR: Failed to get reservations:', err.message);
+          console.error('ERROR: Failed to get reservations:', err.message);
           return null;
         }
       );
@@ -227,7 +227,7 @@ function updateRestaurants() {
 
   function processEnd(err) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('Done.');
     }
@@ -253,5 +253,5 @@ utils.getListByType('Restaurant', limitRestaurantName, fiwareHeaders)
     updateRestaurants();
   })
   .catch(function(err) {
-    console.log(err);
+    console.error(err);
   });
