@@ -237,9 +237,6 @@ function sendObservation(deviceId, data, servicePath) {
     headers: headers
   };
 
-  // console.log('options:', options);
-  // console.log('data:', data);
-
   var q = Q.defer();
   var req = http.request(options, function(res) {
     res.setEncoding('utf-8');
@@ -256,7 +253,6 @@ function sendObservation(deviceId, data, servicePath) {
         responseObject = JSON.parse(responseString);
       }
       if (res.statusCode == 200) {
-        //console.log('Measurement sent: ' + entityName + ' ' + data);
         q.resolve(responseString);
       } else {
         console.log('Request:', options);
