@@ -86,7 +86,7 @@ var feedOrionReviews = function() {
         'value': 'Body review'
       },
       'dateCreated': {
-        'type': 'date',
+        'type': 'DateTime',
         'value': date
       },
       'publisher': {

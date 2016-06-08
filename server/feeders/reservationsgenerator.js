@@ -79,7 +79,7 @@ var feedOrionReservations = function() {
         'value': restaurantsData[index].address
       },
       'startTime': {
-        'type': 'date',
+        'type': 'DateTime',
         'value': utils.getRandomDate().toISOString()
       },
       'partySize': {
