@@ -28,7 +28,7 @@ var PERSON_TYPE = 'Person';
 var ORG_TYPE = 'Organization';
 var RATING_TYPE = 'Rating';
 var FOOD_ESTABLISHMENT_TYPE = 'FoodEstablishment';
-var DATE_TYPE = 'Date';
+var DATE_TYPE = 'DateTime';
 var AGGREGATE_RATING_TYPE = 'AggregateRating';
 
 function doGet(options, callback, res, useHttps) {

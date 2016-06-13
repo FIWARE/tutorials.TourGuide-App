@@ -158,7 +158,7 @@ var feedOrionRestaurants = function() {
       'occupancyLevels': {
         'metadata': {
           'timestamp': {
-            'type': 'date',
+            'type': 'DateTime',
             'value': new Date().toISOString()
           }
         },
