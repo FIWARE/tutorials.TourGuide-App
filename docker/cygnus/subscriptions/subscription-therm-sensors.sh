@@ -7,22 +7,23 @@
 #
 # Restaurant temperature sensors subscription
 
-CYGNUS_HOST=$( hostname -i )
-CYGNUS_PORT=5001
+CYGNUS_HOST=$( getent hosts cygnus | sort -u | awk '{print $1}' )
+CYGNUS_PORT=5050
 CYGNUS_URL=http://${CYGNUS_HOST}:${CYGNUS_PORT}/notify
 ORION_URL=http://${ORION_HOSTNAME}:${ORION_PORT}/v1/subscribeContext
 
-cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Fiware-Service: tourguideidas' --header 'Fiware-ServicePath: /' -d @-
+cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Fiware-Service: tourguide' --header 'Fiware-ServicePath: /#' -d @-
 {
     "entities": [
         {
-            "type": "thing",
-            "isPattern": "true",
-            "id": "SENSOR_TEMP_*"
+            "type": "Restaurant",
+            "isPattern": "false",
+            "id": "0115206c51f60b48b77e4c937835795c33bb953f"
         }
     ],
     "attributes": [
-        "temperature"
+        "temperature:kitchen",
+        "temperature:dining"
     ],
     "reference": "${CYGNUS_URL}",
     "duration": "P1M",
@@ -30,9 +31,11 @@ cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --
         {
             "type": "ONCHANGE",
             "condValues": [
-                "TimeInstant"
+                "temperature:kitchen",
+                "temperature:dining"
             ]
         }
-    ]
+    ],
+    "throttling": "PT1S"
 }
 EOF
