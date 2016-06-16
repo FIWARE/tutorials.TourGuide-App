@@ -68,21 +68,27 @@ ul20client:
         - UL20_API_KEY=tourguide-devices
         - UL20_SERVICE_NAME=tourguide
 
+mysql:
+    image: mysql:5.5
+    hostname: mysql
+    container_name: mysql
+    expose:
+        - "3306"
+    environment:
+        - MYSQL_ROOT_PASSWORD=mysql
+
 cygnus:
-    image: bitergia/cygnus:develop
+    image: fiware/cygnus-ngsi:develop
     hostname: cygnus
     container_name: cygnus
     links:
         - orion
+        - mysql
     expose:
-        - "5001"
-        - "5002"
-        - "5003"
         - "5050"
-        - "6001"
-    volumes:
-        - ./docker/cygnus/subscriptions:/opt/subscribe
-        - ./docker/cygnus/conf:/config
+    environment:
+        - CYGNUS_MYSQL_USER=root
+        - CYGNUS_MYSQL_PASS=mysql
 
 tourguide:
     image: fiware/tutorials.tourguide-app:latest
@@ -92,6 +98,7 @@ tourguide:
         - orion
         - keyrock
         - idas
+        - cygnus
     environment:
         - ORION_HOSTNAME=orion
         - ORION_NO_PROXY_HOSTNAME=orion
