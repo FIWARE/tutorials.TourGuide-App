@@ -1,6 +1,6 @@
 'use strict';
 /*
- * myReviews.js
+ * organizationReviews.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
  * Authors:
  *   Jaisiel Santana <jaisiel@gmail.com>
@@ -16,11 +16,18 @@ var clientLogic;
 var initReviews = function() {
 
   clientLogic.setUpDrawModule();
+  //get franchise from url
+  var franchise = window.location.search.replace('?', '');
+  var prefix = 'organization=';
+  if (franchise.slice(0, prefix.length) == prefix) {
 
-  //only gets reviews if the user is logged
-  connectionsAPI.loginNeeded(function() {
-    clientLogic.getMyReviews();
-  });
+    //only gets reviews if the user is logged
+    connectionsAPI.loginNeeded(function() {
+      clientLogic.showReviewsByOrganization(
+        franchise.slice(prefix.length));
+    });
+
+  }
 
 
   $('tbody').height($(window).height() - $('thead th').height() -

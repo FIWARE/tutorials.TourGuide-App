@@ -3,12 +3,19 @@
     "node": ">= 0.10.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "closure-linter-wrapper": "~1.0.1",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^1.0.0",
-    "grunt-gjslint": "^0.2.1"
+    "grunt-gjslint": "^0.2.1",
+    "jsdom": "^9.0.0",
+    "mocha": "^2.4.5",
+    "mocha-jsdom": "^1.1.0",
+    "redis": "^2.6.0-2",
+    "sinon": "^1.17.4",
+    "localStorage":"^1.0.3"
   },
   "scripts": {
-    "test": "grunt linter"
+    "test": "grunt linter && mocha ./spec --require ./spec/helpers/chai.js  --reporter spec"
   }
 }

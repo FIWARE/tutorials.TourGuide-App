@@ -5,19 +5,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <!-- CSS -->
+
   <!-- FIWARE styles -->
   <link href="stylesheets/styles.css" rel="stylesheet">
-  <!-- addon styles -->
-  <!-- timepicker addon CSS -->
-  <link rel="stylesheet" href="addons/timepicker/jquery.timepicker.css" />
-  <!-- jqueryui -->
+  <!-- Addons Styles -->
+  <!-- jequeryui -->
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
   <!-- leaflet -->
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
-
   <!-- app specific styles -->
   <link rel=stylesheet type=text/css href="stylesheets/app.css">
 
@@ -28,36 +25,51 @@
   <script src="js/bootstrap/bootstrap.min.js"></script>
   <!-- Addons Javascripts -->
   <script src="js/bootstrap/modal.js"></script>
-  <!-- <script src="javascripts/bootstrap/dropdown.js"></script> -->
-  <script src="addons/timepicker/jquery.timepicker.min.js"></script>
+  <!-- jqueryui -->
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 
-  <!-- leaflet -->
+  <!-- leaflet JS -->
   <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
+
   <!-- app JS -->
   <script src="js/utils.js"></script>
   <script src="js/AJAXRequest.js"></script>
   <script src="js/restaurantsAPI.js"></script>
-  <script src="js/index.js"></script>
   <script src="js/connectionsAPI.js"></script>
+  <script src="js/organizationReservations.js"></script>
   <script src="js/clientLogic.js"></script>
   <script src="js/drawModule.js"></script>
 
-  <title>FIWARE Tourguide Application</title>
+  <title>My reservations</title>
 
 </head>
 <body>
+
 <div class="container-fluid">
   <nav id="topMenu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
     <div id='loggedDiv' class="navbar navbar-default" role="navigation">
       <p>Checking if logged </p>
     </div>
   </nav>
-
-  <div id='map'>
+  <div id='reservationsListDiv'>
+    <ul id='reservationList' class="hidden">
+    </ul>
+    <div class="table-fixed-container">
+      <table id="reservationsTable" class="table table-fixed table-hover reservations-table">
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Date</th>
+            <th>Diners</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="reservationsTableBody">
+        </tbody>
+      </table>
+    </div>
   </div>
-
   <div id='popWindow' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="popTitle">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">

@@ -8,48 +8,62 @@
   <!-- CSS -->
   <!-- FIWARE styles -->
   <link href="stylesheets/styles.css" rel="stylesheet">
-  <!-- timepicker plugin CSS -->
-  <link rel="stylesheet" href="addons/timepicker/jquery.timepicker.css" />
-  <!-- leaflet CSS -->
+  <!-- leaflet styles -->
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
-  <!-- jQueryUI -->
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
-
   <!-- app specific styles -->
   <link rel=stylesheet type=text/css href="stylesheets/app.css">
-  
-  <!-- JavaSripts -->
-  <!-- jQuery (necessary for Bootstrap and other JavaScript plugins) -->
+
+  <!-- JavaScripts -->
+
+  <!-- jQuery (necessary for Bootstrap's and other JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <!-- bootstrap -->
   <script src="js/bootstrap/bootstrap.min.js"></script>
   <!-- Addons Javascripts -->
   <script src="js/bootstrap/modal.js"></script>
-  <!-- <script src="javascripts/bootstrap/dropdown.js"></script> -->
-  <script src="addons/timepicker/jquery.timepicker.min.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-  
   <!-- leaflet JS -->
   <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script>
-  <!-- app JS -->
+
+  <!-- app Js -->
   <script src="js/utils.js"></script>
+  <script src="js/AJAXRequest.js"></script>
   <script src="js/restaurantsAPI.js"></script>
-  <script src="js/myRestaurants.js"></script>
   <script src="js/connectionsAPI.js"></script>
-  <title>My restaurants</title>
+  <script src="js/organizationReviews.js"></script>
+  <script src="js/clientLogic.js"></script>
+  <script src="js/drawModule.js"></script>
+
+  <title> My reviews</title>
 
 </head>
 <body>
 <div class="container-fluid">
   <nav id="topMenu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
     <div id='loggedDiv' class="navbar navbar-default" role="navigation">
-      <p>Checking if logged </p>
+        <p>Checking if logged </p>
     </div>
   </nav>
-  <div id='map'>
+
+  <div id='reviewsListDiv'>
+    <ul id='reviewList' class="hidden" >
+    </ul>
+  </div>
+
+  <div class="table-fixed-container">
+    <table id="reviewsTable" class="table table-fixed table-hover">
+      <thead>
+        <tr>
+          <th class="col-xs-6">Restaurant</th>
+          <th class="col-xs-3">Rating</th>
+          <th class="col-xs-3"></th>
+        </tr>
+      </thead>
+      <tbody id="reviewsTableBody">
+      </tbody>
+    </table>
   </div>
 
   <div id='popWindow' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="popTitle">
@@ -64,6 +78,6 @@
       </div>
     </div>
   </div>
-</div> 
+</div>
 </body>
 </html>

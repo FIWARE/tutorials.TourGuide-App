@@ -1,6 +1,6 @@
 'use strict';
 /*
- * myReservations.js
+ * organizationReservations.js
  * Copyright(c) 2016 Universidad de Las Palmas de Gran Canaria
  * Authors:
  *   Jaisiel Santana <jaisiel@gmail.com>
@@ -19,13 +19,20 @@ var initReservations = function() {
   $('#popWindow').modal();
 
   clientLogic.setUpDrawModule();
-  //only gets reservations if the user is logged
-  connectionsAPI.loginNeeded(function() {
-    clientLogic.getMyReservations();
-  });
 
+  //get franchise from url
+  var franchise = window.location.search.replace('?', '');
+  var prefix = 'organization=';
+  if (franchise.slice(0, prefix.length) == prefix) {
 
-  //todo translate to common js
+    //only gets reservations if the user is logged
+    connectionsAPI.loginNeeded(function() {
+      clientLogic.showReservationsByOrganization(
+        franchise.slice(prefix.length));
+    });
+
+  }
+
   $('tbody').height($(window).height() - $('thead th').height() -
     $('#loggedDiv').height() - 50);
 

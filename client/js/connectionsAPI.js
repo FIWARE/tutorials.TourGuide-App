@@ -8,6 +8,8 @@
  *   Pablo Fernández <pablo.fernandez@ulpgc.es>
  * MIT Licensed
 
+  Module that contains funcionalities related to user and log in.
+
 */
 
 /*exported connectionsAPI */
@@ -19,8 +21,9 @@ var connectionsAPI = (function() {
 
   var rol = {
     endUser: 'End user',
-    restaurantViewer: 'Restaurant Viewer',
-    globalManager: 'global manager'
+    restaurantViewer: 'Restaurant viewer',
+    globalManager: 'Global manager',
+    franchiseManager: 'Franchise manager'
   };
 
   var loginTimeout = 500;
@@ -71,8 +74,6 @@ var connectionsAPI = (function() {
 
   function createAndShowMenu(userInfo) {
 
-    //TODO check roles
-
     var loggedMenu = document.createElement('UL');
     loggedMenu.id = 'loggedMenu';
     loggedMenu.classList.add('nav', 'navbar-nav', 'pull-left');
@@ -87,56 +88,98 @@ var connectionsAPI = (function() {
     home.appendChild(homeLink);
     loggedMenu.appendChild(home);
 
-    //check each menu element
-
     //view organizations restaurants
     if (hasRole(userInfo, rol.restaurantViewer) ||
         hasRole(userInfo, rol.globalManager) || true) {//hacked
 
-      //we should ask before for each organization but the user hasn't yet
-      if (userInfo.organizations.length > 0) {
-        var myRestaurantsLi = document.createElement('LI');
-        myRestaurantsLi.className = 'dropdown';
+      var organizations = userInfo.organizations;
+      if (organizations.length > 0) {
+        var myOrganizationsLi = document.createElement('LI');
+        myOrganizationsLi.className = 'dropdown';
 
-        var myRestaurantsA = document.createElement('A');
-        myRestaurantsA.id = 'myRestaurantsButtonLink';
-        myRestaurantsA.className = 'dropdown-toggle';
-        myRestaurantsA.setAttribute('data-toggle', 'dropdown');
-        myRestaurantsA.setAttribute('role', 'button');
-        myRestaurantsA.href = '#';
-        myRestaurantsA.textContent = 'My restaurants';
+        var myOrganizationsA = document.createElement('A');
+        myOrganizationsA.id = 'myOrganizationsButtonLink';
+        myOrganizationsA.className = 'dropdown-toggle';
+        myOrganizationsA.setAttribute('data-toggle', 'dropdown');
+        myOrganizationsA.setAttribute('role', 'button');
+        myOrganizationsA.href = '#';
+        myOrganizationsA.textContent = 'My organizations';
 
         var caret = document.createElement('B');
         caret.className = 'caret';
 
-        myRestaurantsA.appendChild(caret);
-        myRestaurantsLi.appendChild(myRestaurantsA);
+        myOrganizationsA.appendChild(caret);
+        myOrganizationsLi.appendChild(myOrganizationsA);
 
         var organizationsMenu = document.createElement('UL');
-        organizationsMenu.className = 'dropdown-menu';
+        organizationsMenu.className = 'dropdown-menu multi-level';
         organizationsMenu.setAttribute('aria-labelledby',
-                                      'myRestaurantsButtonLink');
+                                      'myOrganizationsButtonLink');
         organizationsMenu.setAttribute('role', 'menu');
 
-        for (var index = 0; index < userInfo.organizations.length; index++) {
+        for (var index = 0; index < organizations.length; index++) {
+          if (! (is_organization_manager(organizations[index]) ||
+            hasRole(userInfo, rol.globalManager))) {
+            continue;
+          }
           var organizationLi = document.createElement('LI');
-          organizationLi.setAttribute('role', 'presentation');
+          organizationLi.className = 'dropdown-submenu';
 
           var organizationA = document.createElement('A');
-          organizationA.setAttribute('role', 'menuitem');
           organizationA.tabIndex = -1;
-          organizationA.href =
-            'myRestaurants.html?franchise=' +
-            userInfo.organizations[index].name;
+
+            organizationA.href = '#';
           organizationA.textContent = userInfo.organizations[index].name;
 
           organizationLi.appendChild(organizationA);
-          organizationsMenu.appendChild(organizationA);
+
+          //submenu
+          var organizationSubMenu = document.createElement('UL');
+          organizationSubMenu.className = 'dropdown-menu';
+
+          //restaurants submenu
+          var restaurantLi = document.createElement('LI');
+          var restaurantA = document.createElement('A');
+          restaurantA.tabIndex = -1;
+          restaurantA.href =
+            'organizationRestaurants.html?organization=' +
+            userInfo.organizations[index].name;
+          restaurantA.textContent = 'Restaurants';
+
+          restaurantLi.appendChild(restaurantA);
+          organizationSubMenu.appendChild(restaurantLi);
+
+          //reviews submenu
+          var reviewLi = document.createElement('LI');
+          var reviewA = document.createElement('A');
+          reviewA.tabIndex = -1;
+          reviewA.href =
+            'organizationReviews.html?organization=' +
+            userInfo.organizations[index].name;
+          reviewA.textContent = 'Reviews';
+
+          reviewLi.appendChild(reviewA);
+          organizationSubMenu.appendChild(reviewLi);
+
+          //reservations submenu
+          var reservationsLi = document.createElement('LI');
+          var reservationsA = document.createElement('A');
+          reservationsA.tabIndex = -1;
+          reservationsA.href =
+            'organizationReservations.html?organization=' +
+            userInfo.organizations[index].name;
+          reservationsA.textContent = 'Reservations';
+
+          reservationsLi.appendChild(reservationsA);
+          organizationSubMenu.appendChild(reservationsLi);
+
+          organizationLi.appendChild(organizationSubMenu);
+          organizationsMenu.appendChild(organizationLi);
         }
 
-        myRestaurantsLi.appendChild(organizationsMenu);
+        myOrganizationsLi.appendChild(organizationsMenu);
 
-        loggedMenu.appendChild(myRestaurantsLi);
+        loggedMenu.appendChild(myOrganizationsLi);
       }
 
     }
@@ -171,9 +214,11 @@ var connectionsAPI = (function() {
   }
 
   function hasRole(userInfo, role) {
-    for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
-      if (role == userInfo.roles[index].name) {
-        return true;
+    if (userInfo) {
+      for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
+        if (role == userInfo.roles[index].name) {
+          return true;
+        }
       }
     }
     return false;
@@ -203,13 +248,13 @@ var connectionsAPI = (function() {
 
 
   function loginNeeded(action) {
-    if (null != localStorage.getItem('userInfo')) {
+    if (null != getUser()) {
       action();
       return;
     }
 
     setTimeout(function() {
-      if (null != localStorage.getItem('userInfo')) {
+      if (null != getUser()) {
           action();
           return;
       }
@@ -219,12 +264,31 @@ var connectionsAPI = (function() {
     }, loginTimeout);
   }
 
+  //should be called once logged
+  function getUser() {
+    return JSON.parse(localStorage.getItem('userInfo'));
+  }
+
+  function is_organization_manager(organization) {
+    if (organization.roles) {
+      for (var i = organization.roles.length - 1; i >= 0; i--) {
+       if (rol.franchiseManager == organization.roles[i].name ||
+        rol.globalManager == organization.roles[i].name) {
+
+          return true;
+       }
+      }
+    }
+    return false;
+  }
+
   return {
     loginNeeded: loginNeeded,
     loggedIn: loggedIn,
     notLoggedIn: notLoggedIn,
     hasRole: hasRole,
-    rol: rol
+    rol: rol,
+    getUser: getUser
   };
 })();
 
@@ -237,4 +301,14 @@ var initConnections = function() {
 };
 
 
+if (typeof exports !== 'undefined') {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = connectionsAPI;
+    utils = require('./utils.js');
+  }
+}
+
+
 utils.addLoadEvent(initConnections);
+
+
