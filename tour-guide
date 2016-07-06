@@ -1,0 +1,162 @@
+#!/bin/bash
+
+version="0.1"
+appname=$( basename $0 )
+
+function show_version () {
+    cat <<EOF >&2
+${appname} version ${version}
+EOF
+    exit 0
+}
+
+function show_help () {
+   cat <<EOF >&2
+Usage: ${appname} [-h | --help] [-v | --version] <command> [<args>]
+
+Options:
+
+  -h  --help                 Show this help.
+  -v  --version              Show program version.
+
+Available commands:
+
+  start                      Start a service.
+  stop                       Stop a service.
+  configure                  Configure a service.
+  load                       Load example data.
+  post-sensor-data           Post simulated sensor data.
+  simulate-sensor-data       Simulate a sensor periodically sending data.
+  check                      Check for the presence of the required commands.
+  help                       Show this help.
+  version                    Show program version.
+
+Use '${appname} <command> --help' to get help about a specific <command>.
+
+EOF
+   exit 0
+}
+
+function not_implemented () {
+    echo "Command not implemented yet."
+    show_help
+}
+
+function cmd_help () {
+    show_help
+}
+
+function cmd_version () {
+    show_version
+}
+
+function cmd_start () {
+    not_implemented
+}
+
+function cmd_stop () {
+    not_implemented
+}
+
+function cmd_configure () {
+    not_implemented
+}
+
+function cmd_load () {
+    not_implemented
+}
+
+function cmd_post-sensor-data () {
+    not_implemented
+}
+
+function cmd_simulate-sensor-data () {
+    not_implemented
+}
+
+function show_help_check () {
+   cat <<EOF >&2
+Usage: ${appname} check [-h | --help]
+
+Check for the presence of the following commands:
+
+ * docker
+ * docker-compose
+
+Command options:
+
+  -h  --help                 Show this help.
+
+EOF
+   exit 0
+}
+
+function parse_options_check () {
+    if [ $# -gt 0 ]; then
+        case "$1" in
+            "-h" | "--help" )
+                show_help_check
+                ;;
+            *)
+                echo "Unknown parameter: $1"
+                show_help_check
+                ;;
+        esac
+    fi
+}
+
+function cmd_check () {
+    local ok=1
+    parse_options_check "$@"
+
+    echo "Checking for the required commands:"
+    echo ""
+
+    # check for the presence of docker
+    echo -ne " * docker: "
+    docker --version >/dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+        echo "Found."
+    else
+        ok=0
+        echo "Not found."
+    fi
+
+    # check for the presence of docker-compose
+    echo -ne " * docker-compose: "
+    docker-compose --version >/dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+        echo "Found."
+    else
+        ok=0
+        echo "Not found."
+    fi
+
+    echo ""
+    if [ ${ok} -eq 0 ]; then
+        echo "Some required commands could not be found."
+        echo "Please, make sure all the above commands are installed and available."
+        exit 1
+    else
+        echo "All required commands found."
+    fi
+}
+
+command="$1"
+case "${command}" in
+    "" | "-h" | "--help" )
+        show_help
+        ;;
+    "-v" | "--version")
+        show_version
+        ;;
+    *)
+        shift
+        if type cmd_${command} > /dev/null 2>&1 ; then
+            cmd_${command} "$@"
+        else
+            echo "Unknown command: ${command}"
+            show_help
+        fi
+        ;;
+esac
