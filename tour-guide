@@ -2,6 +2,7 @@
 
 version="0.1"
 appname=$( basename $0 )
+service=""
 
 function show_version () {
     cat <<EOF >&2
@@ -50,8 +51,54 @@ function cmd_version () {
     show_version
 }
 
+function show_help_start () {
+   cat <<EOF >&2
+Usage: ${appname} start [-h | --help] <service>
+
+Start one of the following services and its dependencies:
+
+ * orion
+ * authzforce
+ * keyrock
+ * idas
+ * cygnus
+ * tourguide
+
+Command options:
+
+  -h  --help                 Show this help.
+
+EOF
+   exit 0
+}
+
+function parse_options_start () {
+    if [ $# -lt 1 ]; then
+        show_help_start
+    else
+        case "$1" in
+            "-h" | "--help" )
+                show_help_start
+                ;;
+            "orion"|"authzforce"|"keyrock"|"idas"|"cygnus"|"tourguide")
+                service="$1"
+                ;;
+            "-"*)
+                echo "Unknown parameter: $1"
+                show_help_start
+                ;;
+            *)
+                echo "Unknown service: $1"
+                show_help_start
+                ;;
+        esac
+    fi
+}
+
 function cmd_start () {
-    not_implemented
+    parse_options_start "$@"
+    docker-compose up -d ${service}
+}
 }
 
 function cmd_stop () {
