@@ -3,6 +3,7 @@
 version="0.1"
 appname=$( basename $0 )
 service=""
+remove_containers=0
 
 function show_version () {
     cat <<EOF >&2
@@ -23,7 +24,7 @@ Options:
 Available commands:
 
   start                      Start a service.
-  stop                       Stop a service.
+  stop                       Stop services.
   configure                  Configure a service.
   load                       Load example data.
   post-sensor-data           Post simulated sensor data.
@@ -99,10 +100,46 @@ function cmd_start () {
     parse_options_start "$@"
     docker-compose up -d ${service}
 }
+
+function show_help_stop () {
+   cat <<EOF >&2
+Usage: ${appname} stop [-h | --help] [-r | --remove]
+
+Stops all the services currently running.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -r  --remove               Remove docker containers after stopping them.
+                             Default is NOT to remove the containers.
+
+EOF
+   exit 0
+}
+
+function parse_options_stop () {
+    if [ $# -gt 0 ]; then
+        case "$1" in
+            "-h" | "--help" )
+                show_help_stop
+                ;;
+            "-r" | "--remove")
+                remove_containers=1
+                ;;
+            *)
+                echo "Unknown parameter: $1"
+                show_help_stop
+                ;;
+        esac
+    fi
 }
 
 function cmd_stop () {
-    not_implemented
+    parse_options_stop "$@"
+    docker-compose stop
+    if [ $remove_containers -eq 1 ] ; then
+        docker-compose rm -f -v
+    fi
 }
 
 function cmd_configure () {
