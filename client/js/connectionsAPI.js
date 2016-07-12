@@ -19,7 +19,7 @@ var utils;
 
 var connectionsAPI = (function() {
 
-  var rol = {
+  var role = {
     endUser: 'End user',
     restaurantViewer: 'Restaurant viewer',
     globalManager: 'Global manager',
@@ -88,9 +88,9 @@ var connectionsAPI = (function() {
     home.appendChild(homeLink);
     loggedMenu.appendChild(home);
 
-    //view organizations restaurants
-    if (hasRole(userInfo, rol.restaurantViewer) ||
-        hasRole(userInfo, rol.globalManager) || true) {//hacked
+    // view organizations restaurants
+    if (hasRole(userInfo, role.restaurantViewer) ||
+        hasRole(userInfo, role.globalManager) || true) {//hacked
 
       var organizations = userInfo.organizations;
       if (organizations.length > 0) {
@@ -117,10 +117,10 @@ var connectionsAPI = (function() {
                                       'myOrganizationsButtonLink');
         organizationsMenu.setAttribute('role', 'menu');
 
-        for (var index = 0; index < organizations.length; index++) {
-          if (! (is_organization_manager(organizations[index]) ||
-            hasRole(userInfo, rol.globalManager))) {
-            continue;
+        organizations.forEach(function(organization) {
+          if (! (is_organization_manager(organization) ||
+            hasRole(userInfo, role.globalManager))) {
+            return;
           }
           var organizationLi = document.createElement('LI');
           organizationLi.className = 'dropdown-submenu';
@@ -129,62 +129,40 @@ var connectionsAPI = (function() {
           organizationA.tabIndex = -1;
 
             organizationA.href = '#';
-          organizationA.textContent = userInfo.organizations[index].name;
+          organizationA.textContent = organization.name;
 
           organizationLi.appendChild(organizationA);
 
-          //submenu
+          // submenu
           var organizationSubMenu = document.createElement('UL');
           organizationSubMenu.className = 'dropdown-menu';
 
-          //restaurants submenu
-          var restaurantLi = document.createElement('LI');
-          var restaurantA = document.createElement('A');
-          restaurantA.tabIndex = -1;
-          restaurantA.href =
-            'organizationRestaurants.html?organization=' +
-            userInfo.organizations[index].name;
-          restaurantA.textContent = 'Restaurants';
-
-          restaurantLi.appendChild(restaurantA);
+          var restaurantLi = createSubMenu('Restaurants', '#',
+           utils.targetOrganizationAndRedirect(organization.name,
+            'organizationRestaurants.html'));
           organizationSubMenu.appendChild(restaurantLi);
 
-          //reviews submenu
-          var reviewLi = document.createElement('LI');
-          var reviewA = document.createElement('A');
-          reviewA.tabIndex = -1;
-          reviewA.href =
-            'organizationReviews.html?organization=' +
-            userInfo.organizations[index].name;
-          reviewA.textContent = 'Reviews';
-
-          reviewLi.appendChild(reviewA);
+          var reviewLi = createSubMenu('Reviews', '#',
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationReviews.html'));
           organizationSubMenu.appendChild(reviewLi);
 
-          //reservations submenu
-          var reservationsLi = document.createElement('LI');
-          var reservationsA = document.createElement('A');
-          reservationsA.tabIndex = -1;
-          reservationsA.href =
-            'organizationReservations.html?organization=' +
-            userInfo.organizations[index].name;
-          reservationsA.textContent = 'Reservations';
-
-          reservationsLi.appendChild(reservationsA);
+          var reservationsLi = createSubMenu('Reservations', '#',
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationReservations.html'));
           organizationSubMenu.appendChild(reservationsLi);
 
           organizationLi.appendChild(organizationSubMenu);
           organizationsMenu.appendChild(organizationLi);
-        }
+        });
 
         myOrganizationsLi.appendChild(organizationsMenu);
 
         loggedMenu.appendChild(myOrganizationsLi);
       }
-
     }
 
-    if (hasRole(userInfo, rol.endUser)) {
+    if (hasRole(userInfo, role.endUser)) {
       var myReservations = document.createElement('LI');
       myReservations.className = 'menuElement';
 
@@ -196,7 +174,7 @@ var connectionsAPI = (function() {
       loggedMenu.appendChild(myReservations);
     }
 
-    if (hasRole(userInfo, rol.endUser)) {
+    if (hasRole(userInfo, role.endUser)) {
       var myReviews = document.createElement('LI');
       myReviews.className = 'menuElement';
 
@@ -208,18 +186,27 @@ var connectionsAPI = (function() {
       loggedMenu.appendChild(myReviews);
     }
 
-    //insert menu inside logged_div
+    // insert menu inside logged_div
     document.getElementById('loggedDiv').innerHTML += '';
     document.getElementById('loggedDiv').appendChild(loggedMenu);
   }
 
-  function hasRole(userInfo, role) {
+  function createSubMenu(text, href, onClickEvent) {
+    var elementLi = document.createElement('LI');
+    var elementA = document.createElement('A');
+    elementA.tabIndex = -1;
+    elementA.href = href;
+    elementA.textContent = text;
+    elementA.onclick = onClickEvent;
+    elementLi.appendChild(elementA);
+    return elementLi;
+  }
+
+  function hasRole(userInfo, roleName) {
     if (userInfo) {
-      for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
-        if (role == userInfo.roles[index].name) {
-          return true;
-        }
-      }
+     return userInfo.roles.filter(function(role) {
+      return roleName == role.name;
+    }).length > 0;
     }
     return false;
   }
@@ -246,15 +233,14 @@ var connectionsAPI = (function() {
     return;
   }
 
-
   function loginNeeded(action) {
-    if (null != getUser()) {
+    if (getUser() != null) {
       action();
       return;
     }
 
     setTimeout(function() {
-      if (null != getUser()) {
+      if (getUser() != null) {
           action();
           return;
       }
@@ -264,20 +250,17 @@ var connectionsAPI = (function() {
     }, loginTimeout);
   }
 
-  //should be called once logged
+  // should be called once logged
   function getUser() {
     return JSON.parse(localStorage.getItem('userInfo'));
   }
 
   function is_organization_manager(organization) {
     if (organization.roles) {
-      for (var i = organization.roles.length - 1; i >= 0; i--) {
-       if (rol.franchiseManager == organization.roles[i].name ||
-        rol.globalManager == organization.roles[i].name) {
-
-          return true;
-       }
-      }
+      var managerRoles = [role.globalManager, role.franchiseManager];
+      return organization.roles.filter(function(role) {
+        return managerRoles.indexOf(role.name) > -1;
+      }).length > 0;
     }
     return false;
   }
@@ -287,14 +270,13 @@ var connectionsAPI = (function() {
     loggedIn: loggedIn,
     notLoggedIn: notLoggedIn,
     hasRole: hasRole,
-    rol: rol,
+    role: role,
     getUser: getUser
   };
 })();
 
-
 var initConnections = function() {
-  //check if user is logged in
+  // check if user is logged in
   AJAXRequest.get('/client/user',
     connectionsAPI.loggedIn,
     connectionsAPI.notLoggedIn);
@@ -308,7 +290,4 @@ if (typeof exports !== 'undefined') {
   }
 }
 
-
 utils.addLoadEvent(initConnections);
-
-

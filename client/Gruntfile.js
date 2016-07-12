@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     gjslint: {
       options: {
         flags: [
-          '--disable 220' //ignore error code 220 from gjslint
+          '--disable 220' // ignore error code 220 from gjslint
         ],
         reporter: {
           name: 'console'
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     fixjsstyle: {
       options: {
         flags: [
-          '--disable 220' //ignore error code 220 from gjslint
+          '--disable 220' // ignore error code 220 from gjslint
         ],
         reporter: {
           name: 'console'

@@ -12,16 +12,14 @@
 var connectionsAPI;
 var utils;
 var clientLogic;
-//initialization
+// initialization
 var initReviews = function() {
-
   clientLogic.setUpDrawModule();
 
-  //only gets reviews if the user is logged
+  // only gets reviews if the user is logged
   connectionsAPI.loginNeeded(function() {
     clientLogic.getMyReviews();
   });
-
 
   $('tbody').height($(window).height() - $('thead th').height() -
     $('#loggedDiv').height() - 50);

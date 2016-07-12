@@ -31,6 +31,7 @@ var clientLogic = (function() {
       function(response) { //error
         alert('Could not retrieve restaurants');
         if (response) {
+          console.log('Error while trying to retrieve all restaurants:');
           console.log(response);
         }
       }
@@ -48,15 +49,17 @@ var clientLogic = (function() {
       function(response) { //error
         alert('Could not retrieve restaurants');
         if (response) {
+          console.log(
+            'Error while trying to retrieve the restaurants of the ' +
+            'organization' +
+            organization + ':');
           console.log(response);
         }
       }
     );
   }
 
-
   function showRestaurantReviews(name) {
-
     restaurantsAPI.getRestaurantReviews(name,
       function(response) {
         var reviewsDiv = drawModule.createReviewsDiv(response);
@@ -64,17 +67,19 @@ var clientLogic = (function() {
         drawModule.setPopupContent(reviewsDiv);
         drawModule.openPopUpWindow();
       },
-      function() {
+      function(response) {
         var error = document.createElement('H2');
         error.textContent = 'Cannot get reviews.';
         document.getElementById('popContent').appendChild(error);
         drawModule.openPopUpWindow();
+        console.log('Error while trying to show restaurant reviews for ' +
+          name + ':');
+        console.log(response);
       }
     );
   }
 
   function showRestaurantReservations(name) {
-
     restaurantsAPI.getRestaurantReservations(name,
       function(response) {
         var reservationsDiv = drawModule.createReservationsDiv(response);
@@ -82,15 +87,17 @@ var clientLogic = (function() {
         drawModule.setPopupContent(reservationsDiv);
         drawModule.openPopUpWindow();
       },
-      function() {
+      function(response) {
         var error = document.createElement('H2');
         error.textContent = 'Cannot get reservations.';
         document.getElementById('popContent').appendChild(error);
         drawModule.openPopUpWindow();
+        console.log('Error while trying to show restaurant reservations for ' +
+          name + ':');
+        console.log(response);
       }
     );
   }
-
 
   function getMyReviews() {
     var username = connectionsAPI.getUser().displayName;
@@ -106,9 +113,11 @@ var clientLogic = (function() {
       },
       function(error) {
         alert('Cannot get user reviews for: ' + username);
+        console.log('Error displaying reviews for the user ' + username);
         console.log(error);
       });
   }
+
   function showReviewsByOrganization(organization) {
     restaurantsAPI.getOrganizationReviews(organization,
       function(reviewsResponse) {
@@ -116,10 +125,11 @@ var clientLogic = (function() {
       },
       function(error) {
         alert('Cannot get user reviews for: ' + organization);
+        console.log('Error displaying reviews for the organization ' +
+          organization);
         console.log(error);
       });
   }
-
 
   function getMyReservations() {
     var username = connectionsAPI.getUser().displayName;
@@ -135,10 +145,10 @@ var clientLogic = (function() {
       },
       function(error) {
         alert('Cannot get user reservations for: ' + username);
+        console.log('Error displaying reservations for the user ' + username);
         console.log(error);
       });
   }
-
 
   function showReservationsByOrganization(organization) {
     restaurantsAPI.getOrganizationReservations(organization,
@@ -147,36 +157,38 @@ var clientLogic = (function() {
       },
       function(error) {
         alert('Cannot get user reservations for: ' + organization);
+        console.log('Error displaying reservations for the organization ' +
+          organization);
         console.log(error);
       });
   }
 
   function createNewReview(name, rating, description) {
-
     restaurantsAPI.createNewReview(name, rating, description,
       drawModule.closePopUpWindow,
       function(err) {
         alert('Cannot add review');
+        console.log('Error creating a new review: ' + name + ' ' + rating +
+          ' ' + description);
         console.log(err);
       }
     );
   }
 
   function updateReview(reviewId, rating, description) {
-
     restaurantsAPI.updateReview(reviewId, rating, description,
       drawModule.closePopUpWindow,
       function(err) {
         alert('Cannot update review');
+        console.log('Error trying to update the review :' + reviewId +
+          ' with:' + rating + ' ' + description);
         console.log(err);
       }
     );
   }
 
   function showReview(reviewId) {
-
     restaurantsAPI.getReview(reviewId, function(reviewResponse) {
-      //'Edit review ' + ' for ' + review.itemReviewed.name;
       var restaurantReviewed =
         JSON.parse(reviewResponse)[0].itemReviewed.name;
       var reviewDiv = drawModule.createViewReviewDiv(reviewResponse);
@@ -186,6 +198,7 @@ var clientLogic = (function() {
     },
     function(err) {
       alert('Cannot get the specified review');
+      console.log('Error retrieving the review: ' + reviewId);
       console.log(err);
     });
 
@@ -200,21 +213,23 @@ var clientLogic = (function() {
         drawModule.setPopupTitle(
           'Edit Review for ' + review.itemReviewed.name);
         drawModule.setPopupContent(formDiv);
-        drawModule.inicializeReviewForm(review);
+        drawModule.initializeReviewForm(review);
         drawModule.openPopUpWindow();
       },
       function(err) {
         alert('Error retrieving the review');
+        console.log('Error trying to update the review: ' + reviewId);
         console.log(err);
       });
   }
 
   function createNewReservation(name, partySize, time) {
-
     restaurantsAPI.createNewReservation(name, partySize, time,
       drawModule.closePopUpWindow,
       function(err) {
         alert('Cannot add reservation');
+        console.log('Error trying to create a new reservation using: ' + name +
+          ' ' + partySize + ' ' + time);
         console.log(err);
       }
     );
@@ -227,6 +242,7 @@ var clientLogic = (function() {
       },
       function(err) {
         alert('Could not delete the reservation.');
+        console.log('Error while trying to delete the review: ' + reviewId);
         console.log(err);
       });
   }
@@ -238,10 +254,11 @@ var clientLogic = (function() {
       },
       function(err) {
         alert('Could not delete the review.');
+        console.log('Error while trying to cancel the reservation: ' +
+          reservationId);
         console.log(err);
       });
   }
-
 
   /* This function sets the method to be used for the different
   operations performed from the graphic interface */
@@ -258,7 +275,6 @@ var clientLogic = (function() {
     drawModule.setDeleteReviewAction(deleteReview);
     drawModule.setCancelReservationAction(cancelReservation);
   }
-
 
   return {
     showAllRestaurants: showAllRestaurants,

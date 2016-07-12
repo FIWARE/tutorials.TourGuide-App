@@ -15,7 +15,7 @@
 
 /*exported restaurantsAPI */
 
-//global vars
+// global vars
 var map; //map instance
 var connectionsAPI;
 var AJAXRequest;
@@ -23,57 +23,46 @@ var restaurantsAPI = (function() {
   var baseURL = 'http://tourguide/api/orion/';
 
   /* get all restaurants and show them */
-  function getAllRestaurants(cb, err_cb) {
-    AJAXRequest.get(baseURL + 'restaurants/', cb, err_cb);
+  function getAllRestaurants(cb, errCb) {
+    AJAXRequest.get(baseURL + 'restaurants/', cb, errCb);
   }
 
-  function getOrganizationRestaurants(organization, cb, err_cb) {
+  function getOrganizationRestaurants(organization, cb, errCb) {
     var URL = baseURL + 'restaurants/organization/' + organization;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-  function getRestaurantReviews(name, cb, err_cb) {
+  function getRestaurantReviews(name, cb, errCb) {
     var URL = baseURL + 'reviews/restaurant/' + name;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-  function getOrganizationReviews(name, cb, err_cb) {
+  function getOrganizationReviews(name, cb, errCb) {
     var URL = baseURL + 'reviews/organization/' + name;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-
-  function getRestaurantReservations(name, cb, err_cb) {
+  function getRestaurantReservations(name, cb, errCb) {
     var URL = baseURL + 'reservations/restaurant/' + name;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-  function getOrganizationReservations(name, cb, err_cb) {
+  function getOrganizationReservations(name, cb, errCb) {
     var URL = baseURL + 'reservations/organization/' + name;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-
-  /*Simplify the restaurant format using only useful info */
+  /* Simplify the restaurant format using only useful info */
   function simplifyRestaurantsFormat(restaurants) {
     restaurants = JSON.parse(restaurants);
-    var convertedRestaurants = [];
-
-    restaurants.forEach(function(restaurant) {
-      convertedRestaurants.push(
-        convertRestaurant(restaurant)
-        );
-    });
-
-    return convertedRestaurants;
+    return restaurants.map(convertRestaurant);
   }
 
-
-  //return nothing if error
+  // return nothing if error
   function convertRestaurant(restaurant) {
     var convertedRestaurant = {'name': restaurant.name};
 
-    //get desired attributes
+    // get desired attributes
     if (restaurant.address) {
       if (restaurant.address.streetAddress) {
         convertedRestaurant.address = restaurant.address.streetAddress;
@@ -171,26 +160,18 @@ var restaurantsAPI = (function() {
     return convertedRestaurant;
   }
 
-
-  function getRestaurantReservationsByDate(restaurantName, time,
-    cb, err_cb) {
-
+  function getRestaurantReservationsByDate(restaurantName, time, cb, errCb) {
     var URL =
       baseURL + 'restaurant/' + restaurantName + '/date/' + time;
-      AJAXRequest.get(URL, cb, err_cb);
+      AJAXRequest.get(URL, cb, errCb);
   }
 
-
-  function getReview(reviewId, cb, err_cb) {
+  function getReview(reviewId, cb, errCb) {
     var URL = baseURL + 'review/' + reviewId;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-
-
-  function createNewReview(
-    restaurantName, ratingValue, reviewBody, cb, err_cb) {
-
+  function createNewReview(restaurantName, ratingValue, reviewBody, cb, errCb) {
     var data = {
       '@type': 'Review',
       'itemReviewed': {
@@ -205,23 +186,21 @@ var restaurantsAPI = (function() {
       }
     };
 
-    AJAXRequest.post(baseURL + 'review/', cb, err_cb, data);
+    AJAXRequest.post(baseURL + 'review/', cb, errCb, data);
   }
 
-  function updateReview(reviewId, ratingValue, reviewBody, cb, err_cb) {
-
+  function updateReview(reviewId, ratingValue, reviewBody, cb, errCb) {
     var data = {
       'reviewBody': '' + reviewBody,
       'reviewRating': parseInt(ratingValue, 10)
     };
 
     var url = baseURL + 'review/' + reviewId;
-    AJAXRequest.patch(url, cb, err_cb, data);
+    AJAXRequest.patch(url, cb, errCb, data);
   }
 
-
   function createNewReservation(
-    restaurantName, partySize, reservationDatetime, cb, err_cb) {
+    restaurantName, partySize, reservationDatetime, cb, errCb) {
 
     var data = {
       '@type': 'FoodEstablishmentReservation',
@@ -234,35 +213,28 @@ var restaurantsAPI = (function() {
     };
 
     AJAXRequest.post(baseURL + 'reservation/',
-      cb, err_cb, data);
+      cb, errCb, data);
   }
 
-
-  function getUserReservations(username, cb, err_cb) {
+  function getUserReservations(username, cb, errCb) {
     var URL = baseURL + 'reservations/user/' + username;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
   }
 
-
-
-
-  function cancelReservation(reservationId, cb, err_cb) {
-
+  function cancelReservation(reservationId, cb, errCb) {
     var URL = baseURL + 'reservation/' + reservationId;
-    AJAXRequest.del(URL, cb, err_cb);
+    AJAXRequest.del(URL, cb, errCb);
   }
 
-
-  function getUserReviews(userName, cb, err_cb) {
+  function getUserReviews(userName, cb, errCb) {
     var URL = baseURL + 'reviews/user/' + userName;
-    AJAXRequest.get(URL, cb, err_cb);
+    AJAXRequest.get(URL, cb, errCb);
 
   }
 
-  function deleteReview(reviewId, cb, err_cb) {
-
+  function deleteReview(reviewId, cb, errCb) {
     var url = baseURL + 'review/' + reviewId;
-    AJAXRequest.del(url, cb, err_cb);
+    AJAXRequest.del(url, cb, errCb);
   }
 
   function setMap(newMap) {
@@ -289,7 +261,6 @@ var restaurantsAPI = (function() {
     setMap: setMap
   };
 })();
-
 
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {

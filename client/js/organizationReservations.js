@@ -13,29 +13,24 @@ var connectionsAPI;
 var utils;
 var clientLogic;
 
-//initialization
+// initialization
 var initReservations = function() {
-
   $('#popWindow').modal();
 
   clientLogic.setUpDrawModule();
 
-  //get franchise from url
-  var franchise = window.location.search.replace('?', '');
-  var prefix = 'organization=';
-  if (franchise.slice(0, prefix.length) == prefix) {
-
-    //only gets reservations if the user is logged
+  // get franchise from sessionStorage
+  var franchise = utils.getCurrentOrganization();
+  if (franchise) {
+    // only gets reservations if the user is logged
     connectionsAPI.loginNeeded(function() {
-      clientLogic.showReservationsByOrganization(
-        franchise.slice(prefix.length));
+      clientLogic.showReservationsByOrganization(franchise);
     });
 
   }
 
   $('tbody').height($(window).height() - $('thead th').height() -
     $('#loggedDiv').height() - 50);
-
 };
 
 utils.addLoadEvent(initReservations);

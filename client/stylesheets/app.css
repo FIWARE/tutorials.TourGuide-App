@@ -9,18 +9,18 @@
 
 */
 
- body {
+body {
   margin: 0;
   padding: 0;
  }
 
 /* Remove padding from first container */
- body > .container-fluid {
+body > .container-fluid {
   padding-left: 0;
   padding-right: 0;
  }
 
- #map {
+#map {
   position: fixed;
   top:0;
   width: 100%;
@@ -140,7 +140,7 @@
   font-size: 1.15em;
 }
 
-.dinersNumberLabel{
+.dinersNumberLabel {
   font-weight: bold;
   font-size: 1.15em;
 }
@@ -149,7 +149,7 @@
   list-style-type: none;
 }
 
-#reservationsListDiv,#reviewsListDiv {
+#reservationsListDiv, #reviewsListDiv {
   margin-top: 50px;
 }
 
@@ -179,11 +179,11 @@
   color: green !important;
 }
 
-.ui-datepicker-calendar td.lastReservations .ui-state-default {
+.ui-datepicker-calendar td .lastReservations .ui-state-default {
   color: orange;
 }
 
-.ui-datepicker-calendar td.fullReservations .ui-state-default {
+.ui-datepicker-calendar td .fullReservations .ui-state-default {
   color: red;
 }
 
@@ -258,17 +258,17 @@
 }
 
 .alert {
-  position:relative;
-  z-index:5000;
+  position: relative;
+  z-index: 5000;
   margin-bottom: 5px;
   margin-right: 20px;
   margin-left: 50px;
   opacity: 0.9 !important;
 }
+
 .alert:first-of-type {
   margin-top: 50px;
 }
-
 
 /* dropdown submenu */
 
@@ -276,7 +276,7 @@
     position: relative;
 }
 
-.dropdown-submenu>.dropdown-menu {
+.dropdown-submenu > .dropdown-menu {
     top: 0;
     left: 100%;
     margin-top: -6px;
@@ -286,11 +286,11 @@
     border-radius: 0 6px 6px 6px;
 }
 
-.dropdown-submenu:hover>.dropdown-menu {
+.dropdown-submenu:hover > .dropdown-menu {
     display: block;
 }
 
-.dropdown-submenu>a:after {
+.dropdown-submenu > a:after {
     display: block;
     content: " ";
     float: right;
@@ -304,15 +304,15 @@
     margin-right: -10px;
 }
 
-.dropdown-submenu:hover>a:after {
+.dropdown-submenu:hover > a:after {
     border-left-color: #fff;
 }
 
-.dropdown-submenu.pull-left {
+.dropdown-submenu .pull-left {
     float: none;
 }
 
-.dropdown-submenu.pull-left>.dropdown-menu {
+.dropdown-submenu .pull-left> .dropdown-menu {
     left: -100%;
     margin-left: 10px;
     -webkit-border-radius: 6px 0 6px 6px;

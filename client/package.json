@@ -13,7 +13,9 @@
     "mocha-jsdom": "^1.1.0",
     "redis": "^2.6.0-2",
     "sinon": "^1.17.4",
-    "localStorage":"^1.0.3"
+    "localStorage":"^1.0.3",
+    "localStorage":"^1.0.3",
+    "sessionstorage":"^0.0.1 "
   },
   "scripts": {
     "test": "grunt linter && mocha ./spec --require ./spec/helpers/chai.js  --reporter spec"

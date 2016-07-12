@@ -13,13 +13,12 @@ var map;
 var utils;
 var clientLogic;
 
-//initialization
+// initialization
 var initIndex = function() {
-
   $('#popWindow').modal();
   map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
-  //set tile layer
+  // set tile layer
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution:
         '&copy; <a href="http://osm.org/copyright">' +
@@ -28,7 +27,6 @@ var initIndex = function() {
 
   clientLogic.setUpDrawModule();
   clientLogic.showAllRestaurants();
-
 };
 
 utils.addLoadEvent(initIndex);

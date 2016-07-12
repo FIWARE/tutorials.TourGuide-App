@@ -13,22 +13,18 @@ var connectionsAPI;
 var utils;
 var clientLogic;
 
-//initialization
+// initialization
 var initReservations = function() {
-
   $('#popWindow').modal();
 
   clientLogic.setUpDrawModule();
-  //only gets reservations if the user is logged
+  // only gets reservations if the user is logged
   connectionsAPI.loginNeeded(function() {
     clientLogic.getMyReservations();
   });
 
-
-  //todo translate to common js
   $('tbody').height($(window).height() - $('thead th').height() -
     $('#loggedDiv').height() - 50);
-
 };
 
 utils.addLoadEvent(initReservations);

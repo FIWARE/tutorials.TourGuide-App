@@ -56,20 +56,30 @@ var utils = (function() {
     return '' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
   }
 
+  function getCurrentOrganization() {
+    return sessionStorage.getItem('targetOrganization');
+  }
+
+  function targetOrganizationAndRedirect(organization, url) {
+    return function() {
+      sessionStorage.setItem('targetOrganization', organization);
+      window.location = url;
+    };
+  }
 
   return {
     addLoadEvent: addLoadEvent,
     showMessage: showMessage,
-    fixBookingTime: fixBookingTime
+    fixBookingTime: fixBookingTime,
+    getCurrentOrganization: getCurrentOrganization,
+    targetOrganizationAndRedirect: targetOrganizationAndRedirect
   };
 })();
-
-
 
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = utils;
-
-    GLOBAL.window = {};
+    global.sessionStorage = require('sessionstorage');
+    global.window = {};
   }
 }

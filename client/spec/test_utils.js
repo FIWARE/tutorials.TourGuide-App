@@ -1,20 +1,13 @@
 var utils = require('../js/utils.js')
-var utils_config = {
-  'file':'file://'+__dirname+'/config_utils.html',
-  'done': function(){}
-};
 var jsdom = require("jsdom").jsdom;
 require('mocha-jsdom')
-
-
 
 describe('Testing utils module', function () {
 
   describe('Testing showMessage function', function() {
 
     beforeEach(function() {
-
-      var doc = jsdom("<div class='container-fluid'>"+
+      var doc = jsdom("<div class='container-fluid'>" +
           "<div id='topMenu'></div>" +
           "<div id='sibling1'></div>" +
         "</div>", {});
@@ -30,7 +23,6 @@ describe('Testing utils module', function () {
       delete global.document;
     })
 
-
     it('Test alert-danger message', function() {
       var message = 'test 1';
       utils.showMessage(message, 'alert-danger');
@@ -38,10 +30,11 @@ describe('Testing utils module', function () {
       var navBar = document.getElementById('topMenu');
       var messageDiv = navBar.nextSibling;
       
-      expect(messageDiv).to.have.property('className').that.is.a('string').to.contain('alert').to.contain('fade').to.contain('in').to.contain('alert-danger');
-      expect(messageDiv).to.have.property('textContent').that.is.a('string').to.be.equal(message+'X')
-    
-
+      expect(messageDiv).to.have.property('className').that.is.a('string')
+        .to.contain('alert').to.contain('fade').to.contain('in')
+        .to.contain('alert-danger');
+      expect(messageDiv).to.have.property('textContent').that.is.a('string')
+        .to.be.equal(message + 'X');
     })
 
     it('Test alert-warning message', function() {
@@ -51,9 +44,11 @@ describe('Testing utils module', function () {
       var navBar = document.getElementById('topMenu');
       var messageDiv = navBar.nextSibling;
 
-      expect(messageDiv).to.have.property('className').that.is.a('string').to.contain('alert').to.contain('fade').to.contain('in').to.contain('alert-warning');
-      expect(messageDiv).to.have.property('textContent').that.is.a('string').to.be.equal(message+'X')
-
+      expect(messageDiv).to.have.property('className').that.is.a('string')
+        .to.contain('alert').to.contain('fade').to.contain('in')
+        .to.contain('alert-warning');
+      expect(messageDiv).to.have.property('textContent').that.is.a('string')
+        .to.be.equal(message + 'X');
     })
 
     it('Test default message', function() {
@@ -63,11 +58,12 @@ describe('Testing utils module', function () {
       var navBar = document.getElementById('topMenu');
       var messageDiv = navBar.nextSibling;
 
-      expect(messageDiv).to.have.property('className').that.is.a('string').to.contain('alert').to.contain('fade').to.contain('in').to.contain('alert-warning');
-      expect(messageDiv).to.have.property('textContent').that.is.a('string').to.be.equal(message+'X')
-
+      expect(messageDiv).to.have.property('className').that.is.a('string')
+        .to.contain('alert').to.contain('fade').to.contain('in')
+        .to.contain('alert-warning');
+      expect(messageDiv).to.have.property('textContent').that.is.a('string')
+        .to.be.equal(message + 'X');
     })
   })
-
 });
   

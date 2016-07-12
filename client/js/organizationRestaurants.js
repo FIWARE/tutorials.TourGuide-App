@@ -12,22 +12,19 @@
 var map;
 var utils;
 var clientLogic;
-//initialization
+// initialization
 var initIndex = function() {
   map = L.map('map').setView([42.90816007196054, -2.52960205078125], 8);
 
   clientLogic.setUpDrawModule();
 
-  //get franchise from url
-  var franchise = window.location.search.replace('?', '');
-  var prefix = 'organization=';
-  if (franchise.slice(0, prefix.length) == prefix) {
-    clientLogic.showOrganizationRestaurants(
-      franchise.slice(prefix.length));
+  // get franchise from sessionStorage
+  var franchise = utils.getCurrentOrganization();
+  if (franchise) {
+    clientLogic.showOrganizationRestaurants(franchise);
   }
 
-
-  //set tile layer
+  // set tile layer
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution:
     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
