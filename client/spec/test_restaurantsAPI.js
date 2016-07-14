@@ -172,7 +172,7 @@ describe('Testing restaurantsAPI', function () {
         done();
       });
     this.requests[0].url.should.equal(
-        baseURL + 'reservations/organization/' + organizationName);
+      baseURL + 'reservations/organization/' + organizationName);
     this.requests[0].method.should.equal('GET');
     this.requests[0].respond(200, { 'Content-Type': 'application/json' },
       dataJson);
@@ -299,7 +299,7 @@ describe('Testing restaurantsAPI', function () {
         done();
       });
     this.requests[0].url.should.equal(
-        baseURL + 'reviews/organization/' + organizationName);
+      baseURL + 'reviews/organization/' + organizationName);
     this.requests[0].method.should.equal('GET');
     this.requests[0].respond(200, { 'Content-Type': 'application/json' }, 
       dataJson);

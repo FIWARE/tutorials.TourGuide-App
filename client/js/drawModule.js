@@ -18,7 +18,6 @@ var map; //map instance
 var connectionsAPI;
 var utils;
 var drawModule = (function() {
-
   var MAXRATING = 5;
   var alreadyPartySizeInit = false;
   var minTime = {
@@ -38,7 +37,6 @@ var drawModule = (function() {
     viewReviewAction, deleteReviewAction,
     showEditReviewAction, updateReviewAction,
     cancelReservationAction = NOP;
-
 
   // functions to set up actions
   function setViewReservationAction(action) {
@@ -179,7 +177,6 @@ var drawModule = (function() {
     }
     span.textContent = text;
     return span;
-
   }
 
   /* Create a div with review information */
@@ -424,7 +421,6 @@ var drawModule = (function() {
     reviewForm.children.submitReview.value = 'Update review';
   }
 
-
   function addCreateReservationLink(restaurantName) {
     var userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -581,13 +577,12 @@ var drawModule = (function() {
       calcAvailability();
     });
 
-    // party_size does not fire initReservatiomTime yet
+    // partySize does not fire initReservatiomTime yet
     alreadyPartySizeInit = false;
 
     document.getElementById('partySize').addEventListener('change',
                 enableCalendar);
   }
-
 
   function dayAvailableForReservation(date, restaurantName) {
     if (date < new Date()) {
@@ -600,18 +595,16 @@ var drawModule = (function() {
     document.getElementById('reservationDate').disabled = false;
   }
 
-
   function initReservationTime() {
     if (alreadyPartySizeInit === false) {
       alreadyPartySizeInit = true;
-       enableAvailabilityCalculation();
+      enableAvailabilityCalculation();
       document.getElementById('partySize').addEventListener('change',
       initReservationTime);
     }
 
     document.getElementById('reservationTime').disabled = false;
   }
-
 
   function enableAvailabilityCalculation() {
     document.getElementById('partySize').addEventListener('change',
@@ -631,7 +624,7 @@ var drawModule = (function() {
     var restaurantName =
       document.getElementById('restaurantName').value;
     var reservationDatetime =
-        new Date(document.forms.editReservationForm.reservationDate.value);
+      new Date(document.forms.editReservationForm.reservationDate.value);
     var reservationTime =
       $('#reservationTime').timepicker('getTime');
 
@@ -640,7 +633,7 @@ var drawModule = (function() {
     }
 
     reservationDatetime.setHours(reservationTime.getHours(),
-                      reservationTime.getMinutes());
+      reservationTime.getMinutes());
 
     getReservationsByDateAction(restaurantName,
         reservationDatetime.toISOString(),
@@ -653,7 +646,7 @@ var drawModule = (function() {
   function _proceesAvailabilityResponse(restaurantResponse) {
     restaurantResponse = JSON.parse(restaurantResponse);
     if (restaurantResponse.length != 1) {
-      console.log('ERROR: NOT RETRIEVED EXACTLY ONE RESTAURANT');
+      console.error('Not retrieved exactly one restaurant', restaurantResponse);
     }
 
     restaurantResponse = restaurantResponse[0];
@@ -690,14 +683,15 @@ var drawModule = (function() {
   }
 
   function _errorProcesingAvailability() {
-    alert('An error ocurred checking reservation availability');
+    utils.showMessage('An error ocurred checking reservation availability',
+      'alert-danger');
     document.getElementById('loadingTime').style.visibility = 'hidden';
   }
 
   function checkReservationInputs() {
     var error = false;
     var reservationDatetime =
-        new Date(document.forms.editReservationForm.reservationDate.value);
+      new Date(document.forms.editReservationForm.reservationDate.value);
     var reservationTime =
       $('#reservationTime').timepicker('getTime');
 
@@ -827,7 +821,6 @@ var drawModule = (function() {
     var view = document.createElement('TD');
     view.className = 'col-xs-3';
 
-
     var viewLink = document.createElement('A');
     viewLink.textContent = 'View review';
     viewLink.onclick = createViewReviewLink(review.name);
@@ -872,7 +865,7 @@ var drawModule = (function() {
   function createViewReviewDiv(reviewResponse) {
     reviewResponse = JSON.parse(reviewResponse);
     if (reviewResponse.length != 1) {
-      window.alert('Error: more than one review received.');
+      utils.showMessage('More than one review received.', 'alert-danger');
     }
     return createSingleReviewDiv(reviewResponse[0]);
   }
@@ -895,7 +888,6 @@ var drawModule = (function() {
     // clean previous table content
     var myNode = document.getElementById('reservationsTableBody');
     myNode.innerHTML = '';
-
 
     if (reservationsResponse.length < 1) {
       var error = document.createElement('TR');

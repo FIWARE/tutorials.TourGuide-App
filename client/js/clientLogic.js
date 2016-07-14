@@ -18,6 +18,7 @@
 var connectionsAPI;
 var drawModule;
 var restaurantsAPI;
+var utils;
 
 var clientLogic = (function() {
 
@@ -29,10 +30,10 @@ var clientLogic = (function() {
         drawModule.addRestaurantstoMap(restaurants);
       },
       function(response) { //error
-        alert('Could not retrieve restaurants');
+      utils.showMessage('Could not retrieve restaurants', 'alert-danger');
+        console.error('Error while trying to retrieve all restaurants.');
         if (response) {
-          console.log('Error while trying to retrieve all restaurants:');
-          console.log(response);
+          console.error(response);
         }
       }
     );
@@ -47,13 +48,12 @@ var clientLogic = (function() {
         drawModule.addRestaurantstoMap(restaurants);
       },
       function(response) { //error
-        alert('Could not retrieve restaurants');
-        if (response) {
-          console.log(
+        utils.showMessage('Could not retrieve restaurants', 'alert-danger');
+        console.error(
             'Error while trying to retrieve the restaurants of the ' +
-            'organization' +
-            organization + ':');
-          console.log(response);
+            'organization: ' + organization);
+        if (response) {
+          console.error(response);
         }
       }
     );
@@ -72,9 +72,11 @@ var clientLogic = (function() {
         error.textContent = 'Cannot get reviews.';
         document.getElementById('popContent').appendChild(error);
         drawModule.openPopUpWindow();
-        console.log('Error while trying to show restaurant reviews for ' +
-          name + ':');
-        console.log(response);
+        console.error('Error while trying to show restaurant reviews for ' +
+          name);
+        if (response) {
+          console.error(response);
+        }
       }
     );
   }
@@ -92,9 +94,11 @@ var clientLogic = (function() {
         error.textContent = 'Cannot get reservations.';
         document.getElementById('popContent').appendChild(error);
         drawModule.openPopUpWindow();
-        console.log('Error while trying to show restaurant reservations for ' +
-          name + ':');
-        console.log(response);
+        console.error('Error while trying to show restaurant reservations ' +
+          ' for ' + name);
+        if (response) {
+          console.error(response);
+        }
       }
     );
   }
@@ -112,9 +116,12 @@ var clientLogic = (function() {
         drawModule.createReviewsTable(reviewsResponse);
       },
       function(error) {
-        alert('Cannot get user reviews for: ' + username);
-        console.log('Error displaying reviews for the user ' + username);
-        console.log(error);
+        utils.showMessage('Cannot get user reviews for: ' + username,
+          'alert-danger');
+        console.error('Error displaying reviews for the user ' + username);
+        if (error) {
+          console.error(error);
+        }
       });
   }
 
@@ -124,10 +131,13 @@ var clientLogic = (function() {
         drawModule.createOrganizationReviewsTable(reviewsResponse);
       },
       function(error) {
-        alert('Cannot get user reviews for: ' + organization);
-        console.log('Error displaying reviews for the organization ' +
+        utils.showMessage('Cannot get user reviews for: ' + organization,
+          'alert-danger');
+        console.error('Error displaying reviews for the organization ' +
           organization);
-        console.log(error);
+        if (error) {
+          console.error(error);
+        }
       });
   }
 
@@ -144,9 +154,12 @@ var clientLogic = (function() {
         drawModule.createReservationsTable(reservationsResponse);
       },
       function(error) {
-        alert('Cannot get user reservations for: ' + username);
-        console.log('Error displaying reservations for the user ' + username);
-        console.log(error);
+        utils.showMessage('Cannot get user reservations for: ' + username,
+          'alert-danger');
+        console.error('Error displaying reservations for the user ' + username);
+        if (error) {
+          console.error(error);
+        }
       });
   }
 
@@ -156,10 +169,13 @@ var clientLogic = (function() {
         drawModule.createReservationsTable(reservationsResponse);
       },
       function(error) {
-        alert('Cannot get user reservations for: ' + organization);
-        console.log('Error displaying reservations for the organization ' +
+        utils.showMessage('Cannot get user reservations for: ' + organization,
+          'alert-danger');
+        console.error('Error displaying reservations for the organization ' +
           organization);
-        console.log(error);
+        if (error) {
+          console.error(error);
+        }
       });
   }
 
@@ -167,10 +183,12 @@ var clientLogic = (function() {
     restaurantsAPI.createNewReview(name, rating, description,
       drawModule.closePopUpWindow,
       function(err) {
-        alert('Cannot add review');
-        console.log('Error creating a new review: ' + name + ' ' + rating +
+        utils.showMessage('Cannot add review', 'alert-danger');
+        console.error('Error creating a new review: ' + name + ' ' + rating +
           ' ' + description);
-        console.log(err);
+        if (err) {
+          console.error(err);
+        }
       }
     );
   }
@@ -179,10 +197,12 @@ var clientLogic = (function() {
     restaurantsAPI.updateReview(reviewId, rating, description,
       drawModule.closePopUpWindow,
       function(err) {
-        alert('Cannot update review');
-        console.log('Error trying to update the review :' + reviewId +
+        utils.showMessage('Cannot update review', 'alert-danger');
+        console.error('Error trying to update the review :' + reviewId +
           ' with:' + rating + ' ' + description);
-        console.log(err);
+        if (err) {
+          console.error(err);
+        }
       }
     );
   }
@@ -197,11 +217,12 @@ var clientLogic = (function() {
       drawModule.openPopUpWindow();
     },
     function(err) {
-      alert('Cannot get the specified review');
-      console.log('Error retrieving the review: ' + reviewId);
-      console.log(err);
+      utils.showMessage('Cannot get the specified review', 'alert-danger');
+      console.error('Error retrieving the review: ' + reviewId);
+      if (err) {
+        console.error(err);
+      }
     });
-
   }
 
   function showUpdateReviewForm(reviewId) {
@@ -217,9 +238,11 @@ var clientLogic = (function() {
         drawModule.openPopUpWindow();
       },
       function(err) {
-        alert('Error retrieving the review');
-        console.log('Error trying to update the review: ' + reviewId);
-        console.log(err);
+        utils.showMessage('Error retrieving the review', 'alert-danger');
+        console.error('Error trying to update the review: ' + reviewId);
+        if (err) {
+          console.error(err);
+        }
       });
   }
 
@@ -227,10 +250,12 @@ var clientLogic = (function() {
     restaurantsAPI.createNewReservation(name, partySize, time,
       drawModule.closePopUpWindow,
       function(err) {
-        alert('Cannot add reservation');
-        console.log('Error trying to create a new reservation using: ' + name +
-          ' ' + partySize + ' ' + time);
-        console.log(err);
+        utils.showMessage('Cannot add reservation', 'alert-danger');
+        console.error('Error trying to create a new reservation using: ' +
+          name + ' ' + partySize + ' ' + time);
+        if (err) {
+          console.error(err);
+        }
       }
     );
   }
@@ -241,9 +266,11 @@ var clientLogic = (function() {
         location.reload();
       },
       function(err) {
-        alert('Could not delete the reservation.');
-        console.log('Error while trying to delete the review: ' + reviewId);
-        console.log(err);
+        utils.showMessage('Could not delete the reservation.', 'alert-danger');
+        console.error('Error while trying to delete the review: ' + reviewId);
+        if (err) {
+          console.error(err);
+        }
       });
   }
 
@@ -253,10 +280,12 @@ var clientLogic = (function() {
         location.reload();
       },
       function(err) {
-        alert('Could not delete the review.');
-        console.log('Error while trying to cancel the reservation: ' +
+        utils.showMessage('Could not delete the review.', 'alert-danger');
+        console.error('Error while trying to cancel the reservation: ' +
           reservationId);
-        console.log(err);
+        if (err) {
+          console.error(err);
+        }
       });
   }
 

@@ -26,7 +26,6 @@ var AJAXRequest = (function() {
     return xhr;
   }
 
-
   function getAjaxRequest(url, successCallback, failureCallback) {
     var xhr = _prepareXHR('GET', url, failureCallback);
 
@@ -41,7 +40,6 @@ var AJAXRequest = (function() {
 
     xhr.send();
   }
-
 
   function deleteAjaxRequest(url, successCallback, failureCallback) {
     var xhr = _prepareXHR('DELETE', url, failureCallback);
@@ -58,7 +56,6 @@ var AJAXRequest = (function() {
     xhr.send();
   }
 
-
   function postAjaxRequest(url, successCallback, failureCallback, data) {
     var xhr = _prepareXHR('POST', url, failureCallback);
 
@@ -74,7 +71,6 @@ var AJAXRequest = (function() {
     xhr.setRequestHeader('Content-type', 'application/json');
     xhr.send(JSON.stringify(data));
   }
-
 
   function patchAjaxRequest(url, successCallback, failureCallback, data) {
     var xhr = _prepareXHR('PATCH', url, failureCallback);

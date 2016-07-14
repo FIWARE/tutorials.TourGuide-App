@@ -39,7 +39,7 @@ describe('Testing drawModule', function () {
           "<div class='container-fluid'>" +
             "<div id='popTitle'></div>" +
           "</div>" +
-          "</body></html>", {});
+        "</body></html>", {});
     
     global.window = doc.defaultView;
     global.document = window.document;
@@ -57,7 +57,7 @@ describe('Testing drawModule', function () {
           "<div class='container-fluid'>" +
             "<div id='popContent'></div>" +
           "</div>" +
-          "</body></html>", {});
+        "</body></html>", {});
     
     global.window = doc.defaultView;
     global.document = window.document;
@@ -75,7 +75,6 @@ describe('Testing drawModule', function () {
     drawModule.setPopupContent(nDiv);
     expect(document.getElementById('popContent').children[0]).to.be.deep.equal(nDiv);
   })
-
 
   it('Test create reviews div', function () {
     var doc = jsdom({});
@@ -95,7 +94,6 @@ describe('Testing drawModule', function () {
     expect(testDiv.innerHTML).to.be.equal(
       expectedDiv.defaultView.document.body.innerHTML);
   })
-
 
   it('Test create reservations div', function() {
     var doc = jsdom({});
@@ -119,10 +117,11 @@ describe('Testing drawModule', function () {
     var doc = jsdom("<html><head></head>" +
         "<body>" +
           "<div class='container-fluid'>" +
-          "<table>" +
-            "<tbody id ='reservationsTableBody'></tbody>" +
+            "<table>" +
+              "<tbody id ='reservationsTableBody'></tbody>" +
+            "</table>" +
           "</div>" +
-          "</body></html>", {});
+        "</body></html>", {});
     
     global.window = doc.defaultView;
     global.document = window.document;
@@ -140,15 +139,15 @@ describe('Testing drawModule', function () {
     .equal(expectedEle.defaultView.document.getElementById('testBody').innerHTML);
   })
  
-
   it('Test create reviews table', function() {
     var doc = jsdom("<html><head></head>" +
-          "<body>" +
-            "<div class='container-fluid'>" +
+        "<body>" +
+          "<div class='container-fluid'>" +
             "<table>" +
               "<tbody id ='reviewsTableBody'></tbody>" +
-            "</div>" +
-            "</body></html>", {});
+            "</table>" +
+          "</div>" +
+        "</body></html>", {});
         
     global.window = doc.defaultView;
     global.document = window.document;
@@ -164,7 +163,6 @@ describe('Testing drawModule', function () {
     expect(document.getElementById('reviewsTableBody').innerHTML).to.be.deep.equal(
       expectedEle.defaultView.document.getElementById('reviewsTableBody').innerHTML);
   })
-
 
   it('Create review form (new)', function() {
     var doc = jsdom({});
@@ -183,14 +181,13 @@ describe('Testing drawModule', function () {
       expectedForm.defaultView.document.getElementById('testForm').innerHTML);
   })
 
-
   it('Create review form (update)', function() {
     var doc = jsdom("<html><head></head>" +
-          "<body>" +
-            "<div class='container-fluid'>" +
-            "</div>" +
-            "</body></html>", {});
-      
+        "<body>" +
+          "<div class='container-fluid'>" +
+          "</div>" +
+        "</body></html>", {});
+    
     global.window = doc.defaultView;
     global.document = window.document;
     global.navigator = {

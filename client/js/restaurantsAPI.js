@@ -16,7 +16,7 @@
 /*exported restaurantsAPI */
 
 // global vars
-var map; //map instance
+var map; // map instance
 var connectionsAPI;
 var AJAXRequest;
 var restaurantsAPI = (function() {
@@ -68,39 +68,39 @@ var restaurantsAPI = (function() {
         convertedRestaurant.address = restaurant.address.streetAddress;
       }
       else {
-        console.log('Cannot get street address for ' + restaurant.name);
+        console.error('Cannot get street address for ' + restaurant.name);
       }
 
       if (restaurant.address.addressLocality) {
         convertedRestaurant.locality = restaurant.address.addressLocality;
       }
       else {
-        console.log('Cannot get locality address for ' + restaurant.name);
+        console.error('Cannot get locality address for ' + restaurant.name);
       }
 
       if (restaurant.address.addressRegion) {
         convertedRestaurant.region = restaurant.address.addressRegion;
       }
       else {
-        console.log('Cannot get region address for ' + restaurant.name);
+        console.error('Cannot get region address for ' + restaurant.name);
       }
     }
     else {
-      console.log('Cannot get address for ' + restaurant.name);
+      console.error('Cannot get address for ' + restaurant.name);
     }
 
     if (restaurant.telephone) {
       convertedRestaurant.telephone = restaurant.telephone;
     }
     else {
-      console.log('Cannot get telephone for ' + restaurant.name);
+      console.error('Cannot get telephone for ' + restaurant.name);
     }
 
     if (restaurant.description) {
       convertedRestaurant.description = restaurant.description;
     }
     else {
-      console.log('Cannot get description for ' + restaurant.name);
+      console.error('Cannot get description for ' + restaurant.name);
     }
 
     if (restaurant.aggregateRating) {
@@ -109,7 +109,7 @@ var restaurantsAPI = (function() {
           restaurant.aggregateRating.ratingValue;
       }
       else {
-        console.log('Cannot get ratingValue for ' + restaurant.name);
+        console.error('Cannot get ratingValue for ' + restaurant.name);
       }
 
       if (typeof restaurant.aggregateRating.reviewCount === 'number') {
@@ -117,11 +117,11 @@ var restaurantsAPI = (function() {
           restaurant.aggregateRating.reviewCount;
       }
       else {
-        console.log('Cannot get reviewCount for ' + restaurant.name);
+        console.error('Cannot get reviewCount for ' + restaurant.name);
       }
     }
     else {
-      console.log('Cannot get aggregate rating for' + restaurant.name);
+      console.error('Cannot get aggregate rating for' + restaurant.name);
     }
 
     convertedRestaurant.coords = [];
@@ -130,31 +130,31 @@ var restaurantsAPI = (function() {
       if (restaurant.geo.latitude) {
         convertedRestaurant.coords.push(parseFloat(restaurant.geo.latitude));
         if (isNaN(convertedRestaurant.coords[0])) {
-          console.log('invalid latitude ' + restaurant.geo.latitude +
+          console.error('invalid latitude ' + restaurant.geo.latitude +
             ' for restaurant ' + restaurant.name);
           return;
         }
       }
       else {
-        console.log('Cannot get latitude for ' + restaurant.name);
+        console.error('Cannot get latitude for ' + restaurant.name);
         return;
       }
 
       if (restaurant.geo.longitude) {
         convertedRestaurant.coords.push(parseFloat(restaurant.geo.longitude));
         if (isNaN(convertedRestaurant.coords[1])) {
-          console.log('invalid longitude ' + restaurant.geo.longitude +
+          console.error('invalid longitude ' + restaurant.geo.longitude +
             ' for restaurant ' + restaurant.name);
           return;
         }
       }
       else {
-        console.log('Cannot get longitude for ' + restaurant.name);
+        console.error('Cannot get longitude for ' + restaurant.name);
         return;
       }
     }
     else {
-      console.log('Cannot get coordinates for ' + restaurant.name);
+      console.error('Cannot get coordinates for ' + restaurant.name);
       return;
     }
     return convertedRestaurant;
@@ -229,7 +229,6 @@ var restaurantsAPI = (function() {
   function getUserReviews(userName, cb, errCb) {
     var URL = baseURL + 'reviews/user/' + userName;
     AJAXRequest.get(URL, cb, errCb);
-
   }
 
   function deleteReview(reviewId, cb, errCb) {

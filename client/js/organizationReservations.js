@@ -26,7 +26,6 @@ var initReservations = function() {
     connectionsAPI.loginNeeded(function() {
       clientLogic.showReservationsByOrganization(franchise);
     });
-
   }
 
   $('tbody').height($(window).height() - $('thead th').height() -

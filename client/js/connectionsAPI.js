@@ -18,7 +18,6 @@ var AJAXRequest;
 var utils;
 
 var connectionsAPI = (function() {
-
   var role = {
     endUser: 'End user',
     restaurantViewer: 'Restaurant viewer',
@@ -73,7 +72,6 @@ var connectionsAPI = (function() {
   }
 
   function createAndShowMenu(userInfo) {
-
     var loggedMenu = document.createElement('UL');
     loggedMenu.id = 'loggedMenu';
     loggedMenu.classList.add('nav', 'navbar-nav', 'pull-left');
@@ -128,7 +126,7 @@ var connectionsAPI = (function() {
           var organizationA = document.createElement('A');
           organizationA.tabIndex = -1;
 
-            organizationA.href = '#';
+          organizationA.href = '#';
           organizationA.textContent = organization.name;
 
           organizationLi.appendChild(organizationA);
@@ -138,8 +136,8 @@ var connectionsAPI = (function() {
           organizationSubMenu.className = 'dropdown-menu';
 
           var restaurantLi = createSubMenu('Restaurants', '#',
-           utils.targetOrganizationAndRedirect(organization.name,
-            'organizationRestaurants.html'));
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationRestaurants.html'));
           organizationSubMenu.appendChild(restaurantLi);
 
           var reviewLi = createSubMenu('Reviews', '#',
@@ -204,9 +202,9 @@ var connectionsAPI = (function() {
 
   function hasRole(userInfo, roleName) {
     if (userInfo) {
-     return userInfo.roles.filter(function(role) {
-      return roleName == role.name;
-    }).length > 0;
+      return userInfo.roles.filter(function(role) {
+        return roleName == role.name;
+      }).length > 0;
     }
     return false;
   }
@@ -241,8 +239,8 @@ var connectionsAPI = (function() {
 
     setTimeout(function() {
       if (getUser() != null) {
-          action();
-          return;
+        action();
+        return;
       }
       else {
         utils.showMessage('Login required', 'alert-warning');
