@@ -8,6 +8,8 @@
  *   Pablo Fernández <pablo.fernandez@ulpgc.es>
  * MIT Licensed
 
+  Module that contains funcionalities related to user and log in.
+
 */
 
 /*exported connectionsAPI */
@@ -16,11 +18,11 @@ var AJAXRequest;
 var utils;
 
 var connectionsAPI = (function() {
-
-  var rol = {
+  var role = {
     endUser: 'End user',
-    restaurantViewer: 'Restaurant Viewer',
-    globalManager: 'global manager'
+    restaurantViewer: 'Restaurant viewer',
+    globalManager: 'Global manager',
+    franchiseManager: 'Franchise manager'
   };
 
   var loginTimeout = 500;
@@ -70,9 +72,6 @@ var connectionsAPI = (function() {
   }
 
   function createAndShowMenu(userInfo) {
-
-    //TODO check roles
-
     var loggedMenu = document.createElement('UL');
     loggedMenu.id = 'loggedMenu';
     loggedMenu.classList.add('nav', 'navbar-nav', 'pull-left');
@@ -87,61 +86,81 @@ var connectionsAPI = (function() {
     home.appendChild(homeLink);
     loggedMenu.appendChild(home);
 
-    //check each menu element
+    // view organizations restaurants
+    if (hasRole(userInfo, role.restaurantViewer) ||
+        hasRole(userInfo, role.globalManager) || true) {//hacked
 
-    //view organizations restaurants
-    if (hasRole(userInfo, rol.restaurantViewer) ||
-        hasRole(userInfo, rol.globalManager) || true) {//hacked
+      var organizations = userInfo.organizations;
+      if (organizations.length > 0) {
+        var myOrganizationsLi = document.createElement('LI');
+        myOrganizationsLi.className = 'dropdown';
 
-      //we should ask before for each organization but the user hasn't yet
-      if (userInfo.organizations.length > 0) {
-        var myRestaurantsLi = document.createElement('LI');
-        myRestaurantsLi.className = 'dropdown';
-
-        var myRestaurantsA = document.createElement('A');
-        myRestaurantsA.id = 'myRestaurantsButtonLink';
-        myRestaurantsA.className = 'dropdown-toggle';
-        myRestaurantsA.setAttribute('data-toggle', 'dropdown');
-        myRestaurantsA.setAttribute('role', 'button');
-        myRestaurantsA.href = '#';
-        myRestaurantsA.textContent = 'My restaurants';
+        var myOrganizationsA = document.createElement('A');
+        myOrganizationsA.id = 'myOrganizationsButtonLink';
+        myOrganizationsA.className = 'dropdown-toggle';
+        myOrganizationsA.setAttribute('data-toggle', 'dropdown');
+        myOrganizationsA.setAttribute('role', 'button');
+        myOrganizationsA.href = '#';
+        myOrganizationsA.textContent = 'My organizations';
 
         var caret = document.createElement('B');
         caret.className = 'caret';
 
-        myRestaurantsA.appendChild(caret);
-        myRestaurantsLi.appendChild(myRestaurantsA);
+        myOrganizationsA.appendChild(caret);
+        myOrganizationsLi.appendChild(myOrganizationsA);
 
         var organizationsMenu = document.createElement('UL');
-        organizationsMenu.className = 'dropdown-menu';
+        organizationsMenu.className = 'dropdown-menu multi-level';
         organizationsMenu.setAttribute('aria-labelledby',
-                                      'myRestaurantsButtonLink');
+                                      'myOrganizationsButtonLink');
         organizationsMenu.setAttribute('role', 'menu');
 
-        for (var index = 0; index < userInfo.organizations.length; index++) {
+        organizations.forEach(function(organization) {
+          if (! (is_organization_manager(organization) ||
+            hasRole(userInfo, role.globalManager))) {
+            return;
+          }
           var organizationLi = document.createElement('LI');
-          organizationLi.setAttribute('role', 'presentation');
+          organizationLi.className = 'dropdown-submenu';
 
           var organizationA = document.createElement('A');
-          organizationA.setAttribute('role', 'menuitem');
           organizationA.tabIndex = -1;
-          organizationA.href =
-            'myRestaurants.html?franchise=' +
-            userInfo.organizations[index].name;
-          organizationA.textContent = userInfo.organizations[index].name;
+
+          organizationA.href = '#';
+          organizationA.textContent = organization.name;
 
           organizationLi.appendChild(organizationA);
-          organizationsMenu.appendChild(organizationA);
-        }
 
-        myRestaurantsLi.appendChild(organizationsMenu);
+          // submenu
+          var organizationSubMenu = document.createElement('UL');
+          organizationSubMenu.className = 'dropdown-menu';
 
-        loggedMenu.appendChild(myRestaurantsLi);
+          var restaurantLi = createSubMenu('Restaurants', '#',
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationRestaurants.html'));
+          organizationSubMenu.appendChild(restaurantLi);
+
+          var reviewLi = createSubMenu('Reviews', '#',
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationReviews.html'));
+          organizationSubMenu.appendChild(reviewLi);
+
+          var reservationsLi = createSubMenu('Reservations', '#',
+            utils.targetOrganizationAndRedirect(organization.name,
+              'organizationReservations.html'));
+          organizationSubMenu.appendChild(reservationsLi);
+
+          organizationLi.appendChild(organizationSubMenu);
+          organizationsMenu.appendChild(organizationLi);
+        });
+
+        myOrganizationsLi.appendChild(organizationsMenu);
+
+        loggedMenu.appendChild(myOrganizationsLi);
       }
-
     }
 
-    if (hasRole(userInfo, rol.endUser)) {
+    if (hasRole(userInfo, role.endUser)) {
       var myReservations = document.createElement('LI');
       myReservations.className = 'menuElement';
 
@@ -153,7 +172,7 @@ var connectionsAPI = (function() {
       loggedMenu.appendChild(myReservations);
     }
 
-    if (hasRole(userInfo, rol.endUser)) {
+    if (hasRole(userInfo, role.endUser)) {
       var myReviews = document.createElement('LI');
       myReviews.className = 'menuElement';
 
@@ -165,16 +184,27 @@ var connectionsAPI = (function() {
       loggedMenu.appendChild(myReviews);
     }
 
-    //insert menu inside logged_div
+    // insert menu inside logged_div
     document.getElementById('loggedDiv').innerHTML += '';
     document.getElementById('loggedDiv').appendChild(loggedMenu);
   }
 
-  function hasRole(userInfo, role) {
-    for (var index = 0, len = userInfo.roles.length; index < len; ++index) {
-      if (role == userInfo.roles[index].name) {
-        return true;
-      }
+  function createSubMenu(text, href, onClickEvent) {
+    var elementLi = document.createElement('LI');
+    var elementA = document.createElement('A');
+    elementA.tabIndex = -1;
+    elementA.href = href;
+    elementA.textContent = text;
+    elementA.onclick = onClickEvent;
+    elementLi.appendChild(elementA);
+    return elementLi;
+  }
+
+  function hasRole(userInfo, roleName) {
+    if (userInfo) {
+      return userInfo.roles.filter(function(role) {
+        return roleName == role.name;
+      }).length > 0;
     }
     return false;
   }
@@ -201,17 +231,16 @@ var connectionsAPI = (function() {
     return;
   }
 
-
   function loginNeeded(action) {
-    if (null != localStorage.getItem('userInfo')) {
+    if (getUser() != null) {
       action();
       return;
     }
 
     setTimeout(function() {
-      if (null != localStorage.getItem('userInfo')) {
-          action();
-          return;
+      if (getUser() != null) {
+        action();
+        return;
       }
       else {
         utils.showMessage('Login required', 'alert-warning');
@@ -219,22 +248,44 @@ var connectionsAPI = (function() {
     }, loginTimeout);
   }
 
+  // should be called once logged
+  function getUser() {
+    return JSON.parse(localStorage.getItem('userInfo'));
+  }
+
+  function is_organization_manager(organization) {
+    if (organization.roles) {
+      var managerRoles = [role.globalManager, role.franchiseManager];
+      return organization.roles.filter(function(role) {
+        return managerRoles.indexOf(role.name) > -1;
+      }).length > 0;
+    }
+    return false;
+  }
+
   return {
     loginNeeded: loginNeeded,
     loggedIn: loggedIn,
     notLoggedIn: notLoggedIn,
     hasRole: hasRole,
-    rol: rol
+    role: role,
+    getUser: getUser
   };
 })();
 
-
 var initConnections = function() {
-  //check if user is logged in
+  // check if user is logged in
   AJAXRequest.get('/client/user',
     connectionsAPI.loggedIn,
     connectionsAPI.notLoggedIn);
 };
 
+
+if (typeof exports !== 'undefined') {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = connectionsAPI;
+    utils = require('./utils.js');
+  }
+}
 
 utils.addLoadEvent(initConnections);

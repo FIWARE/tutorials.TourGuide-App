@@ -35,6 +35,7 @@
   "validthis": true,
   "globals": {
     "$": false,
-    "L": false
+    "L": false,
+    "sessionStorage": true
   }
 }

@@ -10,24 +10,21 @@
 
 */
 var connectionsAPI;
-var restaurantsAPI;
 var utils;
-//initialization
-var initReservations = function() {
+var clientLogic;
 
+// initialization
+var initReservations = function() {
   $('#popWindow').modal();
 
-  //only gets reservations if the user is logged
+  clientLogic.setUpDrawModule();
+  // only gets reservations if the user is logged
   connectionsAPI.loginNeeded(function() {
-    var userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    restaurantsAPI.getUserReservations(userInfo.displayName);
+    clientLogic.getMyReservations();
   });
 
-
-  //todo translate to common js
   $('tbody').height($(window).height() - $('thead th').height() -
     $('#loggedDiv').height() - 50);
-
 };
 
 utils.addLoadEvent(initReservations);

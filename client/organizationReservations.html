@@ -5,19 +5,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <!-- CSS -->
+
   <!-- FIWARE styles -->
   <link href="stylesheets/styles.css" rel="stylesheet">
-  <!-- addon styles -->
-  <!-- timepicker addon CSS -->
-  <link rel="stylesheet" href="addons/timepicker/jquery.timepicker.css" />
-  <!-- jqueryui -->
+  <!-- Addons Styles -->
+  <!-- jequeryui -->
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
   <!-- leaflet -->
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
-
   <!-- app specific styles -->
   <link rel=stylesheet type=text/css href="stylesheets/app.css">
 
@@ -28,35 +25,51 @@
   <script type="text/javascript" src="js/bootstrap/bootstrap.min.js" defer></script>
   <!-- Addons Javascripts -->
   <script type="text/javascript" src="js/bootstrap/modal.js" defer></script>
-  <script type="text/javascript" src="addons/timepicker/jquery.timepicker.min.js" defer></script>
+  <!-- jqueryui -->
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js" defer></script>
 
-  <!-- leaflet -->
+  <!-- leaflet JS -->
   <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js" defer></script>
   <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js' defer></script>
+
   <!-- app JS -->
   <script type="text/javascript" src="js/utils.js" defer></script>
   <script type="text/javascript" src="js/AJAXRequest.js" defer></script>
   <script type="text/javascript" src="js/restaurantsAPI.js" defer></script>
-  <script type="text/javascript" src="js/index.js" defer></script>
   <script type="text/javascript" src="js/connectionsAPI.js" defer></script>
+  <script type="text/javascript" src="js/organizationReservations.js" defer></script>
   <script type="text/javascript" src="js/clientLogic.js" defer></script>
   <script type="text/javascript" src="js/drawModule.js" defer></script>
 
-  <title>FIWARE Tourguide Application</title>
+  <title>My reservations</title>
 
 </head>
 <body>
+
 <div class="container-fluid">
   <nav id="topMenu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
     <div id='loggedDiv' class="navbar navbar-default" role="navigation">
       <p>Checking if logged </p>
     </div>
   </nav>
-
-  <div id='map'>
+  <div id='reservationsListDiv'>
+    <ul id='reservationList' class="hidden">
+    </ul>
+    <div class="table-fixed-container">
+      <table id="reservationsTable" class="table table-fixed table-hover reservations-table">
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Date</th>
+            <th>Diners</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="reservationsTableBody">
+        </tbody>
+      </table>
+    </div>
   </div>
-
   <div id='popWindow' class='modal fade' data-show="false" role="dialog" aria-hidden="true" aria-labelledby="popTitle">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
