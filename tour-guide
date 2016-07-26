@@ -8,6 +8,9 @@ remove_containers=0
 cygnus_mysql_user='root'
 cygnus_mysql_password='mysql'
 fiware_service="tourguide"
+sensors_command=""
+sensors_create_wait=0
+sensors_udpate_wait=0
 
 function show_version () {
     cat <<EOF >&2
@@ -32,8 +35,7 @@ Available commands:
   stop                       Stop services.
   configure                  Configure a service.
   load                       Load example data.
-  post-sensor-data           Post simulated sensor data.
-  simulate-sensor-data       Simulate a sensor periodically sending data.
+  sensors                    Sensors related commands (create, list, simulate data).
   check                      Check for the presence of the required commands.
   help                       Show this help.
   version                    Show program version.
@@ -86,8 +88,11 @@ function parse_options_start () {
             "-h" | "--help" )
                 show_help_start
                 ;;
-            "orion"|"authzforce"|"keyrock"|"idas"|"cygnus"|"tourguide")
+            "orion"|"authzforce"|"keyrock"|"idas"|"cygnus")
                 service="$1"
+                ;;
+            "tourguide")
+                # do not modify service, as an empty value will start all containers
                 ;;
             "-"*)
                 echo "Unknown parameter: $1"
@@ -162,7 +167,8 @@ Command options:
 
   -h  --help                 Show this help.
 
-Use '${appname} configure <service> --help' to get help about a configuration options for a specific <service>.
+Use '${appname} configure <service> --help' to get help about
+configuration options for a specific <service>.
 
 EOF
    exit 0
@@ -200,7 +206,9 @@ function cmd_configure () {
 
 function show_help_configure_cygnus () {
    cat <<EOF >&2
-Usage: ${appname} configure cygnus [-h | --help] [-u <username> | --mysql-user <username>] [-p <password> | --mysql-password <password>]
+
+Usage: ${appname} configure cygnus [-h | --help] [-u <username> | --mysql-user <username>]
+                                   [-p <password> | --mysql-password <password>]
 
 Apply configuration changes for cygnus.
 
@@ -289,12 +297,186 @@ function cmd_load () {
     not_implemented
 }
 
-function cmd_post-sensor-data () {
-    not_implemented
+function show_help_sensors () {
+   cat <<EOF >&2
+Usage: ${appname} sensors [-h | --help] <command> <options>
+
+Run sensors related commands:
+
+  create                     Create sensors for the restaurants available in the application.
+  update                     Update all restaurant sensors measurements.
+  send-data                  Send a single measurement for a specific sensor.
+  simulate-data              Simulate a sensor sending data over a period of time.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Use '${appname} sensors <command> --help' to get help about a specific <command>.
+
+EOF
+   exit 0
 }
 
-function cmd_simulate-sensor-data () {
-    not_implemented
+function parse_options_sensors () {
+    if [ $# -lt 1 ]; then
+        show_help_sensors
+    else
+        case "$1" in
+            "-h" | "--help" )
+                show_help_sensors
+                ;;
+            "create"|"update"|"send-data"|"simulate-data")
+                sensors_command="$1"
+                shift
+                ;;
+            "-"*)
+                echo "Unknown parameter: $1"
+                show_help_sensors
+                ;;
+            *)
+                echo "Unknown command: $1"
+                show_help_sensors
+                ;;
+        esac
+    fi
+}
+
+function cmd_sensors () {
+    parse_options_sensors "$@"
+    shift
+    cmd_sensors_${sensors_command} "$@"
+}
+
+function show_help_sensors_create () {
+   cat <<EOF >&2
+Usage: ${appname} sensors create [-h | --help] [-w | --wait]
+
+Create and initialize sensors for all the restaurants available in the application.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the tourguide container to be ready.
+                             Default is to exit if tourguide container is not ready.
+
+EOF
+   exit 0
+}
+
+function parse_options_sensors_create () {
+    if [ $# -gt 0 ]; then
+        case "$1" in
+            "-h" | "--help" )
+                show_help_sensors_create
+                ;;
+            "-w"|"--wait")
+                shift
+                sensors_create_wait=1
+                ;;
+            *)
+                echo "Unknown parameter: $1"
+                show_help_sensors_create
+                ;;
+        esac
+    fi
+}
+
+function cmd_sensors_create () {
+    local _started=0
+    local _tries=0
+    local _container_name="tourguide"
+
+    parse_options_sensors_create "$@"
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${sensors_create_wait} -eq 1 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        docker exec -i -t ${_container_name} /bin/bash -c 'cd tutorials.TourGuide-App/server/feeders; node sensorsgenerator.js'
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
+}
+
+function show_help_sensors_update () {
+   cat <<EOF >&2
+Usage: ${appname} sensors update [-h | --help] [-w | --wait]
+
+Update all the restaurant sensors measurements.  This will simulate
+all the available sensors sending new measurements.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the tourguide container to be ready.
+                             Default is to exit if tourguide container is not ready.
+
+EOF
+   exit 0
+}
+
+function parse_options_sensors_update () {
+    if [ $# -gt 0 ]; then
+        case "$1" in
+            "-h" | "--help" )
+                show_help_sensors_update
+                ;;
+            "-w"|"--wait")
+                shift
+                sensors_update_wait=1
+                ;;
+            *)
+                echo "Unknown parameter: $1"
+                show_help_sensors_update
+                ;;
+        esac
+    fi
+}
+
+function cmd_sensors_update () {
+    local _started=0
+    local _tries=0
+    local _container_name="tourguide"
+
+    parse_options_sensors_update "$@"
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${sensors_create_wait} -eq 1 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        docker exec -i -t ${_container_name} /bin/bash -c 'cd tutorials.TourGuide-App/server/feeders; node sensorsupdater.js'
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
 }
 
 function show_help_check () {
