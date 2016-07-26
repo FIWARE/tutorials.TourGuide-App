@@ -40,7 +40,6 @@ var oauth = new OAuth2(clientId,
 exports.login = function(req, res) {
   // Using the access code goes again to the IDM to obtain the accessToken
   oauth.getOAuthAccessToken(req.query.code, function(e, results) {
-
     if (results === undefined) {
       res.status(404);
       res.send('Auth token not received in results.');
@@ -58,7 +57,7 @@ exports.login = function(req, res) {
 };
 
 /**
- * Redirect the user to the IdM for Oauth authentication
+ * Redirect the user to the IdM for OAuth authentication
  *
  * @param {Object} req - Request received
  * @param {Object} res - Response

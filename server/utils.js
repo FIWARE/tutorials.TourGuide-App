@@ -88,7 +88,7 @@ function doGet(options, callback, res, useHttps) {
  * @param {Object} dictionary - The dictionary with the content
  * @param {Object} content - The element itself
  * @param {Object} replacehandler - The function to replace them
- * @return {Object} the element replaced
+ * @return {Object} The element replaced
 */
 function replaceOnceUsingDictionary(dictionary, content,
   replacehandler) {
@@ -115,15 +115,11 @@ function replaceOnceUsingDictionary(dictionary, content,
         '\\$1') +
       ')\\b');
 
-    // Add entry to hash variable,
-    // for an optimized backtracking at the next loop
+    // Add entry to hash variable, for an optimized backtracking at the next loop
     patternHash[key] = index++;
   }
   var pattern = new RegExp(patterns.join('|'), 'gi');
   var lastIndex = 0;
-
-  // We should actually test using !== null, but for foolproofness,
-  //  we also reject empty strings
 
   while (!!(key = pattern.exec(content))) {
     // Case-insensitivity
@@ -142,7 +138,7 @@ function replaceOnceUsingDictionary(dictionary, content,
     patterns[patternHash[key]] = '^';
     pattern = new RegExp(patterns.join('|'), 'gi');
 
-    // IMPORTANT: Update lastIndex property. Otherwise, enjoy an infinite loop
+    // In order to avoid a infinite loop, lastIndex is updated
     pattern.lastIndex = lastIndex;
   }
   output.push(content.substring(lastIndex, content.length));
@@ -154,7 +150,7 @@ function replaceOnceUsingDictionary(dictionary, content,
  *
  * @param {Integer} low - List of elements
  * @param {Integer} high - List of elements
- * @return {Integer} a random element from the given array
+ * @return {Integer} A random element from the given array
 */
 function randomIntInc(low, high) {
   return Math.floor(Math.random() * (high - low + 1) + low);
@@ -164,7 +160,7 @@ function randomIntInc(low, high) {
  * Returns a random element from a given array
  *
  * @param {Object} elements - List of elements
- * @return {Object} a random element from the array
+ * @return {Object} A random element from the array
 */
 function randomElement(elements) {
   return elements[Math.floor(Math.random() * elements.length)];
@@ -189,9 +185,9 @@ function fixedEncodeURIComponent(str) {
 /**
  * Returns a random date between given dates
  *
- * @param {String} from - datetime from
- * @param {String} to - datetime to
- * @return {Date} datetime object with the random date
+ * @param {String} from - Datetime from
+ * @param {String} to - Datetime to
+ * @return {Date} Datetime object with the random date
 */
 function getRandomDate(from, to) {
   if (!from) {
@@ -208,37 +204,36 @@ function getRandomDate(from, to) {
 }
 
 /**
- * Removes html code tags
+ * Removes HTML code tags
  *
  * @param {String} str - String to clean
- * @return {String} str - String without the html tags
+ * @return {String} str - String without the HTML tags
 */
 function convertHtmlToText(str) {
-
-  //-- remove BR tags and replace them with line break
+  // remove BR tags and replace them with line break
   str = str.replace(/<br>/gi, '\n');
   str = str.replace(/<br\s\/>/gi, '\n');
   str = str.replace(/<br\/>/gi, '\n');
 
-  //-- remove P and A tags but preserve what's inside of them
+  // Remove P and A tags but preserve what's inside of them
   str = str.replace(/<p.*>/gi, '\n');
   str = str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, ' $2 ($1)');
 
-  //-- remove all inside SCRIPT and STYLE tags
+  // Remove all inside SCRIPT and STYLE tags
   str = str.replace(
     /<script.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/script>/gi, '');
   str = str.replace(/<style.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/style>/gi,
     '');
-  //-- remove all else
+  // Remove all else
   str = str.replace(/<(?:.|\s)*?>/g, '');
 
-  //-- get rid of more than 2 multiple line breaks:
+  // Get rid of more than 2 multiple line breaks:
   str = str.replace(/(?:(?:\r\n|\r|\n)\s*){2,}/gim, '\n\n');
 
-  //-- get rid of more than 2 spaces:
+  // Get rid of more than 2 spaces:
   str = str.replace(/ +(?= )/g, '');
 
-  //-- return
+  // Return
   return str;
 }
 
@@ -249,9 +244,7 @@ function convertHtmlToText(str) {
  * @return {Object} element - Array with the element
 */
 function objectToArray(element) {
-
-  if (util.isArray(element) === false) {
-
+  if (!util.isArray(element)) {
     var aux = element;
     element = [];
     element.push(aux);
@@ -262,8 +255,8 @@ function objectToArray(element) {
 /**
  * Adds the measurements units to the sensor's schema
  *
- * @param {Object} sensor - sensor to add the units to
- * @return {Object} sensor - sensor with the units added
+ * @param {Object} sensor - Sensor to add the units to
+ * @return {Object} sensor - Sensor with the units added
 */
 function setSchemaUnits(sensor) {
   switch (sensor.additionalType) {
@@ -288,7 +281,6 @@ function setSchemaUnits(sensor) {
  * @return {Object} elementToSchema - Object in schema.org format
 */
 function restaurantToSchema(element, date) {
-
   var restaurantSchemaElements = [
     'address',
     'department',
@@ -336,7 +328,6 @@ function restaurantToSchema(element, date) {
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
-
     val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
@@ -386,7 +377,6 @@ function restaurantToSchema(element, date) {
  * @return {Object} elementToSchema - Object in schema.org format
 */
 function reviewToSchema(element) {
-
   var elementToSchema = {
     '@context': 'http://schema.org',
     '@type': REVIEW_TYPE,
@@ -421,7 +411,6 @@ function reviewToSchema(element) {
  * @return {Object} elementToSchema - Object in schema.org format
 */
 function reservationToSchema(element) {
-
   var elementToSchema = {
       '@context': 'http://schema.org',
       '@type': RESERVATION_TYPE,
@@ -445,20 +434,17 @@ function reservationToSchema(element) {
       },
       'reservationId': element.id
     };
-
   return sortObject(elementToSchema);
-
 }
 
 /**
  * Convert elements with Orion format into schema.org ones
  *
  * @param {Object} element - Object to convert
- * @param {String} date - datetime
+ * @param {String} date - Datetime
  * @return {Object} newElement - Object in schema.org format
 */
 function objectDataToSchema(element, date) {
-
   var newElement;
   var type = element.type;
 
@@ -492,7 +478,7 @@ function objectDataToSchema(element, date) {
  * Order the object elements alphabetically
  *
  * @param {Object} element - Object to order
- * @return {Object} sorted - sorted object
+ * @return {Object} sorted - Sorted object
 */
 function sortObject(element) {
   var sorted = {};
@@ -518,11 +504,10 @@ function sortObject(element) {
  * element into Schema format
  *
  * @param {Object} listOfElements - Element or list of elements
- * @param {String} date - datetime
+ * @param {String} date - Datetime
  * @return {Object} newListOfElements - The new list with schema format
 */
 function dataToSchema(listOfElements, date) {
-
   var newListOfElements = [];
   var newElement;
 
@@ -544,12 +529,11 @@ function dataToSchema(listOfElements, date) {
  * Completes the schemaObject address element
  *
  * @param {Object} schemaObject - Object to be added in Orion
- * @param {Object} geoObject - geocoder object
+ * @param {Object} geoObject - Geocoder object
  * @return {Object} schemaObject - The schemaObject with the
  *         fixed address
 */
 function completeAddress(schemaObject, geoObject) {
-
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
       schemaObject.address.value.streetAddress =
@@ -581,7 +565,7 @@ function completeAddress(schemaObject, geoObject) {
  * Completes the schemaObject location element
  *
  * @param {Object} schemaObject - Object to be added in Orion
- * @param {Object} geoObject - geocoder object
+ * @param {Object} geoObject - Geocoder object
  * @return {Object} schemaObject - The schemaObject with the
  *         geocoder latitude and longitude
 */
@@ -599,12 +583,11 @@ function addGeolocation(schemaObject, geoObject) {
  * Generate restaurant data model to be stored in Context Broker
  *
  * @param {Object} schemaObject - Object received
- * @param {Object} geoObject - geocoder object
+ * @param {Object} geoObject - Geocoder object
  * @return {Object} objectToOrion - The objectToOrion with the
  *         converted to Context Broker data model
 */
 function restaurantToOrion(schemaObject, geoObject) {
-
   var objectToOrion = {
     'address': {
       'type': POSTAL_ADDRESS_TYPE,
@@ -673,7 +656,6 @@ function restaurantToOrion(schemaObject, geoObject) {
  *         converted to Context Broker data model
 */
 function reviewToOrion(userObject, schemaObject) {
-
   if (userObject) {
     var date = new Date().toISOString();
     var itemReviewed = fixedEncodeURIComponent(schemaObject.itemReviewed.name);
@@ -717,7 +699,6 @@ function reviewToOrion(userObject, schemaObject) {
  *         converted to Context Broker data model
 */
 function reservationToOrion(userObject, schemaObject) {
-
   if (userObject) {
     var date = new Date(schemaObject.startTime).toISOString();
     var reservationFor = fixedEncodeURIComponent(
@@ -760,7 +741,6 @@ function reservationToOrion(userObject, schemaObject) {
  * @return {List} contains all the reservations of the passed restaurants
 */
 function getOrgReservations(listOfRestaurants, listOfReservations) {
-
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
@@ -840,16 +820,13 @@ function getAverage(data) {
  * @return {Object} newElement - The average element updated
 */
 function getAggregateRating(listOfReviews) {
-
   var counter = 0;
   var ratingValues = [];
 
   listOfReviews = objectToArray(listOfReviews);
 
   listOfReviews.forEach(function(element) {
-
     if (element.reviewRating !== undefined) {
-
       ratingValues.push(element.reviewRating);
       counter++;
     }
@@ -863,15 +840,14 @@ function getAggregateRating(listOfReviews) {
       }
     }
   };
-
   return newElement;
 }
 
 /**
  * Generates a String with the sql sentence for date filtering
  *
- * @param {String} isoTimeString - datetime
- * @return {String} frameTime - string to filter
+ * @param {String} isoTimeString - Datetime
+ * @return {String} frameTime - String to filter
 */
 function getTimeframe(isoTimeString) {
   var newDate = new Date(isoTimeString);
@@ -884,9 +860,9 @@ function getTimeframe(isoTimeString) {
 /**
  * Generates a String with the sql sentence for date filtering
  *
- * @param {String} from - datetime from
- * @param {String} to - datetime to
- * @return {String} frameTime - string to filter
+ * @param {String} from - Datetime from
+ * @param {String} to - Datetime to
+ * @return {String} frameTime - String to filter
 */
 function getTimeBetweenDates(from, to) {
   var fromTimestamp = new Date(from).toISOString();
@@ -898,11 +874,10 @@ function getTimeBetweenDates(from, to) {
 /**
  * Calculates the sum of the occupancyLevels
  *
- * @param {List} listOfReservations - reservations list
- * @return {Integer} occupancyLevels - the occupancyLevels
+ * @param {List} listOfReservations - Reservations list
+ * @return {Integer} occupancyLevels - The occupancyLevels
 */
 function getOccupancyLevels(listOfReservations) {
-
   var occupancyLevels = 0;
 
   listOfReservations.forEach(function(element) {
@@ -916,8 +891,8 @@ function getOccupancyLevels(listOfReservations) {
  * Generates an occupancyLevels object
  *
  * @param {Integer} occupancyLevel - The occupancyLevels
- * @param {Date} date - date object
- * @return {Object} occupancyObject - object to update a Restaurant
+ * @param {Date} date - Date object
+ * @return {Object} occupancyObject - Object to update a Restaurant
 */
 function createOccupancyObject(occupancyLevel, date) {
   var occupancyObject = {
@@ -939,8 +914,8 @@ function createOccupancyObject(occupancyLevel, date) {
  * Generates an occupancyLevels object to update a Restaurant
  *
  * @param {List} listOfReservations - Reservations list
- * @param {Date} date - date object
- * @return {Object} occupancyLevelsObj - object to update a Restaurant
+ * @param {Date} date - Date object
+ * @return {Object} occupancyLevelsObj - Object to update a Restaurant
 */
 function updateOccupancyLevels(listOfReservations, date) {
   var occupancyLevels = getOccupancyLevels(listOfReservations);
@@ -951,9 +926,9 @@ function updateOccupancyLevels(listOfReservations, date) {
 /**
  * Generates an sha1 identifier
  *
- * @param {String} name - element name
- * @param {Date} date - date object
- * @return {String} id - identifier based in the parameters
+ * @param {String} name - Element name
+ * @param {Date} date - Date object
+ * @return {String} id - Identifier based in the parameters
 */
 function generateId(name, date) {
   var id;
@@ -972,11 +947,11 @@ function generateId(name, date) {
 /**
  * Wrapper function to generate sql (Simple Query Languange) elements
  *
- * @param {List} listOfConditions - conditions
- * @param {String} key - key to filter
- * @param {String} operator - operator for the matching
- * @param {String} value - value
- * @return {List} listOfConditions - updated list of conditions
+ * @param {List} listOfConditions - Conditions
+ * @param {String} key - Key to filter
+ * @param {String} operator - Operator for the matching
+ * @param {String} value - Value
+ * @return {List} listOfConditions - Updated list of conditions
 */
 function addConditionToQuery(listOfConditions, key, operator, value) {
   var condition;
@@ -998,9 +973,9 @@ function addConditionToQuery(listOfConditions, key, operator, value) {
 /**
  * Adds the fiware-servicepath to the headers
  *
- * @param {Object} headers - headers of the request
- * @param {String} department - fiware-servicepath (FranchiseX)
- * @return {Object} fiwareHeaders - updated headers
+ * @param {Object} headers - Headers of the request
+ * @param {String} department - Fiware-servicepath (FranchiseX)
+ * @return {Object} fiwareHeaders - Updated headers
 */
 function completeHeaders(headers, department) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
@@ -1013,8 +988,8 @@ function completeHeaders(headers, department) {
 /**
  * Removes the fiware-servicepath for reviews and restaurants
  *
- * @param {Object} headers - headers of the request
- * @return {Object} fiwareHeaders - updated headers
+ * @param {Object} headers - Headers of the request
+ * @return {Object} fiwareHeaders - Updated headers
 */
 function removeServicePath(headers) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
@@ -1027,8 +1002,8 @@ function removeServicePath(headers) {
 /**
  * Send the response object in schema.org format
  *
- * @param {Object} data - object from Orion
- * @param {Object} res - response to send
+ * @param {Object} data - Object from Orion
+ * @param {Object} res - Response to send
 */
 function returnResponse(data, res, date) {
   res.statusCode = data.statusCode;
@@ -1043,8 +1018,8 @@ function returnResponse(data, res, date) {
 /**
  * Send the response error
  *
- * @param {Object} err - error object
- * @param {Object} res - response to send
+ * @param {Object} err - Error object
+ * @param {Object} res - Response to send
 */
 function responseError(err, res) {
   res.statusCode = err.statusCode;
@@ -1061,9 +1036,9 @@ function responseError(err, res) {
 /**
  * Send the response from a POST request
  *
- * @param {Object} data - data object
- * @param {String} element - element added
- * @param {Object} res - response to send
+ * @param {Object} data - Data object
+ * @param {String} element - Element added
+ * @param {Object} res - Response to send
 */
 function responsePost(data, element, res) {
   res.headers = data.headers;
@@ -1081,8 +1056,8 @@ function responsePost(data, element, res) {
 /**
  * Send error response when the schema is invalid
  *
- * @param {Object} res - response to send
- * @param {Object} tv4 - schema validator object
+ * @param {Object} res - Response to send
+ * @param {Object} tv4 - Schema validator object
 */
 function returnInvalidSchema(res, tv4) {
   res.statusCode = 400;
@@ -1100,7 +1075,7 @@ function returnInvalidSchema(res, tv4) {
 /**
  * Send error response when the resource is forbidden
  *
- * @param {Object} res - response to send
+ * @param {Object} res - Response to send
 */
 function returnForbidden(res) {
   res.statusCode = 403;
@@ -1116,7 +1091,7 @@ function returnForbidden(res) {
 /**
  * Send error response when there's a conflict
  *
- * @param {Object} res - response to send
+ * @param {Object} res - Response to send
 */
 function returnConflict(res) {
   res.statusCode = 409;

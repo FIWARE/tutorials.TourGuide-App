@@ -3,12 +3,12 @@
  * Copyright(c) 2015 Bitergia
  * Author: David Muriel <dmuriel@bitergia.com>,
  * MIT Licensed
-
-  Calculates and updates the occupancy levels for all the restaurants.
-
-  First it creates a new service.
-  Then registers the sensors for each restaurant.
-
+ *
+ *  Calculates and updates the occupancy levels for all the restaurants.
+ *
+ *  First it creates a new service.
+ *  Then registers the sensors for each restaurant.
+ *
 */
 
 // jshint node: true
@@ -112,8 +112,15 @@ function parseArgs() {
 
 }
 
-// get the restaurant reservations between two dates
-// from and to are timestamps in milliseconds
+/**
+ * Get the restaurant reservations between two dates
+ * From and to are timestamps in milliseconds
+ *
+ * @param {Object} restaurant - Restaurant object
+ * @param {String} from - Datetime from
+ * @param {String} to - Datetime to
+ * @return {Promise} Returns the request response
+ */
 function getRestaurantReservationsByDate(restaurant, from, to) {
   var timeFrame = 'startTime==' + from + '..' + to;
   return utils.sendRequest(
@@ -170,7 +177,6 @@ function getOccupancyLevelByDate(restaurant, from, to) {
 }
 
 function updateRestaurants() {
-
   var to = Date.now(); // in milliseconds
   var from = to - (intervalSeconds * 1000);
   var count = 0;
@@ -234,7 +240,6 @@ function updateRestaurants() {
   }
 
   maxCount = restaurantsData.length;
-
   async.eachSeries(
     restaurantsData,
     processRestaurant,
