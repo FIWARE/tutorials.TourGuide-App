@@ -188,12 +188,12 @@ function registerSensor(restaurant, room, type) {
       } else if (
         res.statusCode == 409 &&
         responseObject.reason == 'There are conflicts, entity already exists') {
-        console.log('Device', deviceId, 'already exists.');
+        console.error('Device', deviceId, 'already exists.');
         q.resolve(responseString);
       } else {
-        console.log('Response code:', res.statusCode);
-        console.log('Response headers:', res.headers);
-        console.log('Response data:', responseString);
+        console.error('Response code:', res.statusCode);
+        console.error('Response headers:', res.headers);
+        console.error('Response data:', responseString);
         q.reject(responseString);
       }
     });
@@ -255,10 +255,10 @@ function sendObservation(deviceId, data, servicePath) {
       if (res.statusCode == 200) {
         q.resolve(responseString);
       } else {
-        console.log('Request:', options);
-        console.log('Response code:', res.statusCode);
-        console.log('Response headers:', res.headers);
-        console.log('Response data:', responseString);
+        console.error('Request:', options);
+        console.error('Response code:', res.statusCode);
+        console.error('Response headers:', res.headers);
+        console.error('Response data:', responseString);
         q.reject(responseString);
       }
     });
