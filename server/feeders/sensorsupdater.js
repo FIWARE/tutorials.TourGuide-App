@@ -36,10 +36,9 @@ var sensorsPerRestaurant = sensorTypes.length * sensorRooms.length;
 /**
  * Update the sensors data for each restaurant.
  *
- * @param {Array} restaurantsData - list of restaurants to process.
+ * @param {Array} restaurantsData - List of restaurants to process.
 */
 function feedIDASSensors(restaurantsData) {
-
   var sensorsUpdated = 0;
   var totalSensors = restaurantsData.length * sensorsPerRestaurant;
 
@@ -74,9 +73,9 @@ function feedIDASSensors(restaurantsData) {
 /**
  * Generates a new sensor value using the old value as base.
  *
- * @param {Number} oldValue - old value of the sensor.
- * @param {String} type - sensor type
- * @return {Number} newValue - new sensor value
+ * @param {Number} oldValue - Old value of the sensor.
+ * @param {String} type - Sensor type.
+ * @return {Number} newValue - New sensor value.
 */
 function generateRandomValue(oldValue, type) {
   var newValue;

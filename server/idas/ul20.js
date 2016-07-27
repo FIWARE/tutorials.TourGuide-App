@@ -127,7 +127,7 @@ function createService() {
     q.reject(error);
   });
 
-  // perform request
+  // Perform request
   req.write(dataString);
   req.end();
   return q.promise;
@@ -136,17 +136,17 @@ function createService() {
 /**
  * Register a new sensor for a restaurant in the IoT Agent.
  *
- * @param {Object} restaurant - restaurant entity.
- * @param {String} room - the room where the sensor will be locaed.
- * @param {String} type - the type of the new sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {Object} restaurant - Restaurant entity.
+ * @param {String} room - The room where the sensor will be locaed.
+ * @param {String} type - The type of the new sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function registerSensor(restaurant, room, type) {
   var idasUrl = '/iot/devices';
   var headers = JSON.parse(JSON.stringify(defaultHeaders));
   var deviceId = getDeviceId(restaurant, room, type);
 
-  // build payload
+  // Build payload
   var data = sensorsTemplates[type];
   // jshint camelcase: false
   // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
@@ -214,9 +214,9 @@ function registerSensor(restaurant, room, type) {
  * Send a new measurement for a single sensor.
  *
  * @param {String} deviceId - Id of the sensor in the IoT Agent.
- * @param {String} data - the measurement data.
- * @param {String} servicePath - the servicePath of the sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {String} data - The measurement data.
+ * @param {String} servicePath - The servicePath of the sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function sendObservation(deviceId, data, servicePath) {
   var idasUrl = '/iot/d';
@@ -279,9 +279,9 @@ function sendObservation(deviceId, data, servicePath) {
  * Send a temperature measurement.
  *
  * @param {String} deviceId - Id of the sensor in the IoT Agent.
- * @param {String} value - the temperature value.
- * @param {String} servicePath - the servicePath of the sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {String} value - The temperature value.
+ * @param {String} servicePath - The servicePath of the sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function updateTemperatureSensor(deviceId, value, servicePath) {
   return sendObservation(deviceId, 't|' + value, servicePath)
@@ -294,9 +294,9 @@ function updateTemperatureSensor(deviceId, value, servicePath) {
  * Send a relative humidity measurement.
  *
  * @param {String} deviceId - Id of the sensor in the IoT Agent.
- * @param {String} value - the relative humidity value.
- * @param {String} servicePath - the servicePath of the sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {String} value - The relative humidity value.
+ * @param {String} servicePath - The servicePath of the sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function updateRelativeHumiditySensor(deviceId, value, servicePath) {
   return sendObservation(deviceId, 'h|' + value, servicePath)
@@ -308,10 +308,10 @@ function updateRelativeHumiditySensor(deviceId, value, servicePath) {
 /**
  * Initialize a sensor with a default value.
  *
- * @param {Object} restaurant - restaurant entity.
- * @param {String} room - the room where the sensor will be locaed.
- * @param {String} type - the type of the new sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {Object} restaurant - Restaurant entity.
+ * @param {String} room - The room where the sensor will be locaed.
+ * @param {String} type - The type of the new sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function initializeSensor(restaurant, room, type) {
   var deviceId = getDeviceId(restaurant, room, type);
@@ -331,10 +331,10 @@ function initializeSensor(restaurant, room, type) {
  * Send a new measurement for a sensor.
  *
  * @param {String} deviceId - Id of the sensor in the IoT Agent.
- * @param {String} type - the sensor type.
- * @param {String} value - the measurement value.
- * @param {String} servicePath - the servicePath of the sensor.
- * @return {Promise} response of the IoT Agent.
+ * @param {String} type - The sensor type.
+ * @param {String} value - The measurement value.
+ * @param {String} servicePath - The servicePath of the sensor.
+ * @return {Promise} Response of the IoT Agent.
 */
 function updateSensor(deviceId, type, value, servicePath) {
   switch (type) {
@@ -350,9 +350,9 @@ function updateSensor(deviceId, type, value, servicePath) {
 /**
  * Generate a deviceId for a sensor.
  *
- * @param {Object} restaurant - restaurant entity of the sensor.
- * @param {String} room - the room where the sensor will be locaed.
- * @param {String} type - the type of the new sensor.
+ * @param {Object} restaurant - Restaurant entity of the sensor.
+ * @param {String} room - The room where the sensor will be locaed.
+ * @param {String} type - The type of the new sensor.
  * @return {String} deviceId of the sensor.
 */
 function getDeviceId(restaurant, room, type) {

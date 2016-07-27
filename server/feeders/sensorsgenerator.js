@@ -39,7 +39,6 @@ var sensorsPerRestaurant = sensorTypes.length * sensorRooms.length;
  * @param {Array} restaurantsData - list of restaurants to process.
 */
 function feedIDASSensors(restaurantsData) {
-
   var sensorsAdded = 0;
   var sensorsInitialized = 0;
   var totalSensors = restaurantsData.length * sensorsPerRestaurant;
