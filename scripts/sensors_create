@@ -1,0 +1,82 @@
+#!/bin/bash
+
+sensors_create_wait=0
+
+function submodule_help () {
+   cat <<EOF >&2
+Usage: ${appname} sensors create [-h | --help] [-w | --wait]
+
+Create and initialize sensors for all the restaurants available in the application.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the tourguide container to be ready.
+                             Default is to exit if tourguide container is not ready.
+
+EOF
+   exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hw -l help,wait -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-w" | "--wait")
+                shift
+                sensors_create_wait=1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+}
+
+function submodule_cmd () {
+    local _started=0
+    local _tries=0
+    local _container_name="tourguide"
+
+    submodule_options "$@"
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${sensors_create_wait} -eq 1 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        docker exec -i -t ${_container_name} /bin/bash -c 'cd tutorials.TourGuide-App/server/feeders; node sensorsgenerator.js'
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
+}

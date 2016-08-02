@@ -1,0 +1,57 @@
+#!/bin/bash
+
+sensors_command=""
+
+function module_help () {
+   cat <<EOF >&2
+Usage: ${appname} sensors [-h | --help] <command> <options>
+
+Run sensors related commands:
+
+  create                     Create sensors for the restaurants available in the application.
+  update                     Update all restaurant sensors measurements.
+  send-data                  Send a single measurement for a specific sensor.
+  simulate-data              Simulate a sensor sending data over a period of time.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Use '${appname} sensors <command> --help' to get help about a specific <command>.
+
+EOF
+   exit 0
+}
+
+function module_options () {
+    if [ $# -lt 1 ]; then
+        module_help
+    else
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            "create"|"update"|"send-data"|"simulate-data")
+                sensors_command="$1"
+                shift
+                ;;
+            "-"*)
+                echo "Unknown parameter: $1"
+                module_help
+                ;;
+            *)
+                echo "Unknown command: $1"
+                module_help
+                ;;
+        esac
+    fi
+}
+
+function module_cmd () {
+    module_options "$@"
+    shift
+    if [ -e "${modules_dir}/${command}_${sensors_command}" ] ; then
+        source "${modules_dir}/${command}_${sensors_command}"
+        submodule_cmd "$@"
+    fi
+}

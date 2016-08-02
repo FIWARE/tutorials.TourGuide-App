@@ -1,0 +1,58 @@
+#!/bin/bash
+
+configure_service=""
+
+function module_help () {
+   cat <<EOF >&2
+Usage: ${appname} configure [-h | --help] <service> <options>
+
+Apply configuration changes for <service>.
+
+Available services:
+
+  * cygnus
+  * keyrock
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Use '${appname} configure <service> --help' to get help about
+configuration options for a specific <service>.
+
+EOF
+   exit 0
+}
+
+function module_options () {
+    if [ $# -lt 1 ]; then
+        module_help
+    else
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            "cygnus"|"keyrock")
+                configure_service="$1"
+                shift
+                ;;
+            "-"*)
+                echo "Unknown parameter: $1"
+                module_help
+                ;;
+            *)
+                echo "Unknown service: $1"
+                module_help
+                ;;
+        esac
+    fi
+}
+
+function module_cmd () {
+    module_options "$@"
+    shift
+    if [ -e "${modules_dir}/${command}_${configure_service}" ] ; then
+        source "${modules_dir}/${command}_${configure_service}"
+        submodule_cmd "$@"
+    fi
+}

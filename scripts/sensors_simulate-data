@@ -1,0 +1,189 @@
+#!/bin/bash
+
+sensors_id=""
+sensors_type=""
+sensors_delay=""
+
+idas_host="localhost"
+idas_ul20_port="7896"
+idas_api_key="tourguide-devices"
+
+function submodule_help () {
+   cat <<EOF >&2
+Usage: ${appname} sensors simulate-data [-h | --help] [-i <sensorId> | --sensor-id <sensorId>]
+                                        [ -t <type> | --type <type> ] [ -d <n> | --delay <n> ]
+
+Simulate a sensor periodically sending data.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Required parameters:
+
+  -i  --sensor-id  <sensorId>     The sensor Id to modify.  The Id format is '<restaurantId>-<room>-<type>', with
+                                  <restaurantId> being the Id of the restaurant where the sensor is located,
+                                  <room> the room of the restaurant: kitchen, diner,
+                                  <type> the type of the sensor: temperature, relativeHumidity.
+  -t  --type <type>               Type of the sensor.  This must be the same type specified in the sensor Id.
+                                  Valid values: temperature, relativeHumidity.
+  -d  --delay <n>                 Delay in seconds between sensor readings.
+
+EOF
+   exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hi:t:d: -l help,sensor-id:,type:,data: -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-i" | "--sensor-id" )
+                shift
+                sensors_id=$1
+                ;;
+            "-t" | "--type" )
+                shift
+                sensors_type=$1
+                ;;
+            "-d" | "--delay" )
+                shift
+                sensors_delay=$1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        submodule_help
+    fi
+
+    local missing_parameters=0
+    [ -z "${sensors_id}" ] && echo "Missing parameter '--sensor-id'." && missing_parameters=1
+
+    if [ -z "${sensors_type}" ] ; then
+        echo "Missing parameter '--type'." && missing_parameters=1
+    else
+        [ "${sensors_type}" != "temperature" -a "${sensors_type}" != "relativeHumidity" ] && echo "Unknown sensor type: ${sensors_type}." && missing_parameters=1
+    fi
+
+    if [ -z "${sensors_delay}" ] ; then
+        echo "Missing parameter '--delay'." && missing_parameters=1
+    else
+        [[ ! ${sensors_delay} =~ ^\+?[0-9]+$ ]] && echo "Delay value must be a positive integer." && missing_parameters=1
+        [ ${sensors_delay} -lt 1 ] && echo "Delay value must be greater than 0." && missing_parameters=1
+    fi
+
+
+    [ ${missing_parameters} -ne 0 ] && submodule_help
+
+}
+
+function sensor_get_old_value () {
+    local restaurant_id="$1"
+    local room="$2"
+    local type="$3"
+
+    local old_value=$( curl --silent \
+                            --show-error \
+                            --header "Fiware-Service: ${fiware_service}" \
+                            --header "Accept: text/plain" \
+                            "http://localhost:1026/v2/entities/${restaurant_id}/attrs/${type}:${room}/value" )
+    echo ${old_value}
+}
+
+function generate_sensor_value () {
+
+    local old_value="$1"
+    local type="$2"
+    local new_value=${old_value}
+    local MIN=0
+    local MAX=100
+
+    if [ "${type}" = "relativeHumidity" ]; then
+        old_value=$( echo "${old_value} * 100" | bc )
+        old_value=${old_value%.*}
+    fi
+
+    local var_sign=$(( $RANDOM % 2 ))
+    local var_val=$(( $RANDOM % 4 ))
+
+    if [ ${var_sign} -eq 0 ] ; then
+        new_value=$(( ${old_value} + ${var_val} ))
+        [ ${new_value} -gt ${MAX} ] && new_value=${MAX}
+    else
+        new_value=$(( ${old_value} - ${var_val} ))
+        [ ${new_value} -lt ${MIN} ] && new_value=${MIN}
+    fi
+
+    if [ "${type}" = "relativeHumidity" ]; then
+        new_value=$( echo "scale=2; ${new_value} / 100" | bc )
+    fi
+
+    echo "${new_value}"
+}
+
+function submodule_cmd () {
+    submodule_options "$@"
+
+    # get restaurant id from sensor id
+    local restaurant_id=$( echo ${sensors_id} | cut -d "-" -f 1 )
+    local room=$( echo ${sensors_id} | cut -d "-" -f 2 )
+
+    # get fiware-servicepath for the restaurant
+    fiware_servicepath=$( curl --silent \
+                               --show-error \
+                               --header "Fiware-Service: ${fiware_service}" \
+                               --header "Accept: text/plain" \
+                               "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" )
+
+    while true ; do
+        local old_value=$( sensor_get_old_value ${restaurant_id} ${room} ${sensors_type} )
+        local new_value=$( generate_sensor_value ${old_value} ${sensors_type} )
+        local sensors_ul20=""
+        case "${sensors_type}" in
+            "temperature")
+                sensors_ul20="t|${new_value}"
+                ;;
+            "relativeHumidity")
+                sensors_ul20="h|${new_value}"
+                ;;
+            *)
+                echo "Unknown type: ${sensors_type}"
+                submodule_help
+                ;;
+        esac
+
+        curl --request POST \
+             --silent \
+             --show-error \
+             --header "Content-Type: text/plain" \
+             --header "Fiware-Service: ${fiware_service}" \
+             --header "Fiware-ServicePath: ${fiware_servicepath}" \
+             --header "X-Auth-Token: NULL" \
+             --data "${sensors_ul20}" \
+             "http://${idas_host}:${idas_ul20_port}/iot/d?k=${idas_api_key}&i=${sensors_id}"
+
+        echo "sensor: ${sensors_id} | value: ${sensors_ul20}"
+
+        if [ "${sensors_delay}" != "" ] ; then
+            sleep ${sensors_delay}
+        else
+            break;
+        fi
+    done
+}
