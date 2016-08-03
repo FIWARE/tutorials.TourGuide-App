@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function module_help () {
+    exit 0
+}
+
+function module_options () {
+    exit 0
+}
+
+function module_cmd () {
+    not_implemented
+}

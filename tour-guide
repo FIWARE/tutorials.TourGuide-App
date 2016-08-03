@@ -53,15 +53,6 @@ function cmd_version () {
     show_version
 }
 
-
-function cmd_configure_keyrock () {
-    not_implemented
-}
-
-function cmd_load () {
-    not_implemented
-}
-
 while true ; do
     command="$1"
     case "${command}" in

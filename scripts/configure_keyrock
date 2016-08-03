@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function submodule_help () {
+    exit 0
+}
+
+function submodule_options () {
+    exit 0
+}
+
+function submodule_cmd () {
+    not_implemented
+}
