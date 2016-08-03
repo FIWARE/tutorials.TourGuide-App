@@ -1,5 +1,5 @@
 mongodb:
-    image: fiware/tutorials.tourguide-app.restaurant-data:20160608
+    image: mongo:2.6
     hostname: mongodb
     container_name: mongodb
     expose:
