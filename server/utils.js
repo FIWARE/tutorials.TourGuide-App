@@ -32,57 +32,6 @@ var DATE_TYPE = 'DateTime';
 var AGGREGATE_RATING_TYPE = 'AggregateRating';
 
 /**
- * Function used in restaurantfeeder.js to download the json restaurant data
- *
- * @param {Object} options - Options of the request
- * @param {Function} callback - Callback function
- * @param {Object} res - Response object
- * @param {Boolean} useHttps - Boolean to use https
-*/
-function doGet(options, callback, res, useHttps) {
-  var protocol = http;
-  if (useHttps) {
-    protocol = https;
-  }
-
-  var request = protocol.get(options, function(response) {
-    // data is streamed in chunks from the server
-    // so we have to handle the "data" event
-    var buffer = '';
-    var data;
-
-    response.on('data', function(chunk) {
-      buffer += chunk;
-    });
-
-    response.on('end', function() {
-      var msg = '';
-      try {
-        data = JSON.parse(buffer);
-        // console.log(data);
-      } catch (err) {
-        console.log('Can\'t decode JSON response.');
-        console.error(err);
-        msg = 'Can\'t decode JSON response.';
-      }
-      if (data === undefined) {
-        msg = 'Error processing JSON response';
-      } else {
-        msg = buffer;
-      }
-      callback(res, msg);
-    });
-  });
-  request.on('error', function(err) {
-    console.log('FAILED GET REQUEST');
-    err = new Error();
-    err.status = 502; // Bad gateway
-    callback(res, err);
-    console.error(err);
-  });
-}
-
-/**
  * Replaces the key of an element with its match
  *
  * @param {Object} dictionary - The dictionary with the content
@@ -1097,7 +1046,6 @@ function returnConflict(res) {
 }
 
 module.exports = {
-  doGet: doGet,
   replaceOnceUsingDictionary: replaceOnceUsingDictionary,
   randomIntInc: randomIntInc,
   randomElement: randomElement,
