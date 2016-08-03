@@ -142,12 +142,12 @@ function getRandomDate(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
   } else {
-    from = from.getTime();
+    from = new Date(from).getTime();
   }
   if (!to) {
     to = new Date(2015, 10, 25).getTime();
   } else {
-    to = to.getTime();
+    to = new Date(to).getTime();
   }
   return new Date(from + Math.random() * (to - from));
 }
@@ -873,12 +873,10 @@ function updateOccupancyLevels(listOfReservations, date) {
 */
 function generateId(name, date) {
   var id;
-  var inputEncoding;
+  var inputEncoding = name;
 
   if (date) {
-    inputEncoding = name + date;
-  } else {
-    inputEncoding = name;
+    inputEncoding += date;
   }
 
   id = crypto.createHash('sha1').update(inputEncoding).digest('hex');
