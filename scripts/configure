@@ -10,8 +10,9 @@ Apply configuration changes for <service>.
 
 Available services:
 
-  * cygnus
-  * keyrock
+  * cygnus        Configure Cygnus MySQL username and password.
+  * keyrock       Provision Tour Guide users, roles and permissions on Keyrock and sync with Authzforce
+  * oauth         Configure OAuth credentials on Tour Guide container.
 
 Command options:
 
@@ -32,7 +33,7 @@ function module_options () {
             "-h" | "--help" )
                 module_help
                 ;;
-            "cygnus"|"keyrock")
+            "cygnus"|"keyrock"|"oauth")
                 configure_service="$1"
                 shift
                 ;;

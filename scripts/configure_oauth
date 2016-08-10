@@ -1,22 +1,19 @@
 #!/bin/bash
 
-keyrock_scripts_path="$( dirname $0 )/docker/keyrock"
-keyrock_ac_url="http://authzforce:8080"
-keyrock_ac_magic_key="daf26216c5434a0a80f392ed9165b3b4"
 keyrock_wait=1
+tourguide_wait=0
 
 function submodule_help () {
     cat <<EOF >&2
-Usage: ${appname} configure keyrock [-h | --help] [-w | --wait]
+Usage: ${appname} configure oauth [-h | --help] [-w | --wait]
 
-Provision the necessary users, roles and permissions for the Tour
-Guide application on Keyrock and then sync with Authzforce.
+Get the Oauth credentials from Keyrock and add them to the Tour Guide configuration.
 
 Command options:
 
   -h  --help                 Show this help.
-  -w  --wait                 Wait for the keyrock container to be ready.
-                             Default is to exit if keyrock container is not ready.
+  -w  --wait                 Wait for the keyrock and tourguide containers to be ready.
+                             Default is to exit if any of the containers is not ready.
 
 EOF
     exit 0
@@ -39,6 +36,7 @@ function submodule_options () {
             "-w" | "--wait")
                 shift
                 keyrock_wait=10000
+                tourguide_wait=1
                 ;;
             --|*)
                 break;
@@ -55,6 +53,7 @@ function submodule_options () {
 }
 
 function check_host_port () {
+
     local _timeout=10
     local _tries=0
     local _is_open=0
@@ -103,37 +102,41 @@ function check_host_port () {
 }
 
 function submodule_cmd () {
-    local _container_name="keyrock"
+    local _started=0
+    local _tries=0
+    local _keyrock_container="keyrock"
+    local _tourguide_container="tourguide"
 
-    submodule_options "$@"
-
-    # To check for keyrock, we can check if port 5000 on localhost is
-    # listening, as that port will be mapped to the host.
     check_host_port localhost 5000 ${keyrock_wait}
 
-    # copy the needed files to the keyrock container
-    echo "Copying scripts to keyrock container."
-    docker cp ${keyrock_scripts_path}/tourguide-provision.py keyrock:/opt/
-    docker cp ${keyrock_scripts_path}/params-config.py keyrock:/opt/
-    docker cp ${keyrock_scripts_path}/access_control_xacml.py keyrock:/horizon/
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_tourguide_container} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
 
-    # provision tourguide users, roles and permissions
-    echo "Provisioning TourGuide users, roles and permissions."
-    docker exec -i -t ${_container_name} /bin/bash -c \
-           'cd /keystone ; \
-            source .venv/bin/activate ; \
-            (sleep 5 ; echo idm) | bin/keystone-manage -v db_sync --populate ; \
-            [ ! -e /opt/.provision-done ] && python /opt/tourguide-provision.py && touch /opt/.provision-done'
+        if [ ${_started} -eq 0 -a ${tourguide_wait} -ne 0 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
 
-    # configure access and sync with authzforce
-    echo "Syncing with authzforce."
-    docker exec -i -t ${_container_name} /bin/bash -c \
-           "sed -i /horizon/openstack_dashboard/local/local_settings.py \
-            -e \"s|^ACCESS_CONTROL_URL = None|ACCESS_CONTROL_URL = '${keyrock_ac_url}'|\" \
-            -e \"s|^ACCESS_CONTROL_MAGIC_KEY = None|ACCESS_CONTROL_MAGIC_KEY = '${keyrock_ac_magic_key}'|\" ; \
-            python /opt/params-config.py --name 'TourGuide' --file /opt/config.json --database keystone.db ; \
-            cd /horizon ; \
-            source .venv/bin/activate ; \
-            python access_control_xacml.py"
+    if [ ${_started} -eq 1 ]; then
+        # get the OAuth credentials for the app
+        CLIENT_ID=$( echo $( docker exec -i -t ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="id": ")[^"]*' )
+        CLIENT_SECRET=$( echo $( docker exec -i -t ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="secret": ")[^"]*' )
+        docker exec -i -t ${_tourguide_container} /bin/bash -c \
+               "sed -i \${CC_APP_SERVER_PATH}/config.js \
+                -e \"s|config.clientId = 'CLIENT_ID'|config.clientId = '${CLIENT_ID'}|g\" \
+                -e \"s|config.clientSecret = 'CLIENT_SECRET'|config.clientSecret = '${CLIENT_SECRET}'|g\" ; \
+                service apache2 reload"
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
 
 }

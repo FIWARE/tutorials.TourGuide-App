@@ -10,6 +10,7 @@ Check for the presence of the following commands:
  * docker-compose
  * curl (for some sensors commands)
  * bc (for some sensors commands)
+ * nc (netcat)
 
 Command options:
 
@@ -72,6 +73,7 @@ function module_cmd () {
     check_cmd docker-compose --version
     check_cmd curl --version
     check_cmd bc --version
+    check_cmd nc -h
 
     echo ""
     if [ ${ok} -eq 0 ]; then
