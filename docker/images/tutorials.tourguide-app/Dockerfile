@@ -76,9 +76,6 @@ RUN git clone -b ${GIT_REV_TOURGUIDE} ${GIT_URL_TOURGUIDE} && \
 # copy default subscriptions
 COPY cpr-registration.sh ${SUBSCRIPTIONS_PATH}/
 
-# Add provision script for IdM
-COPY keystone_provision.py ${TOURGUIDE_USER_DIR}/keystone_provision.py
-
 # Switch back to root for docker-entrypoint.sh
 USER root
 ADD docker-entrypoint.sh /docker-entrypoint.sh

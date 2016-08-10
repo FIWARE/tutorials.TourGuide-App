@@ -10,9 +10,8 @@ check_var TOURGUIDE_USER
 check_var TOURGUIDE_USER_DIR
 check_var TOURGUIDE_HOSTNAME $(hostname)
 
-check_var IDM_HOSTNAME idm
+check_var IDM_HOSTNAME keyrock
 check_var IDM_PORT 5000
-check_var CONFIG_FILE /config/idm2chanchan.json
 
 check_var FIWARE_SERVICE tourguide
 
@@ -26,8 +25,6 @@ check_var IDAS_ADMIN_PORT 4041
 check_var IDAS_FIWARE_SERVICE tourguide
 check_var IDAS_FIWARE_SERVICE_PATH /
 check_var IDAS_API_KEY tourguide-devices
-
-check_var ORION_SUBSCRIPTIONS_ENABLED true
 
 if [[ ${IDM_PORT} =~ ^tcp://[^:]+:(.*)$ ]] ; then
     export IDM_PORT=${BASH_REMATCH[1]}
@@ -59,16 +56,11 @@ APACHE_LOG_DIR=/var/log/apache2
 
 function _configure_params () {
 
-    # get the desired values
-    CLIENT_ID=$( grep -Po '(?<="id": ")[^"]*' ${CONFIG_FILE} )
-    CLIENT_SECRET=$( grep -Po '(?<="secret": ")[^"]*' ${CONFIG_FILE} )
-
     # parse it into the config.js file
     sed -i ${CC_APP_SERVER_PATH}/config.js \
         -e "s|TOURGUIDE_HOSTNAME|${TOURGUIDE_HOSTNAME}|g" \
         -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
-        -e "s|CLIENT_ID|${CLIENT_ID}|g" \
-        -e "s|CLIENT_SECRET|${CLIENT_SECRET}|g" \
+        -e "s|IDM_PORT|${IDM_PORT}|g" \
         -e "s|ORION_HOSTNAME|${ORION_HOSTNAME}|g" \
         -e "s|ORION_PORT|${ORION_PORT}|g" \
         -e "s|ORION_PEP_ENABLED|${ORION_PEP_ENABLED}|g" \
@@ -82,7 +74,8 @@ function _configure_params () {
         -e "s|ORION_NO_PROXY_HOSTNAME|${ORION_NO_PROXY_HOSTNAME}|g"
 
     sed -i ${VHOST_HTTP} \
-        -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g"
+        -e "s|IDM_HOSTNAME|${IDM_HOSTNAME}|g" \
+        -e "s|IDM_PORT|${IDM_PORT}|g"
 }
 
 function _setup_vhost_http () {
@@ -113,47 +106,17 @@ function tail_logs () {
     tail -F ${apache_logs}
 }
 
-# Move the provision file to /config to make it available for IdM
-
-mv ${TOURGUIDE_USER_DIR}/keystone_provision.py /config/keystone_provision.py
-
 # Call checks
 check_host_port ${IDM_HOSTNAME} ${IDM_PORT}
 check_host_port ${ORION_HOSTNAME} ${ORION_PORT}
 _setup_vhost_http
-check_file ${CONFIG_FILE}
 _configure_params
 # enable new virtualhosts
 a2ensite tourguide-app
 
-# Subscribe to receive temperatures from orion
-if [ "${ORION_SUBSCRIPTIONS_ENABLED}" = "true" ] ; then
-
-    echo "Testing if orion is ready at http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version"
-    check_url http://${ORION_NO_PROXY_HOSTNAME}:${ORION_PORT}/version "<version>.*</version>"
-
-    echo "subscribing to orion"
-    for f in $( ls ${SUBSCRIPTIONS_PATH} ) ; do
-        "${SUBSCRIPTIONS_PATH}/${f}"
-    done
-fi
-
 # Start apache server
-
 echo "Starting tourguide"
 service apache2 start
-
-# Sensors generation
-if [ "${SENSORS_GENERATION_ENABLED}" = "true" ] ; then
-    cd ${CC_APP_SERVER_PATH}/feeders
-    node sensorsgenerator.js
-fi
-
-# Force an update of the sensors data
-if [ "${SENSORS_FORCED_UPDATE_ENABLED}" = "true" ] ; then
-    cd ${CC_APP_SERVER_PATH}/feeders
-    node sensorsupdater.js
-fi
 
 tail_logs & _waitpid=$!
 wait "${_waitpid}"

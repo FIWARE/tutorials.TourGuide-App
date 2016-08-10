@@ -19,25 +19,24 @@ orion:
     command: -dbhost mongodb
 
 authzforce:
-    image: fiware/authzforce-ce-server:release-4.4.1b
+    image: fiware/authzforce-ce-server:release-5.4.0b
     hostname: authzforce
     container_name: authzforce
     expose:
         - "8080"
 
 keyrock:
-    image: bitergia/idm-keyrock:5.1.0
+    image: fiware/idm:v5.3.0
     hostname: keyrock
     container_name: keyrock
     links:
         - authzforce
-    volumes:
-        - /config
     expose:
         - "5000"
-    environment:
-        - APP_NAME=TourGuide
-        - AUTHZFORCE_VERSION=4.4.1b
+        - "8000"
+    ports:
+        - "5000:5000"
+        - "8000:8000"
 
 idas:
     image: fiware/iotagent-ul:develop
@@ -109,9 +108,7 @@ tourguide:
         - IDAS_FIWARE_SERVICE=tourguide
         - IDAS_FIWARE_SERVICE_PATH=/
         - IDAS_API_KEY=tourguide-devices
-        - ORION_SUBSCRIPTIONS_ENABLED=false
-        - SENSORS_GENERATION_ENABLED=false
-        - SENSORS_FORCED_UPDATE_ENABLED=false
         - IDM_HOSTNAME=keyrock
+        - IDM_PORT=8000
     volumes_from:
         - keyrock
