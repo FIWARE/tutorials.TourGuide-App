@@ -104,8 +104,8 @@ function check_host_port () {
 function submodule_cmd () {
     local _started=0
     local _tries=0
-    local _keyrock_container="keyrock"
-    local _tourguide_container="tourguide"
+    local _keyrock_container="${container_prefix}keyrock"
+    local _tourguide_container="${container_prefix}tourguide"
 
     check_host_port localhost 5000 ${keyrock_wait}
 
@@ -127,11 +127,11 @@ function submodule_cmd () {
 
     if [ ${_started} -eq 1 ]; then
         # get the OAuth credentials for the app
-        CLIENT_ID=$( echo $( docker exec -i -t ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="id": ")[^"]*' )
-        CLIENT_SECRET=$( echo $( docker exec -i -t ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="secret": ")[^"]*' )
-        docker exec -i -t ${_tourguide_container} /bin/bash -c \
+        CLIENT_ID=$( echo $( docker exec -i ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="id": ")[^"]*' )
+        CLIENT_SECRET=$( echo $( docker exec -i ${_keyrock_container} /bin/bash -c 'cat /opt/config.json' ) | grep -Po '(?<="secret": ")[^"]*' )
+        docker exec -i ${_tourguide_container} /bin/bash -c \
                "sed -i \${CC_APP_SERVER_PATH}/config.js \
-                -e \"s|config.clientId = 'CLIENT_ID'|config.clientId = '${CLIENT_ID'}|g\" \
+                -e \"s|config.clientId = 'CLIENT_ID'|config.clientId = '${CLIENT_ID}'|g\" \
                 -e \"s|config.clientSecret = 'CLIENT_SECRET'|config.clientSecret = '${CLIENT_SECRET}'|g\" ; \
                 service apache2 reload"
     else

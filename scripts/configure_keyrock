@@ -103,7 +103,7 @@ function check_host_port () {
 }
 
 function submodule_cmd () {
-    local _container_name="keyrock"
+    local _container_name="${container_prefix}keyrock"
 
     submodule_options "$@"
 
@@ -113,13 +113,13 @@ function submodule_cmd () {
 
     # copy the needed files to the keyrock container
     echo "Copying scripts to keyrock container."
-    docker cp ${keyrock_scripts_path}/tourguide-provision.py keyrock:/opt/
-    docker cp ${keyrock_scripts_path}/params-config.py keyrock:/opt/
-    docker cp ${keyrock_scripts_path}/access_control_xacml.py keyrock:/horizon/
+    docker cp ${keyrock_scripts_path}/tourguide-provision.py ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/params-config.py ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/access_control_xacml.py ${_container_name}:/horizon/
 
     # provision tourguide users, roles and permissions
     echo "Provisioning TourGuide users, roles and permissions."
-    docker exec -i -t ${_container_name} /bin/bash -c \
+    docker exec -i ${_container_name} /bin/bash -c \
            'cd /keystone ; \
             source .venv/bin/activate ; \
             (sleep 5 ; echo idm) | bin/keystone-manage -v db_sync --populate ; \
@@ -127,7 +127,7 @@ function submodule_cmd () {
 
     # configure access and sync with authzforce
     echo "Syncing with authzforce."
-    docker exec -i -t ${_container_name} /bin/bash -c \
+    docker exec -i ${_container_name} /bin/bash -c \
            "sed -i /horizon/openstack_dashboard/local/local_settings.py \
             -e \"s|^ACCESS_CONTROL_URL = None|ACCESS_CONTROL_URL = '${keyrock_ac_url}'|\" \
             -e \"s|^ACCESS_CONTROL_MAGIC_KEY = None|ACCESS_CONTROL_MAGIC_KEY = '${keyrock_ac_magic_key}'|\" ; \

@@ -54,7 +54,7 @@ function submodule_options () {
 function submodule_cmd () {
     local _started=0
     local _tries=0
-    local _container_name="tourguide"
+    local _container_name="${container_prefix}tourguide"
 
     submodule_options "$@"
 

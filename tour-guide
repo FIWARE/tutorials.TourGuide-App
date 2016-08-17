@@ -5,6 +5,7 @@ appname=$( basename $0 )
 compose="$( dirname $0 )/docker-compose.yml"
 modules_dir="$( dirname $0 )/scripts"
 fiware_service="tourguide"
+container_prefix=""
 
 function show_version () {
     cat <<EOF >&2
@@ -22,6 +23,8 @@ Options:
   -h  --help                 Show this help.
   -v  --version              Show program version.
   -d  --debug                Print extra info when running this script.
+  -t  --test                 Add 'test_' prefix to container names.
+                             Use this when running the test suite.
 
 Available commands:
 
@@ -65,6 +68,9 @@ while true ; do
             ;;
         "-d" | "--debug")
             set -x
+            ;;
+        "-t" | "--test")
+            container_prefix="test_"
             ;;
         *)
             shift
