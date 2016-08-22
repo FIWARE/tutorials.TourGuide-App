@@ -10,6 +10,7 @@
 
 version="0.1"
 appname=$( basename $0 )
+app="TourGuide CLI"
 compose="$( dirname $0 )/docker-compose.yml"
 modules_dir="$( dirname $0 )/scripts"
 fiware_service="tourguide"
@@ -17,7 +18,7 @@ container_prefix=""
 
 function show_version () {
     cat <<EOF >&2
-${appname} version ${version}
+${app} version ${version}
 EOF
     exit 0
 }
@@ -68,10 +69,10 @@ function cmd_version () {
 while true ; do
     command="$1"
     case "${command}" in
-        "" | "-h" | "--help" )
+        "" | "-h" | "--help" | "help")
             show_help
             ;;
-        "-v" | "--version")
+        "-v" | "--version" | "version")
             show_version
             ;;
         "-d" | "--debug")
