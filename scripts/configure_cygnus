@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  configure_cygnus
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure cygnus subcommand for TourGuide CLI.
+#
 
 cygnus_mysql_user='root'
 cygnus_mysql_password='mysql'

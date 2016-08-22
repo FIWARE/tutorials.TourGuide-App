@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  sensors_update
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  sensors update subcommand for TourGuide CLI.
+#
 
 sensors_udpate_wait=0
 

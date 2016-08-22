@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  sensors
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  sensors command for TourGuide CLI.
+#
 
 sensors_command=""
 

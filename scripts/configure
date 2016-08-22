@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  configure
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure command for TourGuide CLI.
+#
 
 configure_service=""
 

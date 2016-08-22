@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  start
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  start command for TourGuide CLI.
+#
 
 start_service="tourguide"
 

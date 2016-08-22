@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  sensors_create
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  sensors create subcommand for TourGuide CLI.
+#
 
 sensors_create_wait=0
 

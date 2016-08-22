@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  configure_oauth
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure oauth subcommand for TourGuide CLI.
+#
 
 keyrock_wait=1
 tourguide_wait=0

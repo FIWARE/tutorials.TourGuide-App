@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  configure_keyrock
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure keyrock subcommand for TourGuide CLI.
+#
 
 keyrock_scripts_path="$( dirname $0 )/docker/keyrock"
 keyrock_ac_url="http://authzforce:8080"

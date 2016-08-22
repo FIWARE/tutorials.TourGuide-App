@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  tour-guide
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  CLI to configure and interact with TourGuide-App.
+#
 
 version="0.1"
 appname=$( basename $0 )

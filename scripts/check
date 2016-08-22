@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  check
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  check command for TourGuide CLI.
+#
 
 function module_help () {
    cat <<EOF >&2

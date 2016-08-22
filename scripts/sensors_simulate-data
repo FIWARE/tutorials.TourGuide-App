@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  sensors_simulate-data
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  sensors simulate-data subcommand for TourGuide CLI.
+#
 
 sensors_id=""
 sensors_type=""
