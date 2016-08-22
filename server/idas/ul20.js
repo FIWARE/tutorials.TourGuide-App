@@ -204,7 +204,7 @@ function registerSensor(restaurant, room, type) {
     q.reject(error);
   });
 
-  // perform request
+  // Perform request
   req.write(dataString);
   req.end();
   return q.promise;
@@ -269,7 +269,7 @@ function sendObservation(deviceId, data, servicePath) {
     q.reject(error);
   });
 
-  // perform request
+  // Perform request
   req.write(data);
   req.end();
   return q.promise;

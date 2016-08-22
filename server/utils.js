@@ -447,30 +447,22 @@ function reservationToSchema(element) {
 function objectDataToSchema(element, date) {
   var newElement;
   var type = element.type;
-
   switch (type) {
-
-  case RESTAURANT_TYPE:
-
-    if (date) {
-      newElement = restaurantToSchema(element, date);
-    } else {
-      newElement = restaurantToSchema(element);
-    }
-    return newElement;
-
-  case REVIEW_TYPE:
-
-    newElement = reviewToSchema(element);
-    return newElement;
-
-  case RESERVATION_TYPE:
-
-    newElement = reservationToSchema(element);
-    return newElement;
-
-  default:
-    console.log('Undefined type received to convert');
+    case RESTAURANT_TYPE:
+      if (date) {
+        newElement = restaurantToSchema(element, date);
+      } else {
+        newElement = restaurantToSchema(element);
+      }
+      return newElement;
+    case REVIEW_TYPE:
+      newElement = reviewToSchema(element);
+      return newElement;
+    case RESERVATION_TYPE:
+      newElement = reservationToSchema(element);
+      return newElement;
+    default:
+      console.log('Undefined type received to convert');
   }
 }
 
@@ -736,9 +728,9 @@ function reservationToOrion(userObject, schemaObject) {
 /**
  * Generate a list of reservations of a Franchise
  *
- * @param {List} listOfRestaurants - restaurants from a Franchise
- * @param {List} listOfReservations - list of reservations
- * @return {List} contains all the reservations of the passed restaurants
+ * @param {List} listOfRestaurants - Restaurants from a Franchise
+ * @param {List} listOfReservations - List of reservations
+ * @return {List} Contains all the reservations of the passed restaurants
 */
 function getOrgReservations(listOfRestaurants, listOfReservations) {
   return objectToArray(listOfReservations).filter(
@@ -753,12 +745,12 @@ function getOrgReservations(listOfRestaurants, listOfReservations) {
 /**
  * Wrapper to send requests (GET) against Orion
  *
- * @param {String} type - element type (restaurant, review or reservation)
+ * @param {String} type - Element type (restaurant, review or reservation)
  * @param {Object} element - Object received
  * @param {Object} headers - Headers to send
- * @param {Object} queryString - queryString to send
- * @param {String} normalized - normalized mode
- * @return {Promise} returns the request response
+ * @param {Object} queryString - QueryString to send
+ * @param {String} normalized - Normalized mode
+ * @return {Promise} Returns the request response
 */
 function getListByType(type, element, headers, queryString, normalized) {
   var uri = '/v2/entities';
@@ -780,12 +772,12 @@ function getListByType(type, element, headers, queryString, normalized) {
 /**
  * Wrapper to send requests against Orion
  *
- * @param {String} method - method to use
- * @param {Object} body - body to send
- * @param {String} identifier - identifier of the entity
+ * @param {String} method - Method to use
+ * @param {Object} body - Body to send
+ * @param {String} identifier - Identifier of the entity
  * @param {Object} headers - Headers to send
- * @param {Object} queryString - queryString to send
- * @return {Promise} returns the request response
+ * @param {Object} queryString - QueryString to send
+ * @return {Promise} Returns the request response
 */
 function sendRequest(method, body, identifier, headers, queryString) {
   var uri = '/v2/entities';
