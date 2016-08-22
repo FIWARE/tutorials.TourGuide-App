@@ -24,7 +24,7 @@ EOF
 
 function show_help () {
    cat <<EOF >&2
-Usage: ${appname} [-h | --help] [-v | --version] [-d | --debug]  <command> [<args>]
+Usage: ${appname} [-h | --help] [-v | --version] [-d | --debug] [-t | --test] <command> [<args>]
 
 Options:
 
