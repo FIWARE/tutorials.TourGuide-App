@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+#  oauth-token
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  oauth-token command for TourGuide CLI.
+#
+
+user=""
+password=""
+json=0
+tourguide_wait=0
+
+function module_help () {
+   cat <<EOF >&2
+Usage: ${appname} oauth-token [-h | --help] [-u <username> | --user <username>]
+                                   [-p <password> | --password <password>] [-j | --json]
+
+Get the OAuth token for the specified user and password.
+
+Command options:
+
+  -h  --help                         Show this help.
+  -u  --user <username>              Get OAuth token for user <username>.
+  -p  --password <password>          The <password> for the specified user.
+  -j  --json                         Return a JSON with extra information.
+                                     Default is to return just the OAuth token.
+  -w  --wait                         Wait for the tourguide container to be ready.
+                                     Default is to exit if any of the containers is not ready.
+
+EOF
+   exit 0
+}
+
+function module_options () {
+    TEMP=`getopt -o hu:p:j -l help,user:,password:,json -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        module_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            "-u" | "--user" )
+                shift
+                user=$1
+                ;;
+            "-p" | "--password" )
+                shift
+                password=$1
+                ;;
+            "-j" | "--json" )
+                json=1
+                ;;
+            "-w" | "--wait")
+                shift
+                tourguide_wait=1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+
+    local missing_parameters=0
+    [ -z "${user}" ] && echo "Missing parameter '--user'." && missing_parameters=1
+    [ -z "${password}" ] && echo "Missing parameter '--password'." && missing_parameters=1
+
+    [ ${missing_parameters} -ne 0 ] && module_help
+}
+
+function module_cmd () {
+    local _started=0
+    local _tries=0
+    local _container_name="${container_prefix}tourguide"
+
+    module_options "$@"
+
+    while [ true ]; do
+        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${tourguide_wait} -ne 0 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        output=$( docker exec -i ${_container_name} /bin/bash -c \
+                  "cd tutorials.TourGuide-App/server/misc; \
+                   node oauthToken.js ${user} ${password}" )
+
+        if [ ${json} -eq 0 ] ; then
+            echo "${output}" |
+                sed -e 's/^.*"access_token": "\([^"]\+\)".*/\1/g'
+        else
+            echo "${output}"
+        fi
+    else
+        echo "Tour Guide is not running."
+    fi
+}
