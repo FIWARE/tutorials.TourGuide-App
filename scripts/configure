@@ -11,7 +11,7 @@
 configure_service=""
 
 function module_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} configure [-h | --help] <service> <options>
 
 Apply configuration changes for <service>.
@@ -30,7 +30,7 @@ Use '${appname} configure <service> --help' to get help about
 configuration options for a specific <service>.
 
 EOF
-   exit 0
+    exit 0
 }
 
 function module_options () {

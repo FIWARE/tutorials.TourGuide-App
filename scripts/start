@@ -11,7 +11,7 @@
 start_service="tourguide"
 
 function module_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} start [-h | --help] <service>
 
 Start one of the following services and its dependencies:
@@ -28,11 +28,10 @@ Command options:
   -h  --help                 Show this help.
 
 EOF
-   exit 0
+    exit 0
 }
 
 function module_options () {
-
     TEMP=`getopt -o h -l help -- "$@"`
 
     if test "$?" -ne 0 ; then

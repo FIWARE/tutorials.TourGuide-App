@@ -61,7 +61,6 @@ function submodule_options () {
 }
 
 function check_host_port () {
-
     local _timeout=10
     local _tries=0
     local _is_open=0
@@ -146,5 +145,4 @@ function submodule_cmd () {
         echo "Not ready."
         echo "Stopping."
     fi
-
 }

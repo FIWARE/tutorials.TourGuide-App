@@ -12,7 +12,7 @@ cygnus_mysql_user='root'
 cygnus_mysql_password='mysql'
 
 function submodule_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} configure cygnus [-h | --help] [-u <username> | --mysql-user <username>]
                                    [-p <password> | --mysql-password <password>]
 
@@ -26,7 +26,7 @@ Command options:
   -p  --mysql-password <password>    Set the MySQL database password to use.
                                      Default value is 'mysql'.
 EOF
-   exit 0
+    exit 0
 }
 
 function submodule_options () {

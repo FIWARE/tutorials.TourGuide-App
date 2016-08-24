@@ -17,7 +17,7 @@ idas_ul20_port="7896"
 idas_api_key="tourguide-devices"
 
 function submodule_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} sensors simulate-data [-h | --help] [-i <sensorId> | --sensor-id <sensorId>]
                                         [ -t <type> | --type <type> ] [ -d <n> | --delay <n> ]
 
@@ -38,7 +38,7 @@ Required parameters:
   -d  --delay <n>                 Delay in seconds between sensor readings.
 
 EOF
-   exit 0
+    exit 0
 }
 
 function submodule_options () {
@@ -96,9 +96,7 @@ function submodule_options () {
         [ ${sensors_delay} -lt 1 ] && echo "Delay value must be greater than 0." && missing_parameters=1
     fi
 
-
     [ ${missing_parameters} -ne 0 ] && submodule_help
-
 }
 
 function sensor_get_old_value () {
@@ -115,7 +113,6 @@ function sensor_get_old_value () {
 }
 
 function generate_sensor_value () {
-
     local old_value="$1"
     local type="$2"
     local new_value=${old_value}

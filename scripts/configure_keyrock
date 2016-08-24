@@ -143,5 +143,4 @@ function submodule_cmd () {
             cd /horizon ; \
             source .venv/bin/activate ; \
             python access_control_xacml.py"
-
 }

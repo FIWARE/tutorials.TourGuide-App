@@ -11,7 +11,7 @@
 sensors_udpate_wait=0
 
 function submodule_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} sensors update [-h | --help] [-w | --wait]
 
 Update all the restaurant sensors measurements.  This will simulate
@@ -24,7 +24,7 @@ Command options:
                              Default is to exit if tourguide container is not ready.
 
 EOF
-   exit 0
+    exit 0
 }
 
 function submodule_options () {

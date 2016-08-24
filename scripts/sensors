@@ -11,7 +11,7 @@
 sensors_command=""
 
 function module_help () {
-   cat <<EOF >&2
+    cat <<EOF >&2
 Usage: ${appname} sensors [-h | --help] <command> <options>
 
 Run sensors related commands:
@@ -28,7 +28,7 @@ Command options:
 Use '${appname} sensors <command> --help' to get help about a specific <command>.
 
 EOF
-   exit 0
+    exit 0
 }
 
 function module_options () {
