@@ -78,13 +78,11 @@ function parseArgs() {
     showHelp();
   }
 
-  if (typeof argv.jsonfile === 'string' &&
-      argv.jsonfile !== '') {
+  if (typeof argv.jsonfile === 'string' && argv.jsonfile !== '') {
     cacheFile = argv.jsonfile;
   }
 
-  if (typeof argv.output === 'string' &&
-      argv.output !== '') {
+  if (typeof argv.output === 'string' && argv.output !== '') {
     outputFile = argv.output;
   }
 }
@@ -141,9 +139,6 @@ function logProgress(restaurantIdentifier) {
  * @param {List} restaurants - List of the restaurants
 */
 function exportGeocode(restaurants) {
-
-  //restaurantsData = restaurantsData.slice(0,5);
-
   var q = async.queue(function(task, callback) {
     var attributes = task.attributes;
     var address = getAddress(attributes);

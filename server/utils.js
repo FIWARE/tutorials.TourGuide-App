@@ -209,16 +209,16 @@ function objectToArray(element) {
 */
 function setSchemaUnits(sensor) {
   switch (sensor.additionalType) {
-  case 'temperature':
-    sensor.unitCode = 'CEL';
-    sensor.unitText = '°C';
-    break;
-  case 'relativeHumidity':
-    sensor.unitCode = 'P1';
-    sensor.unitText = '%';
-    break;
-  default:
-    console.log('Uknown type:', sensor.additionalType);
+    case 'temperature':
+      sensor.unitCode = 'CEL';
+      sensor.unitText = '°C';
+      break;
+    case 'relativeHumidity':
+      sensor.unitCode = 'P1';
+      sensor.unitText = '%';
+      break;
+    default:
+      console.log('Uknown type:', sensor.additionalType);
   }
   return sensor;
 }

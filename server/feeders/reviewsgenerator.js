@@ -89,13 +89,11 @@ function parseArgs() {
     showHelp();
   }
 
-  if (typeof argv.organization === 'string' &&
-      argv.organization !== '') {
+  if (typeof argv.organization === 'string' && argv.organization !== '') {
     organization = argv.organization;
   }
 
-  if (typeof argv.restaurant === 'string' &&
-      argv.restaurant !== '') {
+  if (typeof argv.restaurant === 'string' && argv.restaurant !== '') {
     restaurantSelected = argv.restaurant;
   }
 
@@ -143,19 +141,21 @@ function getRestaurantInformation() {
     .catch(function(err) {
       console.error(err.error);
     });
-  }  else if (restaurantSelected) {
-    var restaurantId = utils.generateId(restaurantSelected);
-    utils.getListByType(RESTAURANT_TYPE, restaurantId, fiwareHeaders)
-    .then(processRestaurants)
-    .catch(function(err) {
-      console.error(err);
-    });
   } else {
-    utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
-    .then(processRestaurants)
-    .catch(function(err) {
-      console.error(err);
-    });
+    if (restaurantSelected) {
+      var restaurantId = utils.generateId(restaurantSelected);
+      utils.getListByType(RESTAURANT_TYPE, restaurantId, fiwareHeaders)
+      .then(processRestaurants)
+      .catch(function(err) {
+        console.error(err);
+      });
+    } else {
+      utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
+      .then(processRestaurants)
+      .catch(function(err) {
+        console.error(err);
+      });
+    }
   }
 }
 

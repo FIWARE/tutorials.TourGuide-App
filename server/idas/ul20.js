@@ -316,14 +316,14 @@ function updateRelativeHumiditySensor(deviceId, value, servicePath) {
 function initializeSensor(restaurant, room, type) {
   var deviceId = getDeviceId(restaurant, room, type);
   switch (type) {
-  case 'temperature':
-    return updateTemperatureSensor(deviceId, TEMPERATURE,
-                                   restaurant.department);
-  case 'relativeHumidity':
-    return updateRelativeHumiditySensor(deviceId, RELATIVEHUMIDITY,
-                                        restaurant.department);
-  default:
-    return Q.reject('Unsupported sensor type: ' + type);
+    case 'temperature':
+      return updateTemperatureSensor(deviceId, TEMPERATURE,
+                                     restaurant.department);
+    case 'relativeHumidity':
+      return updateRelativeHumiditySensor(deviceId, RELATIVEHUMIDITY,
+                                          restaurant.department);
+    default:
+      return Q.reject('Unsupported sensor type: ' + type);
   }
 }
 
@@ -338,12 +338,12 @@ function initializeSensor(restaurant, room, type) {
 */
 function updateSensor(deviceId, type, value, servicePath) {
   switch (type) {
-  case 'temperature':
-    return updateTemperatureSensor(deviceId, value, servicePath);
-  case 'relativeHumidity':
-    return updateRelativeHumiditySensor(deviceId, value, servicePath);
-  default:
-    return Q.reject('Unsupported sensor type: ' + type);
+    case 'temperature':
+      return updateTemperatureSensor(deviceId, value, servicePath);
+    case 'relativeHumidity':
+      return updateRelativeHumiditySensor(deviceId, value, servicePath);
+    default:
+      return Q.reject('Unsupported sensor type: ' + type);
   }
 }
 

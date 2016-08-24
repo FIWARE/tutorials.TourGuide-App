@@ -89,18 +89,15 @@ function parseArgs() {
     showHelp();
   }
 
-  if (typeof argv.fromDate === 'string' &&
-      argv.fromDate !== '') {
+  if (typeof argv.fromDate === 'string' && argv.fromDate !== '') {
     fromDate = argv.fromDate;
   }
 
-  if (typeof argv.toDate === 'string' &&
-      argv.toDate !== '') {
+  if (typeof argv.toDate === 'string' && argv.toDate !== '') {
     toDate = argv.toDate;
   }
 
-  if (typeof argv.restaurant === 'string' &&
-      argv.restaurant !== '') {
+  if (typeof argv.restaurant === 'string' && argv.restaurant !== '') {
     restaurantSelected = argv.restaurant;
   }
 

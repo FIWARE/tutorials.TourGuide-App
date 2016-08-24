@@ -99,18 +99,15 @@ function parseArgs() {
     showHelp();
   }
 
-  if (typeof argv.jsonfile === 'string' &&
-      argv.jsonfile !== '') {
+  if (typeof argv.jsonfile === 'string' && argv.jsonfile !== '') {
     cacheFile = argv.jsonfile;
   }
 
-  if (typeof argv.geofile === 'string' &&
-      argv.geofile !== '') {
+  if (typeof argv.geofile === 'string' && argv.geofile !== '') {
     geolocationFile = argv.geofile;
   }
 
-  if (typeof argv.restaurant === 'string' &&
-      argv.restaurant !== '') {
+  if (typeof argv.restaurant === 'string' && argv.restaurant !== '') {
     restaurantSelected = argv.restaurant;
   }
 
@@ -145,9 +142,7 @@ function logProgress(restaurantIdentifier) {
  * Function to read the restaurant information from a given file
 */
 function loadRestaurantData() {
-
   console.info('Loading restaurants info ...');
-
   var data = fs.readFileSync(cacheFile);
   restaurantsData = JSON.parse(data);
 
@@ -175,7 +170,6 @@ function loadGeoData() {
  * Function that adapts the information for Orion Context Broker
 */
 function feedOrionRestaurants() {
-
   console.info('Feeding restaurants info in orion.');
   console.info('Number of restaurants: ' + restaurantsData.length);
 
@@ -201,7 +195,6 @@ function feedOrionRestaurants() {
   var capacity = [50, 80, 100, 120, 160, 200];
 
   restaurantsData.forEach(function(element, index) {
-
     var rname = utils.fixedEncodeURIComponent(
       restaurantsData[index].documentName);
 
@@ -242,9 +235,7 @@ function feedOrionRestaurants() {
     };
 
     Object.keys(restaurantsData[index]).forEach(function(element) {
-
       var val = restaurantsData[index][element];
-
       if (val) {
         if (element in addressDictionary) {
           element = utils.fixedEncodeURIComponent(
