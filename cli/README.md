@@ -47,6 +47,8 @@ Check if some required commands (both for running the containers and the scripts
 
 ### oauth-token ###
 
+Get the OAuth token for a specific user.  This may be needed to make requests via curl.
+
 ### sensors ###
 
 #### sensors create ####
