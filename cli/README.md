@@ -21,6 +21,14 @@ The following commands are available:
 
 ### check ###
 
+Check if some required commands (both for running the containers and the scripts) are available.  The required commands are:
+
+* docker
+* docker-compose
+* curl
+* bc
+* nc
+
 ### configure ###
 
 #### configure cygnus ####
