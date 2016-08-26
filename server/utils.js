@@ -31,6 +31,14 @@ var FOOD_ESTABLISHMENT_TYPE = 'FoodEstablishment';
 var DATE_TYPE = 'DateTime';
 var AGGREGATE_RATING_TYPE = 'AggregateRating';
 
+/**
+ * Function used in restaurantfeeder.js to download the json restaurant data
+ *
+ * @param {Object} options - Options of the request
+ * @param {Function} callback - Callback function
+ * @param {Object} res - Response object
+ * @param {Boolean} useHttps - Boolean to use https
+*/
 function doGet(options, callback, res, useHttps) {
   var protocol = http;
   if (useHttps) {
@@ -54,7 +62,7 @@ function doGet(options, callback, res, useHttps) {
         // console.log(data);
       } catch (err) {
         console.log('Can\'t decode JSON response.');
-        console.log(err);
+        console.error(err);
         msg = 'Can\'t decode JSON response.';
       }
       if (data === undefined) {
@@ -70,54 +78,18 @@ function doGet(options, callback, res, useHttps) {
     err = new Error();
     err.status = 502; // Bad gateway
     callback(res, err);
-    console.log(err);
+    console.error(err);
   });
 }
 
-function doPost(options, data, callback, res, useHttps) {
-
-  try {
-    var protocol = http;
-    if (useHttps) {
-      protocol = https;
-    }
-
-    var postReq = protocol.request(options, function(response) {
-      // console.log("DOING POST");
-
-      response.setEncoding('utf8');
-
-      var buffer = '';
-
-      response.on('data', function(chunk) {
-        buffer += chunk;
-
-      });
-
-      response.on('end', function() {
-        // console.log(buffer);
-        callback(res, buffer, response.headers);
-      });
-    });
-
-    // console.log("POST Request created");
-
-    postReq.on('error', function(e) {
-      // TODO: handle error.
-      callback(res, e);
-      console.log(e);
-    });
-
-    // post the data
-    postReq.write(data);
-    postReq.end();
-
-  } catch (error) {
-    callback(res, error);
-    console.log(error);
-  }
-}
-
+/**
+ * Replaces the key of an element with its match
+ *
+ * @param {Object} dictionary - The dictionary with the content
+ * @param {Object} content - The element itself
+ * @param {Object} replacehandler - The function to replace them
+ * @return {Object} The element replaced
+*/
 function replaceOnceUsingDictionary(dictionary, content,
   replacehandler) {
   if (typeof replacehandler !== 'function') {
@@ -143,15 +115,11 @@ function replaceOnceUsingDictionary(dictionary, content,
         '\\$1') +
       ')\\b');
 
-    // Add entry to hash variable,
-    // for an optimized backtracking at the next loop
+    // Add entry to hash variable, for an optimized backtracking at the next loop
     patternHash[key] = index++;
   }
   var pattern = new RegExp(patterns.join('|'), 'gi');
   var lastIndex = 0;
-
-  // We should actually test using !== null, but for foolproofness,
-  //  we also reject empty strings
 
   while (!!(key = pattern.exec(content))) {
     // Case-insensitivity
@@ -170,21 +138,40 @@ function replaceOnceUsingDictionary(dictionary, content,
     patterns[patternHash[key]] = '^';
     pattern = new RegExp(patterns.join('|'), 'gi');
 
-    // IMPORTANT: Update lastIndex property. Otherwise, enjoy an infinite loop
+    // In order to avoid a infinite loop, lastIndex is updated
     pattern.lastIndex = lastIndex;
   }
   output.push(content.substring(lastIndex, content.length));
   return output.join('');
 }
 
+/**
+ * Returns a random integer between the given numbers
+ *
+ * @param {Integer} low - List of elements
+ * @param {Integer} high - List of elements
+ * @return {Integer} A random element from the given array
+*/
 function randomIntInc(low, high) {
   return Math.floor(Math.random() * (high - low + 1) + low);
 }
 
+/**
+ * Returns a random element from a given array
+ *
+ * @param {Object} elements - List of elements
+ * @return {Object} A random element from the array
+*/
 function randomElement(elements) {
   return elements[Math.floor(Math.random() * elements.length)];
 }
 
+/**
+ * Removes forbidden characters in Orion
+ *
+ * @param {String} str - String with the forbidden characters
+ * @return {String} String without the forbidden characters
+*/
 function fixedEncodeURIComponent(str) {
   str = str.replace(/["]/g, '\\"');
   str = str.replace(/\n/g, '\\n');
@@ -195,6 +182,13 @@ function fixedEncodeURIComponent(str) {
   });
 }
 
+/**
+ * Returns a random date between given dates
+ *
+ * @param {String} from - Datetime from
+ * @param {String} to - Datetime to
+ * @return {Date} Datetime object with the random date
+*/
 function getRandomDate(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
@@ -209,39 +203,48 @@ function getRandomDate(from, to) {
   return new Date(from + Math.random() * (to - from));
 }
 
+/**
+ * Removes HTML code tags
+ *
+ * @param {String} str - String to clean
+ * @return {String} str - String without the HTML tags
+*/
 function convertHtmlToText(str) {
-
-  //-- remove BR tags and replace them with line break
+  // remove BR tags and replace them with line break
   str = str.replace(/<br>/gi, '\n');
   str = str.replace(/<br\s\/>/gi, '\n');
   str = str.replace(/<br\/>/gi, '\n');
 
-  //-- remove P and A tags but preserve what's inside of them
+  // Remove P and A tags but preserve what's inside of them
   str = str.replace(/<p.*>/gi, '\n');
   str = str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, ' $2 ($1)');
 
-  //-- remove all inside SCRIPT and STYLE tags
+  // Remove all inside SCRIPT and STYLE tags
   str = str.replace(
     /<script.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/script>/gi, '');
   str = str.replace(/<style.*>[\w\W]{1,}(.*?)[\w\W]{1,}<\/style>/gi,
     '');
-  //-- remove all else
+  // Remove all else
   str = str.replace(/<(?:.|\s)*?>/g, '');
 
-  //-- get rid of more than 2 multiple line breaks:
+  // Get rid of more than 2 multiple line breaks:
   str = str.replace(/(?:(?:\r\n|\r|\n)\s*){2,}/gim, '\n\n');
 
-  //-- get rid of more than 2 spaces:
+  // Get rid of more than 2 spaces:
   str = str.replace(/ +(?= )/g, '');
 
-  //-- return
+  // Return
   return str;
 }
 
+/**
+ * Pushes single objects into an array
+ *
+ * @param {Object} element - Object to push
+ * @return {Object} element - Array with the element
+*/
 function objectToArray(element) {
-
-  if (util.isArray(element) === false) {
-
+  if (!util.isArray(element)) {
     var aux = element;
     element = [];
     element.push(aux);
@@ -249,6 +252,12 @@ function objectToArray(element) {
   return element;
 }
 
+/**
+ * Adds the measurements units to the sensor's schema
+ *
+ * @param {Object} sensor - Sensor to add the units to
+ * @return {Object} sensor - Sensor with the units added
+*/
 function setSchemaUnits(sensor) {
   switch (sensor.additionalType) {
   case 'temperature':
@@ -265,8 +274,13 @@ function setSchemaUnits(sensor) {
   return sensor;
 }
 
+/**
+ * Converts restaurant Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function restaurantToSchema(element, date) {
-
   var restaurantSchemaElements = [
     'address',
     'department',
@@ -314,7 +328,6 @@ function restaurantToSchema(element, date) {
   var val;
 
   Object.keys(element).forEach(function(elementAttribute) {
-
     val = element[elementAttribute];
 
     if (restaurantSchemaElements.indexOf(elementAttribute) !== -1) {
@@ -357,8 +370,13 @@ function restaurantToSchema(element, date) {
   return sortObject(elementToSchema);
 }
 
+/**
+ * Converts review Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reviewToSchema(element) {
-
   var elementToSchema = {
     '@context': 'http://schema.org',
     '@type': REVIEW_TYPE,
@@ -386,8 +404,13 @@ function reviewToSchema(element) {
   return sortObject(elementToSchema);
 }
 
+/**
+ * Converts reservation Orion element into schema.org
+ *
+ * @param {Object} element - Object to convert
+ * @return {Object} elementToSchema - Object in schema.org format
+*/
 function reservationToSchema(element) {
-
   var elementToSchema = {
       '@context': 'http://schema.org',
       '@type': RESERVATION_TYPE,
@@ -411,42 +434,44 @@ function reservationToSchema(element) {
       },
       'reservationId': element.id
     };
-
   return sortObject(elementToSchema);
-
 }
 
+/**
+ * Convert elements with Orion format into schema.org ones
+ *
+ * @param {Object} element - Object to convert
+ * @param {String} date - Datetime
+ * @return {Object} newElement - Object in schema.org format
+*/
 function objectDataToSchema(element, date) {
-
   var newElement;
   var type = element.type;
-
   switch (type) {
-
-  case RESTAURANT_TYPE:
-
-    if (date) {
-      newElement = restaurantToSchema(element, date);
-    } else {
-      newElement = restaurantToSchema(element);
-    }
-    return newElement;
-
-  case REVIEW_TYPE:
-
-    newElement = reviewToSchema(element);
-    return newElement;
-
-  case RESERVATION_TYPE:
-
-    newElement = reservationToSchema(element);
-    return newElement;
-
-  default:
-    console.log('Undefined type received to convert');
+    case RESTAURANT_TYPE:
+      if (date) {
+        newElement = restaurantToSchema(element, date);
+      } else {
+        newElement = restaurantToSchema(element);
+      }
+      return newElement;
+    case REVIEW_TYPE:
+      newElement = reviewToSchema(element);
+      return newElement;
+    case RESERVATION_TYPE:
+      newElement = reservationToSchema(element);
+      return newElement;
+    default:
+      console.log('Undefined type received to convert');
   }
 }
 
+/**
+ * Order the object elements alphabetically
+ *
+ * @param {Object} element - Object to order
+ * @return {Object} sorted - Sorted object
+*/
 function sortObject(element) {
   var sorted = {};
   var key;
@@ -466,8 +491,15 @@ function sortObject(element) {
   return sorted;
 }
 
+/**
+ * Receives an element (or list of elements) and converts each
+ * element into Schema format
+ *
+ * @param {Object} listOfElements - Element or list of elements
+ * @param {String} date - Datetime
+ * @return {Object} newListOfElements - The new list with schema format
+*/
 function dataToSchema(listOfElements, date) {
-
   var newListOfElements = [];
   var newElement;
 
@@ -489,12 +521,11 @@ function dataToSchema(listOfElements, date) {
  * Completes the schemaObject address element
  *
  * @param {Object} schemaObject - Object to be added in Orion
- * @param {Object} geoObject - geocoder object
+ * @param {Object} geoObject - Geocoder object
  * @return {Object} schemaObject - The schemaObject with the
  *         fixed address
 */
 function completeAddress(schemaObject, geoObject) {
-
   if (geoObject) {
     if (geoObject.streetName && geoObject.streetNumber) {
       schemaObject.address.value.streetAddress =
@@ -522,6 +553,14 @@ function completeAddress(schemaObject, geoObject) {
   return schemaObject;
 }
 
+/**
+ * Completes the schemaObject location element
+ *
+ * @param {Object} schemaObject - Object to be added in Orion
+ * @param {Object} geoObject - Geocoder object
+ * @return {Object} schemaObject - The schemaObject with the
+ *         geocoder latitude and longitude
+*/
 function addGeolocation(schemaObject, geoObject) {
   if (geoObject) {
     schemaObject.location = {
@@ -532,8 +571,15 @@ function addGeolocation(schemaObject, geoObject) {
   return schemaObject;
 }
 
+/**
+ * Generate restaurant data model to be stored in Context Broker
+ *
+ * @param {Object} schemaObject - Object received
+ * @param {Object} geoObject - Geocoder object
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function restaurantToOrion(schemaObject, geoObject) {
-
   var objectToOrion = {
     'address': {
       'type': POSTAL_ADDRESS_TYPE,
@@ -593,8 +639,15 @@ function restaurantToOrion(schemaObject, geoObject) {
   return sortObject(objectToOrion);
 }
 
+/**
+ * Generate review data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reviewToOrion(userObject, schemaObject) {
-
   if (userObject) {
     var date = new Date().toISOString();
     var itemReviewed = fixedEncodeURIComponent(schemaObject.itemReviewed.name);
@@ -629,8 +682,15 @@ function reviewToOrion(userObject, schemaObject) {
   }
 }
 
+/**
+ * Generate reservation data model to be stored in Context Broker
+ *
+ * @param {Object} userObject - Object with the user information
+ * @param {Object} schemaObject - Object received
+ * @return {Object} objectToOrion - The objectToOrion with the
+ *         converted to Context Broker data model
+*/
 function reservationToOrion(userObject, schemaObject) {
-
   if (userObject) {
     var date = new Date(schemaObject.startTime).toISOString();
     var reservationFor = fixedEncodeURIComponent(
@@ -665,8 +725,14 @@ function reservationToOrion(userObject, schemaObject) {
   }
 }
 
+/**
+ * Generate a list of reservations of a Franchise
+ *
+ * @param {List} listOfRestaurants - Restaurants from a Franchise
+ * @param {List} listOfReservations - List of reservations
+ * @return {List} Contains all the reservations of the passed restaurants
+*/
 function getOrgReservations(listOfRestaurants, listOfReservations) {
-
   return objectToArray(listOfReservations).filter(
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
@@ -676,6 +742,16 @@ function getOrgReservations(listOfRestaurants, listOfReservations) {
   );
 }
 
+/**
+ * Wrapper to send requests (GET) against Orion
+ *
+ * @param {String} type - Element type (restaurant, review or reservation)
+ * @param {Object} element - Object received
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - QueryString to send
+ * @param {String} normalized - Normalized mode
+ * @return {Promise} Returns the request response
+*/
 function getListByType(type, element, headers, queryString, normalized) {
   var uri = '/v2/entities';
   var limit = 1000;
@@ -693,6 +769,16 @@ function getListByType(type, element, headers, queryString, normalized) {
   return authRequest(uri, 'GET', null, headers, queryString);
 }
 
+/**
+ * Wrapper to send requests against Orion
+ *
+ * @param {String} method - Method to use
+ * @param {Object} body - Body to send
+ * @param {String} identifier - Identifier of the entity
+ * @param {Object} headers - Headers to send
+ * @param {Object} queryString - QueryString to send
+ * @return {Promise} Returns the request response
+*/
 function sendRequest(method, body, identifier, headers, queryString) {
   var uri = '/v2/entities';
   if (identifier) {
@@ -704,6 +790,12 @@ function sendRequest(method, body, identifier, headers, queryString) {
   return authRequest(uri, method, body, headers, queryString);
 }
 
+/**
+ * Calculates the average of a given list
+ *
+ * @param {List} data - List with the elements to calculate
+ * @return {Integer} avg - The average of the elements list
+*/
 function getAverage(data) {
   var sum = data.reduce(function(sum, value) {
     return sum + value;
@@ -713,17 +805,20 @@ function getAverage(data) {
   return avg;
 }
 
+/**
+ * Generates an Element to be patched(updated) in a Restaurant
+ *
+ * @param {List} listOfReviews - List of the reviews
+ * @return {Object} newElement - The average element updated
+*/
 function getAggregateRating(listOfReviews) {
-
   var counter = 0;
   var ratingValues = [];
 
   listOfReviews = objectToArray(listOfReviews);
 
   listOfReviews.forEach(function(element) {
-
     if (element.reviewRating !== undefined) {
-
       ratingValues.push(element.reviewRating);
       counter++;
     }
@@ -737,10 +832,15 @@ function getAggregateRating(listOfReviews) {
       }
     }
   };
-
   return newElement;
 }
 
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} isoTimeString - Datetime
+ * @return {String} frameTime - String to filter
+*/
 function getTimeframe(isoTimeString) {
   var newDate = new Date(isoTimeString);
   var frame = newDate.getTime() - 60 * 60 * 2 * 1000;
@@ -749,6 +849,13 @@ function getTimeframe(isoTimeString) {
   return frameTime;
 }
 
+/**
+ * Generates a String with the sql sentence for date filtering
+ *
+ * @param {String} from - Datetime from
+ * @param {String} to - Datetime to
+ * @return {String} frameTime - String to filter
+*/
 function getTimeBetweenDates(from, to) {
   var fromTimestamp = new Date(from).toISOString();
   var toTimestamp = new Date(to).toISOString();
@@ -756,8 +863,13 @@ function getTimeBetweenDates(from, to) {
   return frameTime;
 }
 
+/**
+ * Calculates the sum of the occupancyLevels
+ *
+ * @param {List} listOfReservations - Reservations list
+ * @return {Integer} occupancyLevels - The occupancyLevels
+*/
 function getOccupancyLevels(listOfReservations) {
-
   var occupancyLevels = 0;
 
   listOfReservations.forEach(function(element) {
@@ -767,6 +879,13 @@ function getOccupancyLevels(listOfReservations) {
   return occupancyLevels;
 }
 
+/**
+ * Generates an occupancyLevels object
+ *
+ * @param {Integer} occupancyLevel - The occupancyLevels
+ * @param {Date} date - Date object
+ * @return {Object} occupancyObject - Object to update a Restaurant
+*/
 function createOccupancyObject(occupancyLevel, date) {
   var occupancyObject = {
     'occupancyLevels': {
@@ -783,12 +902,26 @@ function createOccupancyObject(occupancyLevel, date) {
   return occupancyObject;
 }
 
+/**
+ * Generates an occupancyLevels object to update a Restaurant
+ *
+ * @param {List} listOfReservations - Reservations list
+ * @param {Date} date - Date object
+ * @return {Object} occupancyLevelsObj - Object to update a Restaurant
+*/
 function updateOccupancyLevels(listOfReservations, date) {
   var occupancyLevels = getOccupancyLevels(listOfReservations);
   var occupancyLevelsObj = createOccupancyObject(occupancyLevels, date);
   return occupancyLevelsObj;
 }
 
+/**
+ * Generates an sha1 identifier
+ *
+ * @param {String} name - Element name
+ * @param {Date} date - Date object
+ * @return {String} id - Identifier based in the parameters
+*/
 function generateId(name, date) {
   var id;
   var inputEncoding;
@@ -803,6 +936,15 @@ function generateId(name, date) {
   return id;
 }
 
+/**
+ * Wrapper function to generate sql (Simple Query Languange) elements
+ *
+ * @param {List} listOfConditions - Conditions
+ * @param {String} key - Key to filter
+ * @param {String} operator - Operator for the matching
+ * @param {String} value - Value
+ * @return {List} listOfConditions - Updated list of conditions
+*/
 function addConditionToQuery(listOfConditions, key, operator, value) {
   var condition;
 
@@ -820,6 +962,13 @@ function addConditionToQuery(listOfConditions, key, operator, value) {
   return listOfConditions;
 }
 
+/**
+ * Adds the fiware-servicepath to the headers
+ *
+ * @param {Object} headers - Headers of the request
+ * @param {String} department - Fiware-servicepath (FranchiseX)
+ * @return {Object} fiwareHeaders - Updated headers
+*/
 function completeHeaders(headers, department) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
   if (department) {
@@ -828,6 +977,12 @@ function completeHeaders(headers, department) {
   return fiwareHeaders;
 }
 
+/**
+ * Removes the fiware-servicepath for reviews and restaurants
+ *
+ * @param {Object} headers - Headers of the request
+ * @return {Object} fiwareHeaders - Updated headers
+*/
 function removeServicePath(headers) {
   var fiwareHeaders = JSON.parse(JSON.stringify(headers));
   if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
@@ -836,6 +991,12 @@ function removeServicePath(headers) {
   return fiwareHeaders;
 }
 
+/**
+ * Send the response object in schema.org format
+ *
+ * @param {Object} data - Object from Orion
+ * @param {Object} res - Response to send
+*/
 function returnResponse(data, res, date) {
   res.statusCode = data.statusCode;
   res.headers = data.headers;
@@ -846,6 +1007,12 @@ function returnResponse(data, res, date) {
   }
 }
 
+/**
+ * Send the response error
+ *
+ * @param {Object} err - Error object
+ * @param {Object} res - Response to send
+*/
 function responseError(err, res) {
   res.statusCode = err.statusCode;
   res.headers = err.headers;
@@ -858,6 +1025,13 @@ function responseError(err, res) {
   }
 }
 
+/**
+ * Send the response from a POST request
+ *
+ * @param {Object} data - Data object
+ * @param {String} element - Element added
+ * @param {Object} res - Response to send
+*/
 function responsePost(data, element, res) {
   res.headers = data.headers;
   if (element.type === 'Restaurant') {
@@ -871,6 +1045,12 @@ function responsePost(data, element, res) {
   res.end();
 }
 
+/**
+ * Send error response when the schema is invalid
+ *
+ * @param {Object} res - Response to send
+ * @param {Object} tv4 - Schema validator object
+*/
 function returnInvalidSchema(res, tv4) {
   res.statusCode = 400;
   res.json({
@@ -884,6 +1064,11 @@ function returnInvalidSchema(res, tv4) {
   });
 }
 
+/**
+ * Send error response when the resource is forbidden
+ *
+ * @param {Object} res - Response to send
+*/
 function returnForbidden(res) {
   res.statusCode = 403;
   res.json({
@@ -895,6 +1080,11 @@ function returnForbidden(res) {
   });
 }
 
+/**
+ * Send error response when there's a conflict
+ *
+ * @param {Object} res - Response to send
+*/
 function returnConflict(res) {
   res.statusCode = 409;
   res.json({
@@ -908,7 +1098,6 @@ function returnConflict(res) {
 
 module.exports = {
   doGet: doGet,
-  doPost: doPost,
   replaceOnceUsingDictionary: replaceOnceUsingDictionary,
   randomIntInc: randomIntInc,
   randomElement: randomElement,

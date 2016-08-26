@@ -10,6 +10,10 @@
 
 // jshint node: true
 
+/*
+ * Defines the Restaurant schema that the API should receive
+ * at /api/orion/restaurant for a restaurant generation
+*/
 module.exports.restaurant = {
   '$schema': 'http://json-schema.org/draft-04/schema#',
   'title': 'Restaurant',
@@ -127,6 +131,10 @@ module.exports.restaurant = {
   ]
 };
 
+/*
+ * Defines the Reservation schema that the API should receive
+ * at /api/orion/reservation for a reservation generation
+*/
 module.exports.reservation = {
   '$schema': 'http://json-schema.org/draft-04/schema#',
   'title': 'Reservation',
@@ -165,6 +173,10 @@ module.exports.reservation = {
   'required': ['@type', 'partySize', 'startTime', 'reservationFor']
 };
 
+/*
+ * Defines the Review schema that the API should receive
+ * at /api/orion/review for a review generation
+*/
 module.exports.review = {
   '$schema': 'http://json-schema.org/draft-04/schema#',
   'title': 'Review',

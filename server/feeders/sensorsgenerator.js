@@ -22,10 +22,6 @@ var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 
-var restaurantsData;
-var sensorsAdded = 0;
-var sensorsInitialized = 0;
-
 /* There will be 4 sensors for each restaurant:
  * - Temperature of the Kitchen
  * - Temperature of the Dining room
@@ -33,12 +29,18 @@ var sensorsInitialized = 0;
  * - Humidity of the Dining room
  */
 
-var sensorsPerRestaurant = 4;
 var sensorTypes = ['temperature', 'relativeHumidity'];
 var sensorRooms = ['kitchen', 'dining'];
+var sensorsPerRestaurant = sensorTypes.length * sensorRooms.length;
 
-var feedIDASSensors = function() {
-
+/**
+ * Create the sensors for each restaurant.
+ *
+ * @param {Array} restaurantsData - list of restaurants to process.
+*/
+function feedIDASSensors(restaurantsData) {
+  var sensorsAdded = 0;
+  var sensorsInitialized = 0;
   var totalSensors = restaurantsData.length * sensorsPerRestaurant;
 
   console.log('Registering sensors on IDAS.');
@@ -66,27 +68,20 @@ var feedIDASSensors = function() {
       });
     });
   });
-};
-
-// Load restaurant data from Orion
-var loadRestaurantData = function() {
-
-  // Generate the sensors once we have all restaurant data
-  var processRestaurants = function(data) {
-    restaurantsData = JSON.parse(JSON.stringify(data.body));
-    feedIDASSensors();
-  };
-
-  utils.getListByType('Restaurant', null, fiwareHeaders)
-  .then(processRestaurants)
-  .catch(function(err) {
-    console.log(err);
-  });
-};
+}
 
 console.log('Generating sensors for restaurants...');
 
 idas.createService()
-  .done(function(response) {
-    loadRestaurantData();
+  .then(function(response) {
+    // Get all the restaurants from Orion.
+    return utils.getListByType('Restaurant', null, fiwareHeaders);
+  })
+  .then(function(data) {
+    // Generate the sensors
+    var restaurantsData = JSON.parse(JSON.stringify(data.body));
+    feedIDASSensors(restaurantsData);
+  })
+  .catch(function(err) {
+    console.error(err);
   });

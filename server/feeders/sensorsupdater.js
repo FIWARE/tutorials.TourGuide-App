@@ -22,9 +22,6 @@ var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 
-var restaurantsData;
-var sensorsUpdated = 0;
-
 /* There will be 4 sensors for each restaurant:
  * - Temperature of the Kitchen
  * - Temperature of the Dining room
@@ -32,18 +29,23 @@ var sensorsUpdated = 0;
  * - Humidity of the Dining room
  */
 
-var sensorsPerRestaurant = 4;
 var sensorTypes = ['temperature', 'relativeHumidity'];
 var sensorRooms = ['kitchen', 'dining'];
+var sensorsPerRestaurant = sensorTypes.length * sensorRooms.length;
 
-var feedIDASSensors = function() {
-
+/**
+ * Update the sensors data for each restaurant.
+ *
+ * @param {Array} restaurantsData - List of restaurants to process.
+*/
+function feedIDASSensors(restaurantsData) {
+  var sensorsUpdated = 0;
   var totalSensors = restaurantsData.length * sensorsPerRestaurant;
 
-  console.log('Registering sensors on IDAS.');
+  console.log('Updating sensors on IDAS.');
   console.log('Number of restaurants: ' + restaurantsData.length);
 
-  // For each restaurant, generate a new sensors
+  // For each restaurant, update the sensors data (if sensor exists)
   restaurantsData.forEach(function(restaurant) {
     sensorRooms.forEach(function(room) {
       sensorTypes.forEach(function(type) {
@@ -66,8 +68,15 @@ var feedIDASSensors = function() {
       });
     });
   });
-};
+}
 
+/**
+ * Generates a new sensor value using the old value as base.
+ *
+ * @param {Number} oldValue - Old value of the sensor.
+ * @param {String} type - Sensor type.
+ * @return {Number} newValue - New sensor value.
+*/
 function generateRandomValue(oldValue, type) {
   var newValue;
   var MIN = 0;
@@ -99,22 +108,15 @@ function generateRandomValue(oldValue, type) {
   return newValue;
 }
 
-// Load restaurant data from Orion
-var loadRestaurantData = function() {
-
-  // Generate the sensors once we have all restaurant data
-  var processRestaurants = function(data) {
-    restaurantsData = JSON.parse(JSON.stringify(data.body));
-    feedIDASSensors();
-  };
-
-  utils.getListByType('Restaurant', null, fiwareHeaders)
-  .then(processRestaurants)
-  .catch(function(err) {
-    console.log(err);
-  });
-};
-
 console.log('Updating restaurant sensors...');
 
-loadRestaurantData();
+// Get all the restaurants from Orion.
+utils.getListByType('Restaurant', null, fiwareHeaders)
+  .then(function(data) {
+    // Update the sensors
+    var restaurantsData = JSON.parse(JSON.stringify(data.body));
+    feedIDASSensors(restaurantsData);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });

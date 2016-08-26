@@ -21,16 +21,25 @@ var port = 1026;
 
 module.exports = performRequest;
 
+/**
+ * Helper function to perform requests against Orion
+ *
+ * @param {Object} endpoint - Endpoint to perform the request
+ * @param {Object} method - HTTP method to use
+ * @param {Object} data - Data to send
+ * @param {Object} fiwareHeaders - Headers to use
+ * @param {Object} querystring - querystring data
+ * @return {Promise} promise with the result of the request
+*/
 function performRequest(endpoint, method, data, fiwareHeaders, querystring) {
-
   var deferred = Q.defer();
   var headers = {};
 
-  if (typeof fiwareHeaders !== 'undefined') {
-    if (typeof fiwareHeaders['fiware-service'] !== 'undefined') {
+  if (fiwareHeaders) {
+    if (fiwareHeaders['fiware-service']) {
       headers['fiware-service'] = fiwareHeaders['fiware-service'];
     }
-    if (typeof fiwareHeaders['fiware-servicepath'] !== 'undefined') {
+    if (fiwareHeaders['fiware-servicepath']) {
       headers['fiware-servicepath'] = fiwareHeaders['fiware-servicepath'];
     }
   }
@@ -48,22 +57,22 @@ function performRequest(endpoint, method, data, fiwareHeaders, querystring) {
   }
 
   switch (method) {
-  case 'GET':
-    options.method = 'GET';
-    break;
-  case 'POST':
-    options.method = 'POST';
-    options.body = data;
-    break;
-  case 'PATCH':
-    options.method = 'PATCH';
-    options.body = data;
-    break;
-  case 'DELETE':
-    options.method = 'DELETE';
-    break;
-  default:
-    deferred.reject('The requested method is not available');
+    case 'GET':
+      options.method = 'GET';
+      break;
+    case 'POST':
+      options.method = 'POST';
+      options.body = data;
+      break;
+    case 'PATCH':
+      options.method = 'PATCH';
+      options.body = data;
+      break;
+    case 'DELETE':
+      options.method = 'DELETE';
+      break;
+    default:
+      deferred.reject('The requested method is not available');
   }
 
   var req = rp(options)

@@ -46,7 +46,7 @@ var feedOrionReservations = function() {
     utils.sendRequest('POST', attributes, null, fiwareHeaders)
     .then(callback)
     .catch(function(err) {
-      console.log(err);
+      console.error(err);
     });
   }, apiRestSimtasks);
 
@@ -105,7 +105,7 @@ var loadRestaurantData = function() {
   utils.getListByType('Restaurant',null,fiwareHeaders)
   .then(processRestaurants)
   .catch(function(err) {
-    console.log(err);
+    console.error(err);
   });
 };
 

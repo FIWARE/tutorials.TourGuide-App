@@ -33,8 +33,16 @@ tv4.addSchema('restaurant', schema.restaurant);
 tv4.addSchema('reservation', schema.reservation);
 tv4.addSchema('review', schema.review);
 
-// Restaurants
+/**
+ * Restaurants
+*/
 
+/**
+ * Function used to POST at /api/orion/restaurant and generate a Restaurant
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.createRestaurant = function(req, res) {
   var elementToOrion = req.body;
   var validSchema = tv4.validate(elementToOrion, 'restaurant');
@@ -57,6 +65,12 @@ exports.createRestaurant = function(req, res) {
   }
 };
 
+/**
+ * Function used to GET a restaurant at /api/orion/restaurant/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.readRestaurant = function(req, res) {
   var occupancyLevelsObject;
   var servicePath;
@@ -93,6 +107,13 @@ exports.readRestaurant = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a restaurant with a given date
+ * at /api/orion/restaurant/:id/date/:date
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.readRestaurantWithDate = function(req, res) {
   var occupancyLevelsObject;
   var servicePath;
@@ -126,6 +147,12 @@ exports.readRestaurantWithDate = function(req, res) {
   });
 };
 
+/**
+ * Function used to PATCH a restaurant at /api/orion/restaurant/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.updateRestaurant = function(req, res) {
   var queryString = {'options': 'keyValues'};
   var restaurantId = utils.generateId(req.params.id);
@@ -138,6 +165,12 @@ exports.updateRestaurant = function(req, res) {
   });
 };
 
+/**
+ * Function used to DELETE a restaurant at /api/orion/restaurant/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.deleteRestaurant = function(req, res) {
   var restaurantId = utils.generateId(req.params.id);
   utils.sendRequest('DELETE', null, restaurantId, req.headers)
@@ -149,6 +182,12 @@ exports.deleteRestaurant = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of restaurants at /api/orion/restaurants
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getRestaurants = function(req, res) {
   utils.getListByType(RESTAURANT_TYPE, null, req.headers)
   .then(function(restaurants) {
@@ -159,6 +198,13 @@ exports.getRestaurants = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of restaurants with a given organization
+ * at /api/orion/restaurants/organization/:org
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getOrganizationRestaurants = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -173,8 +219,16 @@ exports.getOrganizationRestaurants = function(req, res) {
   });
 };
 
-// Reviews
+/**
+ * Reviews
+*/
 
+/**
+ * Function used to POST at /api/orion/review and generate a Review
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
   var restaurantName = elementToOrion.itemReviewed.name;
@@ -220,6 +274,12 @@ exports.createReview = function(req, res) {
   }
 };
 
+/**
+ * Function used to GET a review at /api/orion/review/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.readReview = function(req, res) {
   var reviewId = req.params.id;
   utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
@@ -231,6 +291,12 @@ exports.readReview = function(req, res) {
   });
 };
 
+/**
+ * Function used to PATCH a review at /api/orion/review/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.updateReview = function(req, res) {
   var reviewId = req.params.id;
   var restaurantName;
@@ -284,6 +350,12 @@ exports.updateReview = function(req, res) {
   });
 };
 
+/**
+ * Function used to DELETE a review at /api/orion/review/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.deleteReview = function(req, res) {
   var restaurantName;
   var restaurantId;
@@ -324,6 +396,12 @@ exports.deleteReview = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews at /api/orion/reviews
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getReviews = function(req, res) {
   utils.getListByType(REVIEW_TYPE, null, req.headers)
   .then(function(reviews) {
@@ -334,6 +412,13 @@ exports.getReviews = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews of a given user
+ * at /api/orion/reviews/user/:user
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getUserReviews = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -348,6 +433,13 @@ exports.getUserReviews = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews of a given restaurant
+ * at /api/orion/reviews/restaurant/:restaurant
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getRestaurantReviews = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -363,6 +455,13 @@ exports.getRestaurantReviews = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews of a given organization
+ * at /api/orion/reviews/organization/:org
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getOrganizationReviews = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -377,8 +476,16 @@ exports.getOrganizationReviews = function(req, res) {
   });
 };
 
-// Reservations
+/**
+ * Reservations
+*/
 
+/**
+ * Function used to POST at /api/orion/reservation and generate a Reservation
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.createReservation = function(req, res) {
   var elementToOrion = req.body;
   var restaurantReservations;
@@ -428,6 +535,12 @@ exports.createReservation = function(req, res) {
   }
 };
 
+/**
+ * Function used to GET a reservation at /api/orion/reservation/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.readReservation = function(req, res) {
   var reservationId = req.params.id;
   utils.getListByType(RESERVATION_TYPE, reservationId, req.headers)
@@ -439,6 +552,12 @@ exports.readReservation = function(req, res) {
   });
 };
 
+/**
+ * Function used to PATCH a review at /api/orion/review/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.updateReservation = function(req, res) {
   var restaurantName;
   var userId;
@@ -468,6 +587,12 @@ exports.updateReservation = function(req, res) {
   });
 };
 
+/**
+ * Function used to DELETE a reservation at /api/orion/reservation/:id
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.deleteReservation = function(req, res) {
   var reservationId = req.params.id;
   utils.sendRequest('DELETE', null, reservationId, req.headers)
@@ -479,6 +604,12 @@ exports.deleteReservation = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reservations at /api/orion/reservations
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getReservations = function(req, res) {
   utils.getListByType(RESERVATION_TYPE, null, req.headers)
   .then(function(reservations) {
@@ -489,6 +620,13 @@ exports.getReservations = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reservations of a given user
+ * at /api/orion/reservations/user/:user
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getUserReservations = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -503,6 +641,13 @@ exports.getUserReservations = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reservations of a given restaurant
+ * at /api/orion/reservations/restaurant/:restaurant
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getRestaurantReservations = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -518,6 +663,13 @@ exports.getRestaurantReservations = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews of a given organization
+ * at /api/orion/reservations/organization/:org
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getOrganizationReservations = function(req, res) {
   var filter = [];
   var queryString = {};
@@ -541,6 +693,13 @@ exports.getOrganizationReservations = function(req, res) {
   });
 };
 
+/**
+ * Function used to GET a list of reviews of a given restaurant and date
+ * at /api/orion/reservations/restaurant/:restaurant/from/:from/to/:to
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getReservationsByDate = function(req, res) {
   var timeframe = utils.getTimeBetweenDates(req.params.from, req.params.to);
   var filter = [];

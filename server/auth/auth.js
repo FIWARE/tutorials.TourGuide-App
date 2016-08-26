@@ -31,12 +31,15 @@ var oauth = new OAuth2(clientId,
   '/oauth2/token',
   callbackURL);
 
-// This is the callback url for the application.  The IdM will
-// redirect the user here after a successful authentication
+/**
+ * Function to login a user against IDM
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.login = function(req, res) {
   // Using the access code goes again to the IDM to obtain the accessToken
   oauth.getOAuthAccessToken(req.query.code, function(e, results) {
-
     if (results === undefined) {
       res.status(404);
       res.send('Auth token not received in results.');
@@ -53,13 +56,23 @@ exports.login = function(req, res) {
   });
 };
 
-// Redirect the user to the IdM for authentication
+/**
+ * Redirect the user to the IdM for OAuth authentication
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.auth = function(req, res) {
   var path = oauth.getAuthorizeUrl(responseType);
   res.redirect(path);
 };
 
-// Logout from the application
+/**
+ * Logout from the application
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.logout = function(req, res) {
   // jshint camelcase: false
   // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
@@ -69,6 +82,12 @@ exports.logout = function(req, res) {
   res.redirect('/');
 };
 
+/**
+ * Receives information regarding the user
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+*/
 exports.getUserData = function(req, res) {
   var url = idmURL + '/user/';
   var user = null;
@@ -89,6 +108,13 @@ exports.getUserData = function(req, res) {
   );
 };
 
+/**
+ * Validates the token being used in every request
+ *
+ * @param {Object} req - Request received
+ * @param {Object} res - Response
+ * @param {Object} next - Next element
+*/
 exports.validateRequest = function(req, res, next) {
   var url = idmURL + '/user/';
   var user = null;
@@ -113,6 +139,12 @@ exports.validateRequest = function(req, res, next) {
   );
 };
 
+/**
+ * Receives information regarding the user using promises
+ *
+ * @param {Object} req - Request received
+ * @return {Promise} returns the user data using promises
+*/
 exports.getUserDataPromise = function(req) {
   var url = idmURL + '/user/';
   var user = null;

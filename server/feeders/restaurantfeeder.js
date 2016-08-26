@@ -85,15 +85,15 @@ var feedOrionRestaurants = function() {
           utils.sendRequest('POST', attributes, null, fwHeaders)
           .then(callback(null))
           .catch(function(err) {
-            console.log(err);
+            console.error(err);
           });
         })
          .catch(function(err) {
-          console.log(err);
+          console.error(err);
           utils.sendRequest('POST', attributes, null, fwHeaders)
           .then(callback(null))
           .catch(function(err) {
-            console.log(err);
+            console.error(err);
           });
         });
        }, geoWaitTimeMs);
