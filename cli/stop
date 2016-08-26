@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+#  stop
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  stop command for TourGuide CLI.
+#
+
+remove_containers=0
+
+function module_help () {
+    cat <<EOF >&2
+Usage: ${appname} stop [-h | --help] [-r | --remove]
+
+Stops all the services currently running.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -r  --remove               Remove docker containers after stopping them.
+                             Default is NOT to remove the containers.
+
+EOF
+    exit 0
+}
+
+function module_options () {
+    TEMP=`getopt -o hr -l help,remove -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        module_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            "-r" | "--remove")
+                remove_containers=1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+}
+
+function module_cmd () {
+    module_options "$@"
+    docker-compose stop
+    if [ $remove_containers -eq 1 ] ; then
+        docker-compose rm -f -v
+    fi
+}
