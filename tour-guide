@@ -1,0 +1,113 @@
+#!/bin/bash
+#
+#  tour-guide
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  CLI to configure and interact with TourGuide-App.
+#
+
+version="0.1"
+appname=$( basename $0 )
+app="TourGuide CLI"
+compose="$( dirname $0 )/docker-compose.yml"
+modules_dir="$( dirname $0 )/cli"
+fiware_service="tourguide"
+container_prefix=""
+available_commands=(
+    "version"
+    "help"
+    "check"
+    "start"
+    "stop"
+    "load"
+    "oauth-token"
+    "configure"
+    "sensors"
+    )
+
+function show_version () {
+    cat <<EOF >&2
+${app} version ${version}
+EOF
+    exit 0
+}
+
+function show_help () {
+    cat <<EOF >&2
+Usage: ${appname} [-h | --help] [-v | --version] [-d | --debug] [-t | --test] <command> [<args>]
+
+Options:
+
+  -h  --help                 Show this help.
+  -v  --version              Show program version.
+  -d  --debug                Print extra info when running this script.
+  -t  --test                 Add 'test_' prefix to container names.
+                             Use this when running the test suite.
+
+Available commands:
+
+  start                      Start a service.
+  stop                       Stop services.
+  configure                  Configure a service.
+  load                       Load example data.
+  sensors                    Sensors related commands (create, list, simulate data).
+  check                      Check for the presence of the required commands.
+  oauth-token                Get the OAuth token for a user.
+
+  help                       Show this help (shortcut for --help).
+  version                    Show program version (shortcut for --version).
+
+Use '${appname} <command> --help' to get help about a specific <command>.
+
+EOF
+    exit 0
+}
+
+function not_implemented () {
+    echo "Command not implemented yet."
+    show_help
+}
+
+function cmd_help () {
+    show_help
+}
+
+function cmd_version () {
+    show_version
+}
+
+while true ; do
+    command="$1"
+    case "${command}" in
+        "" | "-h" | "--help" | "help")
+            show_help
+            ;;
+        "-v" | "--version" | "version")
+            show_version
+            ;;
+        "-d" | "--debug")
+            set -x
+            ;;
+        "-t" | "--test")
+            container_prefix="test_"
+            ;;
+        *)
+            shift
+            if [ -e "${modules_dir}/${command}" ] ; then
+                source "${modules_dir}/${command}"
+                module_cmd "$@"
+            else
+                if [[ ${available_commands[*]} =~ ${command} ]] ; then
+                    not_implemented
+                else
+                    echo "Unknown command: ${command}"
+                    show_help
+                fi
+            fi
+            break
+            ;;
+    esac
+    shift
+done
