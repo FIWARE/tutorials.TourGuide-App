@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+#  sensors_send-data
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  sensors send-data subcommand for TourGuide CLI.
+#
+
+sensors_id=""
+sensors_ul20=""
+idas_host="localhost"
+idas_ul20_port="7896"
+idas_api_key="tourguide-devices"
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} sensors send-data [-h | --help] [-i <sensorId> | --sensor-id <sensorId>]
+                                    [ -d <ul20-string> | --data <ul20-string> ]
+
+Send a single measurement for a specific sensor using a Ultralight 2.0 string.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Required parameters:
+
+  -i  --sensor-id  <sensorId>     The sensor Id to modify.  The Id format is '<restaurantId>-<room>-<type>', with
+                                  <restaurantId> being the Id of the restaurant where the sensor is located,
+                                  <room> the room of the restaurant: kitchen, diner,
+                                  <type> the type of the sensor: temperature, relativeHumidity.
+  -d  --data <ul20-string>        The string to send with the new measurement.  Examples of this are:
+                                  't|20' for temperature (20 C),
+                                  'h|0.4' for relativeHumidity (40%).
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hi:d: -l help,sensor-id:,data: -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-i" | "--sensor-id" )
+                shift
+                sensors_id=$1
+                ;;
+            "-d" | "--data" )
+                shift
+                sensors_ul20=$1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        submodule_help
+    fi
+
+    local missing_parameters=0
+    [ -z "${sensors_id}" ] && echo "Missing parameter '--sensor-id'." && missing_parameters=1
+    [ -z "${sensors_ul20}" ] && echo "Missing parameter '--data'." && missing_parameters=1
+
+    [ ${missing_parameters} -ne 0 ] && submodule_help
+}
+
+function submodule_cmd () {
+    submodule_options "$@"
+
+    # get restaurant id from sensor id
+    restaurant_id=$( echo ${sensors_id} | cut -d "-" -f 1 )
+
+    # get fiware-servicepath for the restaurant
+    fiware_servicepath=$( curl --silent \
+                               --show-error \
+                               --header "Fiware-Service: ${fiware_service}" \
+                               --header "Accept: text/plain" \
+                               "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" )
+
+    curl --request POST \
+         --header "Content-Type: text/plain" \
+         --header "Fiware-Service: ${fiware_service}" \
+         --header "Fiware-ServicePath: /${fiware_servicepath}" \
+         --header "X-Auth-Token: NULL" \
+         --data "${sensors_ul20}" \
+         "http://${idas_host}:${idas_ul20_port}/iot/d?k=${idas_api_key}&i=${sensors_id}"
+}

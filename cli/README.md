@@ -63,13 +63,23 @@ Get the OAuth token for a specific user.  This may be needed to make requests vi
 
 ### sensors ###
 
+Sensors related commands.
+
 #### sensors create ####
+
+Create and initialize sensors for all the restaurants available in the application.
 
 #### sensors update ####
 
+Update all the restaurant sensors measurements.  This will simulate all the available sensors sending new measurements.
+
 #### sensors send-data ####
 
+Send a single measurement for a specific sensor using a Ultralight 2.0 string.
+
 #### sensors simulate-data ####
+
+Simulate a sensor periodically sending data.
 
 ### start ###
 
