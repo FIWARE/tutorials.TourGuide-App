@@ -93,12 +93,12 @@ function submodule_cmd () {
                                --header "Fiware-Service: ${fiware_service}" \
                                --header "Accept: text/plain" \
                                "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" )
-
+    local api_key="${idas_api_key}-${fiware_servicepath}"
     curl --request POST \
          --header "Content-Type: text/plain" \
          --header "Fiware-Service: ${fiware_service}" \
          --header "Fiware-ServicePath: /${fiware_servicepath}" \
          --header "X-Auth-Token: NULL" \
          --data "${sensors_ul20}" \
-         "http://${idas_host}:${idas_ul20_port}/iot/d?k=${idas_api_key}&i=${sensors_id}"
+         "http://${idas_host}:${idas_ul20_port}/iot/d?k=${api_key}&i=${sensors_id}"
 }

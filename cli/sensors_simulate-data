@@ -155,6 +155,7 @@ function submodule_cmd () {
                                --header "Fiware-Service: ${fiware_service}" \
                                --header "Accept: text/plain" \
                                "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" )
+    local api_key="${idas_api_key}-${fiware_servicepath}"
 
     while true ; do
         local old_value=$( sensor_get_old_value ${restaurant_id} ${room} ${sensors_type} )
@@ -181,7 +182,7 @@ function submodule_cmd () {
              --header "Fiware-ServicePath: ${fiware_servicepath}" \
              --header "X-Auth-Token: NULL" \
              --data "${sensors_ul20}" \
-             "http://${idas_host}:${idas_ul20_port}/iot/d?k=${idas_api_key}&i=${sensors_id}"
+             "http://${idas_host}:${idas_ul20_port}/iot/d?k=${api_key}&i=${sensors_id}"
 
         echo "sensor: ${sensors_id} | value: ${sensors_ul20}"
 
