@@ -7,7 +7,7 @@ mongodb:
     command: --smallfiles
 
 orion:
-    image: fiware/orion:latest
+    image: fiware/orion:1.2.1
     hostname: orion
     container_name: orion
     links:
@@ -40,7 +40,7 @@ keyrock:
         - AUTHZFORCE_VERSION=4.4.1b
 
 idas:
-    image: fiware/iotagent-ul:develop
+    image: fiware/iotagent-ul:1.1.7
     hostname: idas
     container_name: idas
     links:
@@ -78,7 +78,7 @@ mysql:
         - MYSQL_ROOT_PASSWORD=mysql
 
 cygnus:
-    image: fiware/cygnus-ngsi:develop
+    image: fiware/cygnus-ngsi:1.2.0
     hostname: cygnus
     container_name: cygnus
     links:
@@ -91,7 +91,7 @@ cygnus:
         - CYGNUS_MYSQL_PASS=mysql
 
 tourguide:
-    image: fiware/tutorials.tourguide-app:latest
+    image: fiware/tutorials.tourguide-app:0.6
     hostname: tourguide
     container_name: tourguide
     links:
