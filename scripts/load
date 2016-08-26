@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+#  load
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  load command for TourGuide CLI.
+#
+
+load_command=""
+
+function module_help () {
+    cat <<EOF >&2
+Usage: ${appname} load [-h | --help] <data-type> <options>
+
+Load sample data into TourGuide-App.
+
+Available data options:
+
+  restaurants                Load sample restaurants.
+  reservations               Generate random reservations for the restaurants.
+  reviews                    Generate random reviews for the restaurants.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+Use '${appname} load <data-type> --help' to get help about a specific <data-type> option.
+
+EOF
+    exit 0
+}
+
+function module_options () {
+    if [ $# -lt 1 ]; then
+        module_help
+    else
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            "restaurants"|"reservations"|"reviews")
+                load_command="$1"
+                shift
+                ;;
+            "-"*)
+                echo "Unknown parameter: $1"
+                module_help
+                ;;
+            *)
+                echo "Unknown command: $1"
+                module_help
+                ;;
+        esac
+    fi
+}
+
+function module_cmd () {
+    module_options "$@"
+    shift
+    if [ -e "${modules_dir}/${command}_${load_command}" ] ; then
+        source "${modules_dir}/${command}_${load_command}"
+        submodule_cmd "$@"
+    fi
+}

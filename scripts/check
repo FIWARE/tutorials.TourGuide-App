@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+#  check
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  check command for TourGuide CLI.
+#
+
+function module_help () {
+    cat <<EOF >&2
+Usage: ${appname} check [-h | --help]
+
+Check for the presence of the following commands:
+
+ * docker
+ * docker-compose
+ * curl (for some sensors commands)
+ * bc (for some sensors commands)
+ * nc (netcat)
+
+Command options:
+
+  -h  --help                 Show this help.
+
+EOF
+    exit 0
+}
+
+function module_options () {
+    TEMP=`getopt -o h -l help -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        module_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                module_help
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+}
+
+function check_cmd () {
+    echo -ne " * $1: "
+
+    $@ >/dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+        echo "Found."
+    else
+        ok=0
+        echo "Not found."
+    fi
+}
+
+function module_cmd () {
+    local ok=1
+    module_options "$@"
+
+    echo "Checking for the required commands:"
+    echo ""
+
+    check_cmd docker --version
+    check_cmd docker-compose --version
+    check_cmd curl --version
+    check_cmd bc --version
+    check_cmd nc -h
+
+    echo ""
+    if [ ${ok} -eq 0 ]; then
+        echo "Some required commands could not be found."
+        echo "Please, make sure all the above commands are installed and available."
+        exit 1
+    else
+        echo "All required commands found."
+    fi
+}
