@@ -81,9 +81,12 @@ function submodule_options () {
         submodule_help
     fi
 
-    [ ${limit} -gt 0 ] && feeder_params="${feeder_params} --numberOfReviews ${limit}"
-    [ ! -z "${restaurant_name}" ] && feeder_params="${feeder_params} --restaurant '${restaurant_name}'"
-    [ ! -z "${organization_name}" ] && feeder_params="${feeder_params} --organization '${organization_name}'"
+    [ ${limit} -gt 0 ] &&
+        feeder_params="${feeder_params} --numberOfReviews ${limit}"
+    [ ! -z "${restaurant_name}" ] &&
+        feeder_params="${feeder_params} --restaurant '${restaurant_name}'"
+    [ ! -z "${organization_name}" ] &&
+        feeder_params="${feeder_params} --organization '${organization_name}'"
 }
 
 function submodule_cmd () {
@@ -95,7 +98,8 @@ function submodule_cmd () {
 
     while [ true ]; do
         echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
-        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+        if ( docker logs ${_container_name} 2>&1 |
+                 grep -qE "service apache2 reload" ) ; then
             echo "OK."
             _started=1
         fi
@@ -110,7 +114,9 @@ function submodule_cmd () {
     done
 
     if [ ${_started} -eq 1 ]; then
-        docker exec -i -t ${_container_name} /bin/bash -c "cd tutorials.TourGuide-App/server/feeders; node reviewsgenerator.js ${feeder_params}"
+        docker exec -i -t ${_container_name} /bin/bash -c \
+               "cd tutorials.TourGuide-App/server/feeders; \
+               node reviewsgenerator.js ${feeder_params}"
     else
         echo "Not ready."
         echo "Stopping."
