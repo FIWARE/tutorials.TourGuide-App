@@ -67,16 +67,13 @@ def test_data(keystone_path='./keystone/'):
         users.append(_register_user(keystone, username + str(i)))
 
     # Register pepProxy user
-
     pep_user = _register_user(keystone, 'pepproxy')
 
     # Create Franchises
-
     franchises = []
 
     for i in range(4):
         franchises.append(_create_organization(keystone, 'Franchise' + str(i+1)))
-
 
     for franchise in franchises:
         keystone.roles.grant(user=pep_user.id,
@@ -124,9 +121,7 @@ def test_data(keystone_path='./keystone/'):
         is_internal=False,
         application=tourguide_app.id)
 
-
     # Make all users Restaurant viewers
-
     for user in users:
         keystone.fiware_roles.roles.add_to_user(
             role=end_user.id,
@@ -135,7 +130,6 @@ def test_data(keystone_path='./keystone/'):
             organization=user.default_project_id)
 
     # Make user0 Global Manager
-
     keystone.fiware_roles.roles.add_to_user(
         role=global_manager.id,
         user=users[0].id,
@@ -171,11 +165,8 @@ def test_data(keystone_path='./keystone/'):
             role=owner_role.id,
             project=franchises[i].id)
 
-
     # Make user1-4 Frnanchise Manager
-
     # Adding permissions for manager and restaurants (TODO)
-
     perm0 = keystone.fiware_roles.permissions.create(
                 name='reservations',
                 application=tourguide_app,

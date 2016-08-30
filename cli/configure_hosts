@@ -44,7 +44,8 @@ function check_permissions () {
         fi
     else
         if [ ! -w "${hosts_file}" ] ; then
-            echo "Hosts file '${hosts_file}' does not have write permission for user ${user}."
+            echo -n "Hosts file '${hosts_file}' "
+            echo "does not have write permission for user ${user}."
             exit 1
         fi
     fi
@@ -188,14 +189,18 @@ function submodule_cmd () {
     fi
 
     # get list of running containers
-    containers_running=($( docker inspect --format "{{if .State.Running}}{{.Id}}{{end}}" "${containers_list[@]}" ))
+    containers_running=($( docker inspect --format \
+                                  "{{if .State.Running}}{{.Id}}{{end}}" \
+                                  "${containers_list[@]}" ))
     if [ -z "${containers_running}" ] ; then
         echo "There's no running containers."
         echo "Hosts file will NOT be modified."
         exit 0
     else
         # get the names of the running containers
-        container_names=( $( docker inspect --format '{{.Name}}' "${containers_running[@]}" ) )
+        container_names=( $( docker inspect --format \
+                                    "{{.Name}}" \
+                                    "${containers_running[@]}" ) )
         container_names=( "${container_names[@]#/}" )
 
         # get the list of links
@@ -204,7 +209,9 @@ function submodule_cmd () {
         # dump hosts info
         docker_hosts=$(
             for name in "${container_names[@]}" ; do
-                local ip=$( docker inspect -f "{{ .NetworkSettings.IPAddress }}" "${name}" )
+                local ip=$( docker inspect --format \
+                                   "{{ .NetworkSettings.IPAddress }}" \
+                                   "${name}" )
                 local aliases=$( get_container_aliases "${name}" )
                 echo "${ip}    ${name} ${aliases}" | sed -e 's/[ ]*$//g'
             done )
@@ -217,7 +224,8 @@ function submodule_cmd () {
                 sed -i "${hosts_file}" \
                     -e "/^${begin_tag}\$/,/^${end_tag}\$/{d}"
             fi
-            echo -e "${begin_tag}\n${docker_hosts}\n${end_tag}" >> "${hosts_file}"
+            echo -e "${begin_tag}\n${docker_hosts}\n${end_tag}" \
+                 >> "${hosts_file}"
         else
             echo -e "${begin_tag}\n${docker_hosts}\n${end_tag}"
         fi

@@ -86,7 +86,8 @@ function check_host_port () {
     echo "Testing if port '${_port}' is open at host '${_host}'."
 
     while [ ${_tries} -lt ${_max_tries} -a ${_is_open} -eq 0 ] ; do
-        echo -n "Checking connection to '${_host}:${_port}' [try $(( ${_tries} + 1 ))/${_max_tries}] ... "
+        echo -n "Checking connection to '${_host}:${_port}' "
+        echo -n "[try $(( ${_tries} + 1 ))/${_max_tries}] ... "
         if ${NC} -z -w ${_timeout} ${_host} ${_port} ; then
             echo "OK."
             _is_open=1
@@ -102,7 +103,8 @@ function check_host_port () {
     done
 
     if [ ${_is_open} -eq 0 ] ; then
-        echo "Failed to connect to port '${_port}' on host '${_host}' after ${_tries} tries."
+        echo -n "Failed to connect to port '${_port}' on host '${_host}'"
+        echo " after ${_tries} tries."
         echo "Port is closed or host is unreachable."
         exit 1
     else
@@ -121,9 +123,12 @@ function submodule_cmd () {
 
     # copy the needed files to the keyrock container
     echo "Copying scripts to keyrock container."
-    docker cp ${keyrock_scripts_path}/tourguide-provision.py ${_container_name}:/opt/
-    docker cp ${keyrock_scripts_path}/params-config.py ${_container_name}:/opt/
-    docker cp ${keyrock_scripts_path}/access_control_xacml.py ${_container_name}:/horizon/
+    docker cp ${keyrock_scripts_path}/tourguide-provision.py \
+           ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/params-config.py \
+           ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/access_control_xacml.py \
+           ${_container_name}:/horizon/
 
     # provision tourguide users, roles and permissions
     echo "Provisioning TourGuide users, roles and permissions."
@@ -131,15 +136,22 @@ function submodule_cmd () {
            'cd /keystone ; \
             source .venv/bin/activate ; \
             (sleep 5 ; echo idm) | bin/keystone-manage -v db_sync --populate ; \
-            [ ! -e /opt/.provision-done ] && python /opt/tourguide-provision.py && touch /opt/.provision-done'
+            [ ! -e /opt/.provision-done ] && \
+            python /opt/tourguide-provision.py && \
+            touch /opt/.provision-done'
 
     # configure access and sync with authzforce
     echo "Syncing with authzforce."
+    local ac_url="ACCESS_CONTROL_URL = '${keyrock_ac_url}'"
+    local ac_key="ACCESS_CONTROL_MAGIC_KEY = '${keyrock_ac_magic_key}'"
     docker exec -i ${_container_name} /bin/bash -c \
            "sed -i /horizon/openstack_dashboard/local/local_settings.py \
-            -e \"s|^ACCESS_CONTROL_URL = None|ACCESS_CONTROL_URL = '${keyrock_ac_url}'|\" \
-            -e \"s|^ACCESS_CONTROL_MAGIC_KEY = None|ACCESS_CONTROL_MAGIC_KEY = '${keyrock_ac_magic_key}'|\" ; \
-            python /opt/params-config.py --name 'TourGuide' --file /opt/config.json --database keystone.db ; \
+            -e \"s|^ACCESS_CONTROL_URL = None|${ac_url}|\" \
+            -e \"s|^ACCESS_CONTROL_MAGIC_KEY = None|${ac_key}|\" ; \
+            python /opt/params-config.py \
+                   --name 'TourGuide' \
+                   --file /opt/config.json \
+                   --database keystone.db ; \
             cd /horizon ; \
             source .venv/bin/activate ; \
             python access_control_xacml.py"

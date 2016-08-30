@@ -74,19 +74,27 @@ function submodule_cmd () {
 
     local sum=$( md5sum "${compose}" )
     # configure cygnus container
+    local cyg_user="CYGNUS_MYSQL_USER=${cygnus_mysql_user}"
+    local cyg_pass="CYGNUS_MYSQL_PASS=${cygnus_mysql_password}"
     sed -i "${compose}" \
-        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_USER=.*$/CYGNUS_MYSQL_USER=${cygnus_mysql_user}/" \
-        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_PASS=.*$/CYGNUS_MYSQL_PASS=${cygnus_mysql_password}/"
+        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_USER=.*$/${cyg_user}/" \
+        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_PASS=.*$/${cyg_pass}/"
 
     # configure mysql container
     if [ "${cygnus_mysql_user}" = "root" ] ; then
+        local my_pass="        - MYSQL_ROOT_PASSWORD=${cygnus_mysql_password}"
         sed -i "${compose}" \
             -e "/^mysql:/,/^$/ {/environment:/,/^$/ { /- /d}}" \
-            -e "/^mysql:/,/^$/ {/environment:/ s/environment:.*$/environment:\n        - MYSQL_ROOT_PASSWORD=${cygnus_mysql_password}/}"
+            -e "/^mysql:/,/^$/ \
+                {/environment:/ s/environment:.*$/environment:\n${my_pass}/}"
     else
+        local my_user="        - MYSQL_USER=${cygnus_mysql_user}"
+        local my_pass="        - MYSQL_PASSWORD=${cygnus_mysql_password}"
+        local my_db="        - MYSQL_DATABASE=${fiware_service}"
+        local env_exp="environment:\\n${my_user}\\n${my_pass}\\n${my_db}"
         sed -i "${compose}" \
             -e "/^mysql:/,/^$/ {/environment:/,/^$/ { /- /d}}" \
-            -e "/^mysql:/,/^$/ {/environment:/ s/environment:.*$/environment:\n        - MYSQL_USER=${cygnus_mysql_user}\n        - MYSQL_PASSWORD=${cygnus_mysql_password}\n        - MYSQL_DATABASE=${fiware_service}/}"
+            -e "/^mysql:/,/^$/ {/environment:/ s/environment:.*$/${env_exp}/}"
     fi
 
     local mod=$( md5sum "${compose}" )
