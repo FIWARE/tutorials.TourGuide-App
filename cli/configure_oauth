@@ -114,6 +114,8 @@ function submodule_cmd () {
     local _keyrock_container="${container_prefix}keyrock"
     local _tourguide_container="${container_prefix}tourguide"
 
+    submodule_options "$@"
+
     check_host_port localhost 5000 ${keyrock_wait}
 
     while [ true ]; do
