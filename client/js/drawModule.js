@@ -92,6 +92,11 @@ var drawModule = (function() {
 
   // create a restaurant mark and add it to the cluster.
   function addRestaurantMark(currentMark, markerCluster) {
+    // check current mark
+    if (!(currentMark && currentMark.coords)) {
+      console.error("Error trying to add a restaurant marker");
+      return;
+    }
     // add mark to map
     currentMark.mark = L.marker(currentMark.coords);
 

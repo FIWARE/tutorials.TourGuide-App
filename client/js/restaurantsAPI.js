@@ -55,7 +55,13 @@ var restaurantsAPI = (function() {
   /* Simplify the restaurant format using only useful info */
   function simplifyRestaurantsFormat(restaurants) {
     restaurants = JSON.parse(restaurants);
-    return restaurants.map(convertRestaurant);
+    return restaurants.map(convertRestaurant).filter(
+      function(restaurant){ 
+        if(restaurant) {
+          return true;
+        }
+        return false;
+      });
   }
 
   // return nothing if error
