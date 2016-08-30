@@ -91,7 +91,8 @@ function module_cmd () {
     module_options "$@"
 
     while [ true ]; do
-        if ( docker logs ${_container_name} 2>&1 | grep -qE "service apache2 reload" ) ; then
+        if ( docker logs ${_container_name} 2>&1 |
+                 grep -qE "service apache2 reload" ) ; then
             _started=1
         fi
 
