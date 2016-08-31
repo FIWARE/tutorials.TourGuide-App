@@ -27,7 +27,7 @@ Command options:
                              Default is to exit if tourguide container is not ready.
   -r  --restaurant <name>    Load a single restaurant using its <name>.
   -l  --limit <n>            Limit the number of restaurants to load to <n>.
-                             Using --restaurant limits <n> to 1.
+                             This option is ignored when using --restaurant option.
 
 EOF
     exit 0
