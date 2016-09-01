@@ -59,4 +59,8 @@ Check if some required commands (both for running the containers and the scripts
 
 ### start ###
 
+Simple wrapper for docker-compose up.  Allows the user to start the TourGuide-App container and related services.
+
 ### stop ###
+
+Simple wrapper for docker-compose stop/rm.  Allows the user to stop the TourGuide-App container and related services.
