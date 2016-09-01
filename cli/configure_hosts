@@ -1,0 +1,233 @@
+#!/bin/bash
+#
+#  configure_hosts
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure hosts subcommand for TourGuide CLI.
+#
+
+supported_os=1
+requires_root=0
+default_hosts_file=""
+begin_tag="### BEGIN Docker container IPs ###"
+end_tag="### END Docker container IPs ###"
+modify_hosts=0
+
+function check_os () {
+    local os=$( uname )
+    case "${os}" in
+        "Darwin")
+            echo "Operating System: Mac OS X"
+            default_hosts_file="/private/etc/hosts"
+            ;;
+        "Linux")
+            echo "Operating System: Linux"
+            default_hosts_file="/etc/hosts"
+            ;;
+        *)
+            echo "Operating System: Unsupported"
+            supported_os=0
+            exit 1
+            ;;
+    esac
+}
+
+function check_permissions () {
+    local user=$( whoami )
+    if [ ${requires_root} -eq 1 ] ; then
+        if [ "${user}" != "root" ] ; then
+            echo "Only root is allowed to modify ${hosts_file}"
+            echo "Run the script as root or use an alternate method like sudo"
+            exit 1
+        fi
+    else
+        if [ ! -w "${hosts_file}" ] ; then
+            echo -n "Hosts file '${hosts_file}' "
+            echo "does not have write permission for user ${user}."
+            exit 1
+        fi
+    fi
+}
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} configure hosts [-h | --help]
+
+Modify the hosts file to add entries for the running docker containers.
+
+Command options:
+
+  -h  --help                 Show this help.
+
+  -m  --modify-hosts         Modify the system /etc/hosts file (requires root permission)
+                             Default is to show the list of entries that would have been added.
+  -f  --hosts-file <file>    Use <file> as the hosts file to modify.
+                             Default is /etc/hosts for Linux and /private/etc/hosts for OS X.
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hmf: -l help,modify-hosts,hosts-file: -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-m" | "--modify-hosts")
+                modify_hosts=1
+                ;;
+            "-f" | "--hosts-file")
+                shift
+                hosts_file="$1"
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+
+    check_os
+    if [ -z "${hosts_file}" ] ; then
+        echo "No hosts file specified."
+        echo "Using OS default: ${default_hosts_file}"
+        hosts_file="${default_hosts_file}"
+        requires_root=1
+    fi
+}
+
+function backup_hosts_file () {
+    local file="$1"
+    local backup_file="${file}.tourguide.$( date +%Y%m%d.%H%M%S )"
+
+    echo "Backing up '${file}' to '${backup_file}'"
+    cp "${file}" "${backup_file}"
+    if [ $? -ne 0 ] ; then
+        echo "Failed to create backup file '${backup_file}'."
+        echo "Cannot continue without backup file."
+        exit 1
+    fi
+}
+
+function get_container_links () {
+    local container_names=("$@")
+    local links=$(
+        docker inspect -f "{{ .HostConfig.Links }}" "${container_names[@]}" |
+            grep -v -F "<no value>" |
+            tr ' ' '\n' |
+            sed -e 's/^\[//g' \
+                -e 's/\]$//g' \
+                -e 's|:/[^/]\+/|:|g' \
+                -e 's|/||g' \
+                -e '/^\([^:]\+\):\1/ d' |
+            sort -u )
+    [ -n "${links}" ] && echo "${links}"
+}
+
+function get_extra_aliases () {
+    local host="$1"
+    local aliases=$(
+        cat "${hosts_file}" |
+            grep "\(^\|[ ]\)${host}\([ ]\|$\)" |
+            sed -e 's/^[^ \t]\+[ \t]\+//g' |
+            tr '\n' ' ' |
+            sed -e "s/\(^\|[ ]\)${host}\([ ]\|$\)/ /g" \
+                -e 's/^[ ]*//g' \
+                -e 's/[ ]*$//g' \
+                -e 's/[ ]\+/ /g' |
+            tr ' ' '\n' |
+            sort -u |
+            sed -e 's/^[ ]*$//g' )
+    [ -n "${aliases}" ] && echo "${aliases}"
+}
+
+function get_container_aliases () {
+    local name="$1"
+    local aliases=""
+    local links=$( echo "${container_links}" |
+                         grep "^${name}:" |
+                         cut -d ':' -f 2- |
+                         tr '\n' ' ' )
+    local extra=$( get_extra_aliases "${name}" )
+    local hostname=$( docker inspect -f "{{.Config.Hostname}}" "${name}" )
+    if [ -n "$links" -o -n "$extra" -o -n "$hostname" ]; then
+        aliases=$( echo $links $extra $hostname |
+                         tr ' ' '\n' |
+                         sort -u |
+                         sed -e 's/^[ ]*$//g' |
+                         tr '\n' ' ' )
+    fi
+    [ -n "${aliases}" ] && echo "${aliases}"
+}
+
+function submodule_cmd () {
+    submodule_options "$@"
+
+    # get list of all containers
+    containers_list=($( docker ps -a -q --no-trunc ))
+    if [ "${#containers_list[@]}" -eq 0 ] ; then
+        echo "No containers found."
+        echo "Hosts file will NOT be modified."
+        exit 0
+    fi
+
+    # get list of running containers
+    containers_running=($( docker inspect --format \
+                                  "{{if .State.Running}}{{.Id}}{{end}}" \
+                                  "${containers_list[@]}" ))
+    if [ -z "${containers_running}" ] ; then
+        echo "There's no running containers."
+        echo "Hosts file will NOT be modified."
+        exit 0
+    else
+        # get the names of the running containers
+        container_names=( $( docker inspect --format \
+                                    "{{.Name}}" \
+                                    "${containers_running[@]}" ) )
+        container_names=( "${container_names[@]#/}" )
+
+        # get the list of links
+        container_links=$( get_container_links "${container_names[@]}" )
+
+        # dump hosts info
+        docker_hosts=$(
+            for name in "${container_names[@]}" ; do
+                local ip=$( docker inspect --format \
+                                   "{{ .NetworkSettings.IPAddress }}" \
+                                   "${name}" )
+                local aliases=$( get_container_aliases "${name}" )
+                echo "${ip}    ${name} ${aliases}" | sed -e 's/[ ]*$//g'
+            done )
+
+        if [ ${modify_hosts} -eq 1 ]; then
+            check_permissions
+            backup_hosts_file "${hosts_file}"
+            echo "Modifying ${hosts_file}"
+            if grep -q "^${begin_tag}" "${hosts_file}" ; then
+                sed -i "${hosts_file}" \
+                    -e "/^${begin_tag}\$/,/^${end_tag}\$/{d}"
+            fi
+            echo -e "${begin_tag}\n${docker_hosts}\n${end_tag}" \
+                 >> "${hosts_file}"
+        else
+            echo -e "${begin_tag}\n${docker_hosts}\n${end_tag}"
+        fi
+    fi
+}

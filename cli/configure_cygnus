@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+#  configure_cygnus
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure cygnus subcommand for TourGuide CLI.
+#
+
+cygnus_mysql_user='root'
+cygnus_mysql_password='mysql'
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} configure cygnus [-h | --help] [-u <username> | --mysql-user <username>]
+                                   [-p <password> | --mysql-password <password>]
+
+Apply configuration changes for cygnus.
+
+Command options:
+
+  -h  --help                         Show this help.
+  -u  --mysql-user <username>        Set the MySQL database user to use.
+                                     Default value is 'root'.
+  -p  --mysql-password <password>    Set the MySQL database password to use.
+                                     Default value is 'mysql'.
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    if [ $# -lt 1 ]; then
+        submodule_help
+    else
+        TEMP=`getopt -o hu:p: -l help,mysql-user:,mysql-password: -- "$@"`
+
+        if test "$?" -ne 0 ; then
+            submodule_help
+        fi
+
+        eval set -- "$TEMP"
+
+        while true ; do
+            case "$1" in
+                "-h" | "--help" )
+                    submodule_help
+                    ;;
+                "-u" | "--mysql-user" )
+                    shift
+                    cygnus_mysql_user=$1
+                    ;;
+                "-p" | "--mysql-password" )
+                    shift
+                    cygnus_mysql_password=$1
+                    ;;
+                --|*)
+                    break;
+                    ;;
+            esac
+            shift
+        done
+        shift
+
+        if [ $# -gt 0 ]; then
+            echo "Unknown parameters: $@"
+            submodule_help
+        fi
+    fi
+}
+
+function submodule_cmd () {
+    submodule_options "$@"
+
+    local sum=$( md5sum "${compose}" )
+    # configure cygnus container
+    local cyg_user="CYGNUS_MYSQL_USER=${cygnus_mysql_user}"
+    local cyg_pass="CYGNUS_MYSQL_PASS=${cygnus_mysql_password}"
+    sed -i "${compose}" \
+        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_USER=.*$/${cyg_user}/" \
+        -e "/^cygnus:/,/^$/ s/CYGNUS_MYSQL_PASS=.*$/${cyg_pass}/"
+
+    # configure mysql container
+    if [ "${cygnus_mysql_user}" = "root" ] ; then
+        local my_pass="        - MYSQL_ROOT_PASSWORD=${cygnus_mysql_password}"
+        sed -i "${compose}" \
+            -e "/^mysql:/,/^$/ {/environment:/,/^$/ { /- /d}}" \
+            -e "/^mysql:/,/^$/ \
+                {/environment:/ s/environment:.*$/environment:\n${my_pass}/}"
+    else
+        local my_user="        - MYSQL_USER=${cygnus_mysql_user}"
+        local my_pass="        - MYSQL_PASSWORD=${cygnus_mysql_password}"
+        local my_db="        - MYSQL_DATABASE=${fiware_service}"
+        local env_exp="environment:\\n${my_user}\\n${my_pass}\\n${my_db}"
+        sed -i "${compose}" \
+            -e "/^mysql:/,/^$/ {/environment:/,/^$/ { /- /d}}" \
+            -e "/^mysql:/,/^$/ {/environment:/ s/environment:.*$/${env_exp}/}"
+    fi
+
+    local mod=$( md5sum "${compose}" )
+    if [ "${mod}" != "${sum}" ]; then
+        echo "Updated ${compose}." >&2
+    else
+        echo "No modifications applied to ${compose}." >&2
+    fi
+}

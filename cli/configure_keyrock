@@ -1,0 +1,158 @@
+#!/bin/bash
+#
+#  configure_keyrock
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure keyrock subcommand for TourGuide CLI.
+#
+
+keyrock_scripts_path="$( dirname $0 )/docker/keyrock"
+keyrock_ac_url="http://authzforce:8080"
+keyrock_ac_magic_key="daf26216c5434a0a80f392ed9165b3b4"
+keyrock_wait=1
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} configure keyrock [-h | --help] [-w | --wait]
+
+Provision the necessary users, roles and permissions for the Tour
+Guide application on Keyrock and then sync with Authzforce.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the keyrock container to be ready.
+                             Default is to exit if keyrock container is not ready.
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hw -l help,wait -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-w" | "--wait")
+                shift
+                keyrock_wait=10000
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+}
+
+function check_host_port () {
+    local _timeout=10
+    local _tries=0
+    local _is_open=0
+
+    if [ $# -lt 2 ] ; then
+        echo "check_host_port: missing parameters."
+        echo "Usage: check_host_port <host> <port> [max-tries]"
+        exit 1
+    fi
+
+    local _host=$1
+    local _port=$2
+    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
+    local NC=$( which nc )
+
+    if [ ! -e "${NC}" ] ; then
+        echo "Unable to find 'nc' command."
+        exit 1
+    fi
+
+    echo "Testing if port '${_port}' is open at host '${_host}'."
+
+    while [ ${_tries} -lt ${_max_tries} -a ${_is_open} -eq 0 ] ; do
+        echo -n "Checking connection to '${_host}:${_port}' "
+        echo -n "[try $(( ${_tries} + 1 ))/${_max_tries}] ... "
+        if ${NC} -z -w ${_timeout} ${_host} ${_port} ; then
+            echo "OK."
+            _is_open=1
+        else
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
+        fi
+    done
+
+    if [ ${_is_open} -eq 0 ] ; then
+        echo -n "Failed to connect to port '${_port}' on host '${_host}'"
+        echo " after ${_tries} tries."
+        echo "Port is closed or host is unreachable."
+        exit 1
+    else
+        echo "Port '${_port}' at host '${_host}' is open."
+    fi
+}
+
+function submodule_cmd () {
+    local _container_name="${container_prefix}keyrock"
+
+    submodule_options "$@"
+
+    # To check for keyrock, we can check if port 5000 on localhost is
+    # listening, as that port will be mapped to the host.
+    check_host_port localhost 5000 ${keyrock_wait}
+
+    # copy the needed files to the keyrock container
+    echo "Copying scripts to keyrock container."
+    docker cp ${keyrock_scripts_path}/tourguide-provision.py \
+           ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/params-config.py \
+           ${_container_name}:/opt/
+    docker cp ${keyrock_scripts_path}/access_control_xacml.py \
+           ${_container_name}:/horizon/
+
+    # provision tourguide users, roles and permissions
+    echo "Provisioning TourGuide users, roles and permissions."
+    docker exec -i ${_container_name} /bin/bash -c \
+           'cd /keystone ; \
+            source .venv/bin/activate ; \
+            (sleep 5 ; echo idm) | bin/keystone-manage -v db_sync --populate ; \
+            [ ! -e /opt/.provision-done ] && \
+            python /opt/tourguide-provision.py && \
+            touch /opt/.provision-done'
+
+    # configure access and sync with authzforce
+    echo "Syncing with authzforce."
+    local ac_url="ACCESS_CONTROL_URL = '${keyrock_ac_url}'"
+    local ac_key="ACCESS_CONTROL_MAGIC_KEY = '${keyrock_ac_magic_key}'"
+    docker exec -i ${_container_name} /bin/bash -c \
+           "sed -i /horizon/openstack_dashboard/local/local_settings.py \
+            -e \"s|^ACCESS_CONTROL_URL = None|${ac_url}|\" \
+            -e \"s|^ACCESS_CONTROL_MAGIC_KEY = None|${ac_key}|\" ; \
+            python /opt/params-config.py \
+                   --name 'TourGuide' \
+                   --file /opt/config.json \
+                   --database keystone.db ; \
+            cd /horizon ; \
+            source .venv/bin/activate ; \
+            python access_control_xacml.py"
+}

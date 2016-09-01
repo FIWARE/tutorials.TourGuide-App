@@ -1,0 +1,159 @@
+#!/bin/bash
+#
+#  configure_oauth
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  configure oauth subcommand for TourGuide CLI.
+#
+
+keyrock_wait=1
+tourguide_wait=0
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} configure oauth [-h | --help] [-w | --wait]
+
+Get the Oauth credentials from Keyrock and add them to the Tour Guide configuration.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the keyrock and tourguide containers to be ready.
+                             Default is to exit if any of the containers is not ready.
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hw -l help,wait -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-w" | "--wait")
+                shift
+                keyrock_wait=10000
+                tourguide_wait=1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        module_help
+    fi
+}
+
+function check_host_port () {
+    local _timeout=10
+    local _tries=0
+    local _is_open=0
+
+    if [ $# -lt 2 ] ; then
+        echo "check_host_port: missing parameters."
+        echo "Usage: check_host_port <host> <port> [max-tries]"
+        exit 1
+    fi
+
+    local _host=$1
+    local _port=$2
+    local _max_tries=${3:-${DEFAULT_MAX_TRIES}}
+    local NC=$( which nc )
+
+    if [ ! -e "${NC}" ] ; then
+        echo "Unable to find 'nc' command."
+        exit 1
+    fi
+
+    echo "Testing if port '${_port}' is open at host '${_host}'."
+
+    while [ ${_tries} -lt ${_max_tries} -a ${_is_open} -eq 0 ] ; do
+        echo -n "Checking connection to '${_host}:${_port}' "
+        echo -n "[try $(( ${_tries} + 1 ))/${_max_tries}] ... "
+        if ${NC} -z -w ${_timeout} ${_host} ${_port} ; then
+            echo "OK."
+            _is_open=1
+        else
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            if [ ${_tries} -lt ${_max_tries} ] ; then
+                echo "Retrying."
+            else
+                echo "Failed."
+            fi
+        fi
+    done
+
+    if [ ${_is_open} -eq 0 ] ; then
+        echo -n "Failed to connect to port '${_port}' on host '${_host}'"
+        echo " after ${_tries} tries."
+        echo "Port is closed or host is unreachable."
+        exit 1
+    else
+        echo "Port '${_port}' at host '${_host}' is open."
+    fi
+}
+
+function submodule_cmd () {
+    local _started=0
+    local _tries=0
+    local _keyrock_container="${container_prefix}keyrock"
+    local _tourguide_container="${container_prefix}tourguide"
+
+    submodule_options "$@"
+
+    check_host_port localhost 5000 ${keyrock_wait}
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_tourguide_container} 2>&1 |
+                 grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${tourguide_wait} -ne 0 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        # get the OAuth credentials for the app
+        CLIENT_ID=$( echo $( docker exec -i ${_keyrock_container} \
+                                    /bin/bash -c 'cat /opt/config.json' ) |
+                           grep -Po '(?<="id": ")[^"]*' )
+        CLIENT_SECRET=$( echo $( docker exec -i ${_keyrock_container} \
+                                        /bin/bash -c 'cat /opt/config.json' ) |
+                               grep -Po '(?<="secret": ")[^"]*' )
+        local c_id="config.clientId = '${CLIENT_ID}'"
+        local c_sec="config.clientSecret = '${CLIENT_SECRET}'"
+        docker exec -i ${_tourguide_container} /bin/bash -c \
+               "sed -i \${CC_APP_SERVER_PATH}/config.js \
+                -e \"s|config.clientId = 'CLIENT_ID'|${c_id}|g\" \
+                -e \"s|config.clientSecret = 'CLIENT_SECRET'|${c_sec}|g\" ; \
+                service apache2 reload"
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
+}
