@@ -14,7 +14,7 @@
 /*exported utils*/
 var utils = (function() {
 
-  /* alerType could be alert-warning(default) or alert-danger*/
+  // alerType could be alert-warning(default) or alert-danger
   function showMessage(message, alertType) {
     alertType = typeof alertType !== 'undefined' ? alertType : 'alert-warning';
 
@@ -50,7 +50,7 @@ var utils = (function() {
     }
   }
 
-  /* aux function, it changes the date format to print reservations */
+  // aux function, it changes the date format to print reservations 
   function fixBookingTime(bookingTime) {
     var d = new Date(bookingTime);
     return '' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
