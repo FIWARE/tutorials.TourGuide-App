@@ -79,9 +79,9 @@ var drawModule = (function() {
     cancelReservationAction = action;
   }
 
-  /* this functions add the restaurants to the leaflet map */
+  // This functions add the restaurants to the leaflet map
   function addRestaurantstoMap(restaurants) {
-    /* add marks with clustering approach */
+    // add marks with clustering approach 
     var markerClusters = L.markerClusterGroup({showCoverageOnHover: true});
     restaurants.forEach(function(currentMark) {
       addRestaurantMark(currentMark, markerClusters);
@@ -92,6 +92,11 @@ var drawModule = (function() {
 
   // create a restaurant mark and add it to the cluster.
   function addRestaurantMark(currentMark, markerCluster) {
+    // check current mark
+    if (!(currentMark && currentMark.coords)) {
+      console.error("Error trying to add a restaurant marker");
+      return;
+    }
     // add mark to map
     currentMark.mark = L.marker(currentMark.coords);
 
@@ -179,7 +184,7 @@ var drawModule = (function() {
     return span;
   }
 
-  /* Create a div with review information */
+  // Create a div with review information 
   function createSingleReviewDiv(reviewResponse) {
     var reviewElement = document.createElement('DIV');
     reviewElement.className = 'reviewElement';
@@ -236,8 +241,8 @@ var drawModule = (function() {
     return reviewElement;
   }
 
-  /* Show restaurant reviews from an API response. */
-  /* At this moment, show all reviews without pagination */
+  /* Show restaurant reviews from an API response. 
+   At this moment, show all reviews without pagination */
   function createReviewsDiv(reviewsResponse) {
     reviewsResponse = JSON.parse(reviewsResponse);
 
@@ -927,12 +932,12 @@ var drawModule = (function() {
     document.getElementById('reservationsTableBody').appendChild(row);
   }
 
-  /* aux function that opens the PopUp windows */
+  // aux function that opens the PopUp windows 
   function openPopUpWindow() {
     $('#popWindow').modal('show');
   }
 
-  /* aux function that closes the PopUp window */
+  // aux function that closes the PopUp window 
   function closePopUpWindow() {
     $('#popWindow').modal('hide');
   }

@@ -22,7 +22,7 @@ var AJAXRequest;
 var restaurantsAPI = (function() {
   var baseURL = 'http://tourguide/api/orion/';
 
-  /* get all restaurants and show them */
+  // get all restaurants and show them 
   function getAllRestaurants(cb, errCb) {
     AJAXRequest.get(baseURL + 'restaurants/', cb, errCb);
   }
@@ -52,10 +52,16 @@ var restaurantsAPI = (function() {
     AJAXRequest.get(URL, cb, errCb);
   }
 
-  /* Simplify the restaurant format using only useful info */
+  // Simplify the restaurant format using only useful info 
   function simplifyRestaurantsFormat(restaurants) {
     restaurants = JSON.parse(restaurants);
-    return restaurants.map(convertRestaurant);
+    return restaurants.map(convertRestaurant).filter(
+      function(restaurant){ 
+        if(restaurant) {
+          return true;
+        }
+        return false;
+      });
   }
 
   // return nothing if error
