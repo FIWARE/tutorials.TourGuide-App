@@ -181,7 +181,11 @@ frisby.create('OAuth2 login')
       .expectHeaderContains('content-type', 'application/json')
       .expectJSON({
         error: 'NotFound',
-        description: 'No context element found'
+        // jshint maxlen: 100
+        // jscs:disable maximumLineLength
+        description: 'The requested entity has not been found. Check type and id'
+        // jshint maxlen: 80
+        // jscs:enable
       })
       .toss();
 
