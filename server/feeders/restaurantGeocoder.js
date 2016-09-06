@@ -147,6 +147,7 @@ function exportGeocode(restaurants) {
       .then(function(geoRes) {
         geocodes[attributes.id] = geoRes[0];
         callback(attributes.documentName);
+        writeOutput(geocodes);
       })
       .catch(function(err) {
         console.err(err);
@@ -156,7 +157,6 @@ function exportGeocode(restaurants) {
 
   q.drain = function() {
     console.log('Total restaurants geolocated: ' + restaurantsAdded);
-    writeOutput(geocodes);
   };
 
   Object.keys(restaurantsData).forEach(function(element, index) {
