@@ -41,6 +41,13 @@ function start_test_env() {
     # start containers with docker-compose
     docker-compose -f "${test_yml}" -p tests up -d
 
+    # provision keyrock
+    pwd
+    ./tour-guide --test configure keyrock -w
+
+    # configure oauth
+    ./tour-guide --test configure oauth -w
+
     # wait for tourguide to be ready
     container_name=$( docker-compose -f "${test_yml}" -p tests ps 2>/dev/null | grep test_tourguide | cut -d ' ' -f 1 )
     while [ ${_started} -eq 0 -a ${_tries} -lt ${_max_tries} ]; do

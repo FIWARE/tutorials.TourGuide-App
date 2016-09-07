@@ -4,7 +4,7 @@ var config = {};
 
 // URL to the FI-WARE Identity Management GE
 // default: https://account.lab.fi-ware.org
-config.idmUrl = 'https://IDM_HOSTNAME';
+config.idmUrl = 'http://IDM_HOSTNAME:IDM_PORT';
 
 // Oauth2 configuration
 // Found on the application profile page after registering
