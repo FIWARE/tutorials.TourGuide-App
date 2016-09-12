@@ -224,6 +224,9 @@ function generateReviews(restaurant) {
   var date = new Date().toISOString();
   var user = 'user' + utils.randomIntInc(1, 10);
   var random = Math.random();
+  var organization = ['Franchise1', 'Franchise2',
+  'Franchise3', 'Franchise4'
+  ];
 
   var attr = {
     'type': REVIEW_TYPE,
@@ -249,7 +252,7 @@ function generateReviews(restaurant) {
     },
     'publisher': {
       'type': 'Organization',
-      'value': 'Bitergia'
+      'value': utils.randomElement(organization)
     }
   };
 
