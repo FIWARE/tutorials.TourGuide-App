@@ -109,7 +109,7 @@ function sensor_get_old_value () {
                             --header "Fiware-Service: ${fiware_service}" \
                             --header "Accept: text/plain" \
                             "http://localhost:1026/v2/entities/${restaurant_id}/attrs/${type}:${room}/value" )
-    echo ${old_value}
+    echo ${old_value} | tr -d '"'
 }
 
 function generate_sensor_value () {
@@ -154,7 +154,8 @@ function submodule_cmd () {
                                --show-error \
                                --header "Fiware-Service: ${fiware_service}" \
                                --header "Accept: text/plain" \
-                               "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" )
+                               "http://localhost:1026/v2/entities/${restaurant_id}/attrs/department/value" |
+                          tr -d '"')
     local api_key="${idas_api_key}-${fiware_servicepath}"
 
     while true ; do
