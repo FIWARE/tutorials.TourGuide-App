@@ -330,10 +330,28 @@ var drawModule = (function() {
   }
 
   function addCreateReviewLink(restaurantName) {
-    var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    var userInfo = connectionsAPI.getUser();
 
+    // only end users can write reviews
     if (! connectionsAPI.hasRole(userInfo,
       connectionsAPI.role.endUser)) {
+      return null;
+    }
+
+    // franchise managers can't write reviews
+    if ( connectionsAPI.hasRole(userInfo,
+      connectionsAPI.role.franchiseManager)) {
+      return null;
+    }
+
+    // global managers can't write reviews
+    if ( connectionsAPI.hasRole(userInfo,
+      connectionsAPI.role.globalManager)) {
+      return null;
+    }
+
+    // franchise employees can't write reviews
+    if ( userInfo.organizations.length > 0) {
       return null;
     }
 
