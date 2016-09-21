@@ -167,6 +167,18 @@ function loadGeoData() {
 }
 
 /**
+ * Function to generate the organization based on the restaurant name
+ *
+ * @param {String} rname - Restaurant name
+ * @return {String} The organization name
+*/
+function selectOrganization(rname) {
+  var id = utils.generateId(rname);
+  var n = (parseInt(id.replace(/[a-z]/gi, '').slice(0,10)) % 4) + 1;
+  return 'Franchise' + n;
+}
+
+/**
  * Function that adapts the information for Orion Context Broker
 */
 function feedOrionRestaurants() {
@@ -209,7 +221,7 @@ function feedOrionRestaurants() {
         'value': rname
       },
       'department': {
-        'value': utils.randomElement(organization)
+        'value': selectOrganization(rname),
       },
       'capacity': {
         'type': PROPERTY_VALUE_TYPE,
