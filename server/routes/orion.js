@@ -463,13 +463,19 @@ exports.getRestaurantReviews = function(req, res) {
  * @param {Object} res - Response
 */
 exports.getOrganizationReviews = function(req, res) {
-  var filter = [];
-  var queryString = {};
-  utils.addConditionToQuery(filter, 'publisher', '==', req.params.org);
-  queryString.q = filter.join(';');
-  utils.getListByType(REVIEW_TYPE, null, req.headers, queryString)
+  var organizationReviews;
+  var reviewsList;
+  utils.getListByType(REVIEW_TYPE, null, req.headers)
   .then(function(reviews) {
-    utils.returnResponse(reviews, res);
+    reviewsList = reviews;
+    return utils.getListByType(RESTAURANT_TYPE, null, req.headers);
+  })
+  .then(function(restaurants) {
+    organizationReviews = utils.getOrgReviews(req.params.org,
+                                              restaurants.body,
+                                              reviewsList.body);
+    res.statusCode = restaurants.statusCode;
+    res.json(utils.dataToSchema(organizationReviews));
   })
   .catch(function(err) {
     utils.responseError(err, res);

@@ -675,6 +675,21 @@ function reservationToOrion(userObject, schemaObject) {
 }
 
 /**
+ * Generate a list of restaurants of a Franchise
+ *
+ * @param {String} organization - Franchise name
+ * @param {List} listOfElements - List of restaurant elements
+ * @return {List} Contains all the restaurants belonging to an Organization
+*/
+function getOrgRestaurants(organization, listOfElements) {
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.department === organization;
+    }
+  );
+}
+
+/**
  * Generate a list of reservations of a Franchise
  *
  * @param {List} listOfRestaurants - Restaurants from a Franchise
@@ -686,6 +701,25 @@ function getOrgReservations(listOfRestaurants, listOfReservations) {
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
         return restaurant.name === element.reservationFor;
+      });
+    }
+  );
+}
+
+/**
+ * Generate a list of reviews of a Franchise
+ *
+ * @param {String} organization - Organization to filter
+ * @param {List} listOfRestaurants - Restaurants from a Franchise
+ * @param {List} listOfReviews - List of reviews
+ * @return {List} Contains all the reviews of the passed restaurants
+*/
+function getOrgReviews(organization, listOfRestaurants, listOfReviews) {
+  listOfRestaurants = getOrgRestaurants(organization, listOfRestaurants);
+  return objectToArray(listOfReviews).filter(
+    function(element) {
+      return listOfRestaurants.some(function(restaurant) {
+        return restaurant.name === element.itemReviewed;
       });
     }
   );
@@ -1080,5 +1114,7 @@ module.exports = {
   returnInvalidSchema: returnInvalidSchema,
   removeServicePath: removeServicePath,
   returnForbidden: returnForbidden,
-  returnConflict: returnConflict
+  returnConflict: returnConflict,
+  getOrgRestaurants: getOrgRestaurants,
+  getOrgReviews: getOrgReviews
 };
