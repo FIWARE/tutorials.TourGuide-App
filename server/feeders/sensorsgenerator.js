@@ -18,6 +18,7 @@
 var utils = require('../utils');
 var idas = require('../idas/ul20');
 var config = require('../config');
+var Q = require('q');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
@@ -29,6 +30,12 @@ var fiwareHeaders = {
  * - Humidity of the Dining room
  */
 
+var organization = [
+  'Franchise1',
+  'Franchise2',
+  'Franchise3',
+  'Franchise4'
+];
 var sensorTypes = ['temperature', 'relativeHumidity'];
 var sensorRooms = ['kitchen', 'dining'];
 var sensorsPerRestaurant = sensorTypes.length * sensorRooms.length;
@@ -72,7 +79,11 @@ function feedIDASSensors(restaurantsData) {
 
 console.log('Generating sensors for restaurants...');
 
-idas.createService()
+var services = organization.map(function(org) {
+  return idas.createService(org);
+});
+
+Q.all(services)
   .then(function(response) {
     // Get all the restaurants from Orion.
     return utils.getListByType('Restaurant', null, fiwareHeaders);

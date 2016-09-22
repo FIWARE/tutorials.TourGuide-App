@@ -69,18 +69,28 @@ var sensorsTemplates = {
  *
  * @return {Promise} response of the IoT Agent.
 */
-function createService() {
+function createService(servicePath) {
   var idasUrl = '/iot/services';
   var headers = JSON.parse(JSON.stringify(defaultHeaders));
   var RESOURCE = '/iot/d';
+  var apiKey = idasApiKey;
+
+  if (!servicePath) {
+    servicePath = idasFiwareServicePath;
+  } else {
+    apiKey += '-' + servicePath;
+  }
+
+  headers = utils.completeHeaders(headers, servicePath);
 
   // build payload
   var data = {
     'services': [
       {
-        'apikey': '' + idasApiKey + '',
+        'apikey': '' + apiKey + '',
         'cbroker': 'http://' + orionHostname + ':' + orionPort + '',
-        'resource': RESOURCE
+        'resource': RESOURCE,
+        'entity_type': 'Restaurant'
       }
     ]
   };
@@ -221,8 +231,12 @@ function registerSensor(restaurant, room, type) {
 function sendObservation(deviceId, data, servicePath) {
   var idasUrl = '/iot/d';
   var headers = JSON.parse(JSON.stringify(defaultHeaders));
+  var apiKey = idasApiKey;
+  if (servicePath) {
+    apiKey += '-' + servicePath;
+  }
   var idasParams = [
-    'k=' + idasApiKey,
+    'k=' + apiKey,
     'i=' + encodeURIComponent(deviceId)
   ];
 
