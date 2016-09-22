@@ -333,25 +333,25 @@ var drawModule = (function() {
     var userInfo = connectionsAPI.getUser();
 
     // only end users can write reviews
-    if (! connectionsAPI.hasRole(userInfo,
+    if (!connectionsAPI.hasRole(userInfo,
       connectionsAPI.role.endUser)) {
       return null;
     }
 
     // franchise managers can't write reviews
-    if ( connectionsAPI.hasRole(userInfo,
+    if (connectionsAPI.hasRole(userInfo,
       connectionsAPI.role.franchiseManager)) {
       return null;
     }
 
     // global managers can't write reviews
-    if ( connectionsAPI.hasRole(userInfo,
+    if (connectionsAPI.hasRole(userInfo,
       connectionsAPI.role.globalManager)) {
       return null;
     }
 
     // franchise employees can't write reviews
-    if ( userInfo.organizations.length > 0) {
+    if (userInfo.organizations.length > 0) {
       return null;
     }
 
