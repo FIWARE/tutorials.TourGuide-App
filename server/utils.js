@@ -32,57 +32,6 @@ var DATE_TYPE = 'DateTime';
 var AGGREGATE_RATING_TYPE = 'AggregateRating';
 
 /**
- * Function used in restaurantfeeder.js to download the json restaurant data
- *
- * @param {Object} options - Options of the request
- * @param {Function} callback - Callback function
- * @param {Object} res - Response object
- * @param {Boolean} useHttps - Boolean to use https
-*/
-function doGet(options, callback, res, useHttps) {
-  var protocol = http;
-  if (useHttps) {
-    protocol = https;
-  }
-
-  var request = protocol.get(options, function(response) {
-    // data is streamed in chunks from the server
-    // so we have to handle the "data" event
-    var buffer = '';
-    var data;
-
-    response.on('data', function(chunk) {
-      buffer += chunk;
-    });
-
-    response.on('end', function() {
-      var msg = '';
-      try {
-        data = JSON.parse(buffer);
-        // console.log(data);
-      } catch (err) {
-        console.log('Can\'t decode JSON response.');
-        console.error(err);
-        msg = 'Can\'t decode JSON response.';
-      }
-      if (data === undefined) {
-        msg = 'Error processing JSON response';
-      } else {
-        msg = buffer;
-      }
-      callback(res, msg);
-    });
-  });
-  request.on('error', function(err) {
-    console.log('FAILED GET REQUEST');
-    err = new Error();
-    err.status = 502; // Bad gateway
-    callback(res, err);
-    console.error(err);
-  });
-}
-
-/**
  * Replaces the key of an element with its match
  *
  * @param {Object} dictionary - The dictionary with the content
@@ -193,12 +142,12 @@ function getRandomDate(from, to) {
   if (!from) {
     from = new Date(2015, 10, 1).getTime();
   } else {
-    from = from.getTime();
+    from = new Date(from).getTime();
   }
   if (!to) {
     to = new Date(2015, 10, 25).getTime();
   } else {
-    to = to.getTime();
+    to = new Date(to).getTime();
   }
   return new Date(from + Math.random() * (to - from));
 }
@@ -260,16 +209,16 @@ function objectToArray(element) {
 */
 function setSchemaUnits(sensor) {
   switch (sensor.additionalType) {
-  case 'temperature':
-    sensor.unitCode = 'CEL';
-    sensor.unitText = '°C';
-    break;
-  case 'relativeHumidity':
-    sensor.unitCode = 'P1';
-    sensor.unitText = '%';
-    break;
-  default:
-    console.log('Uknown type:', sensor.additionalType);
+    case 'temperature':
+      sensor.unitCode = 'CEL';
+      sensor.unitText = '°C';
+      break;
+    case 'relativeHumidity':
+      sensor.unitCode = 'P1';
+      sensor.unitText = '%';
+      break;
+    default:
+      console.log('Uknown type:', sensor.additionalType);
   }
   return sensor;
 }
@@ -726,6 +675,21 @@ function reservationToOrion(userObject, schemaObject) {
 }
 
 /**
+ * Generate a list of restaurants of a Franchise
+ *
+ * @param {String} organization - Franchise name
+ * @param {List} listOfElements - List of restaurant elements
+ * @return {List} Contains all the restaurants belonging to an Organization
+*/
+function getOrgRestaurants(organization, listOfElements) {
+  return objectToArray(listOfElements).filter(
+    function(element) {
+      return element.department === organization;
+    }
+  );
+}
+
+/**
  * Generate a list of reservations of a Franchise
  *
  * @param {List} listOfRestaurants - Restaurants from a Franchise
@@ -737,6 +701,25 @@ function getOrgReservations(listOfRestaurants, listOfReservations) {
     function(element) {
       return listOfRestaurants.some(function(restaurant) {
         return restaurant.name === element.reservationFor;
+      });
+    }
+  );
+}
+
+/**
+ * Generate a list of reviews of a Franchise
+ *
+ * @param {String} organization - Organization to filter
+ * @param {List} listOfRestaurants - Restaurants from a Franchise
+ * @param {List} listOfReviews - List of reviews
+ * @return {List} Contains all the reviews of the passed restaurants
+*/
+function getOrgReviews(organization, listOfRestaurants, listOfReviews) {
+  listOfRestaurants = getOrgRestaurants(organization, listOfRestaurants);
+  return objectToArray(listOfReviews).filter(
+    function(element) {
+      return listOfRestaurants.some(function(restaurant) {
+        return restaurant.name === element.itemReviewed;
       });
     }
   );
@@ -924,12 +907,10 @@ function updateOccupancyLevels(listOfReservations, date) {
 */
 function generateId(name, date) {
   var id;
-  var inputEncoding;
+  var inputEncoding = name;
 
   if (date) {
-    inputEncoding = name + date;
-  } else {
-    inputEncoding = name;
+    inputEncoding += date;
   }
 
   id = crypto.createHash('sha1').update(inputEncoding).digest('hex');
@@ -1097,7 +1078,6 @@ function returnConflict(res) {
 }
 
 module.exports = {
-  doGet: doGet,
   replaceOnceUsingDictionary: replaceOnceUsingDictionary,
   randomIntInc: randomIntInc,
   randomElement: randomElement,
@@ -1134,5 +1114,7 @@ module.exports = {
   returnInvalidSchema: returnInvalidSchema,
   removeServicePath: removeServicePath,
   returnForbidden: returnForbidden,
-  returnConflict: returnConflict
+  returnConflict: returnConflict,
+  getOrgRestaurants: getOrgRestaurants,
+  getOrgReviews: getOrgReviews
 };

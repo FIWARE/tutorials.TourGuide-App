@@ -4,111 +4,228 @@
  * Author: Alvaro del Castillo <acs@bitergia.com>,
  * Alberto Martín <amartin@bitergia.com>
  * MIT Licensed
-
-  Generates random reservations for restaurants in orion
-
-  First it gets all restaurant information
-  Then a random automatic reservation is generated
-  Then the reservation is added to Orion CB
-
+ *
+ *  Generates random reservations for restaurants in orion
+ *
+ *  First it gets all restaurant information
+ *  A random automatic reservation is generated
+ *  Then the reservation is added to Orion CB
 */
 
 // jshint node: true
 
 'use strict';
 
+var path = require('path');
 var utils = require('../utils');
-var async = require('async');
 var shortid = require('shortid'); // unique ids generator
-var apiRestSimtasks = 5; // number of simultaneous calls to API REST
+
+var RESTAURANT_TYPE = 'Restaurant';
+var RESERVATION_TYPE = 'FoodEstablishmentReservation';
 var reservationsAdded = 0;
 var restaurantsData; // All data for the restaurants to be reserved
+var fromDate;
+var toDate;
+var restaurantSelected;
+var numberOfReservations = 1;
 
 var config = require('../config');
 var fiwareHeaders = {
   'fiware-service': config.fiwareService
 };
 
-var feedOrionReservations = function() {
-  var returnPost = function(data) {
-    reservationsAdded++;
-    console.log(reservationsAdded + '/' + restaurantsData.length);
-  };
+/**
+ * Function to display a help menu using the CLI
+*/
+function showHelp() {
+  var progname = path.basename(process.argv[1]);
+  // jshint multistr: true, maxlen: false
+  // jscs:disable maximumLineLength, disallowMultipleLineStrings
+  var helpMessage = [
+    '',
+    'Generate random reservations of restaurant/s between the provided dates.',
+    '',
+    'Usage: ' + progname + ' <options>',
+    '',
+    'Available options:',
+    '',
+    '  -h  --help                          Show this help.',
+    '  -s  --fromDate                      Select a date to start (ISO8601 format).',
+    '  -e  --toDate                        Select an end date (ISO8601 format).',
+    '  -r  --restaurant                    Load reservations for the restaurant of the JSON provided ',
+    '                                      using its name. Without this value, it will generate ',
+    '                                      reservations for all the restaurants loaded. ',
+    '  -n  --numberOfReservations          Load a defined number of reservations (for each restaurant)',
+    '                                      among the provided ones.',
+    '',
+    'NOTE: restaurants must be previously loaded to generate reservations. ',
+    ''].join('\n');
+  // jshint multistr: false, maxlen: 80
+  // jscs:enable
+  console.log(helpMessage);
+  process.exit(0);
+}
 
-  // restaurantsData = restaurantsData.slice(0,5); // debug with few items
+/**
+ * Function to parse the arguments given launching the script
+*/
+function parseArgs() {
+  if (process.argv.length < 3) {
+    // no args, use defaults
+    return;
+  }
 
-  console.log('Feeding reservations info in orion.');
-  console.log('Number of restaurants: ' + restaurantsData.length);
+  var argv = require('minimist')(process.argv.slice(2), {
+    alias: {
+      h: 'help',
+      s: 'fromDate',
+      e: 'toDate',
+      r: 'restaurant',
+      n: 'numberOfReservations'
+    }
+  });
 
-  // Limit the number of calls to be done in parallel to orion
-  var q = async.queue(function(task, callback) {
-    var attributes = task.attributes;
-    utils.sendRequest('POST', attributes, null, fiwareHeaders)
-    .then(callback)
+  if (argv.help) {
+    showHelp();
+  }
+
+  if (typeof argv.fromDate === 'string' && argv.fromDate !== '') {
+    fromDate = argv.fromDate;
+  }
+
+  if (typeof argv.toDate === 'string' && argv.toDate !== '') {
+    toDate = argv.toDate;
+  }
+
+  if (typeof argv.restaurant === 'string' && argv.restaurant !== '') {
+    restaurantSelected = argv.restaurant;
+  }
+
+  if (typeof argv.numberOfReservations === 'number' &&
+      argv.numberOfReservations !== '') {
+    numberOfReservations = argv.numberOfReservations;
+  }
+
+  if (!argv.restaurant && argv.numberOfReservations) {
+    console.error('\'numberOfReservations\' needs a \'restaurant\' ' +
+                  'to load into. Please try again.');
+    showHelp();
+    process.exit(1);
+  }
+
+}
+
+/**
+ * Function to load the restaurant information into a variable
+*/
+function processRestaurants(data) {
+  restaurantsData = utils.objectToArray(JSON.parse(JSON.stringify(data.body)));
+  feedOrionReservations();
+}
+
+/**
+ * Function to get the restaurant information for the reservations
+*/
+function getRestaurantInformation() {
+  if (restaurantSelected) {
+    var restaurantId = utils.generateId(restaurantSelected);
+    utils.getListByType(RESTAURANT_TYPE, restaurantId, fiwareHeaders)
+    .then(processRestaurants)
     .catch(function(err) {
       console.error(err);
     });
-  }, apiRestSimtasks);
+  } else {
+    utils.getListByType(RESTAURANT_TYPE, null, fiwareHeaders)
+    .then(processRestaurants)
+    .catch(function(err) {
+      console.error(err);
+    });
+  }
+}
 
-  q.drain = function() {
-    console.log('Total reservations added: ' + reservationsAdded);
+/**
+ * Function to log the process of the reservations loading
+*/
+function logProgress() {
+  reservationsAdded++;
+  var message = restaurantsData.length;
+  if (numberOfReservations > 1) {
+    message = numberOfReservations;
+  }
+  console.log(reservationsAdded + '/' + message);
+}
+
+/**
+ * Function that generates a Reservation
+ *
+ * @param {Object} restaurant - Restaurant of the reservation
+*/
+function createReservations(restaurant) {
+  var reservedRestaurant = restaurant.name;
+  var date = utils.getRandomDate(fromDate, toDate).toISOString();
+  var user = 'user' + utils.randomIntInc(1, 10);
+  var random = Math.random();
+  var occupancyLevels;
+
+  var attr = {
+    'type': RESERVATION_TYPE,
+    'id': utils.generateId(reservedRestaurant, random),
+    'reservationStatus': {
+      'value': 'Confirmed'
+    },
+    'underName': {
+      'type': 'Person',
+      'value': user
+    },
+    'reservationFor': {
+      'type': 'FoodEstablishment',
+      'value': reservedRestaurant
+    },
+    'address': {
+      'type': 'PostalAddress',
+      'value': restaurant.address
+    },
+    'startTime': {
+      'type': 'DateTime',
+      'value': date
+    },
+    'partySize': {
+      'value': utils.randomIntInc(1, 10)
+    }
   };
 
-  Object.keys(restaurantsData).forEach(function(element, index) {
+  sendReservation(attr);
+}
 
-    var reservedRestaurant = restaurantsData[index].name;
-    var date = new Date().toISOString();
-    var reservations = ['Cancelled', 'Confirmed', 'Hold', 'Pending'];
-
-    var attr = {
-      'type': 'FoodEstablishmentReservation',
-      'id': utils.generateId(reservedRestaurant, date),
-      'reservationStatus': {
-        'value': utils.randomElement(reservations)
-      },
-      'underName': {
-        'type': 'Person',
-        'value': 'user' + utils.randomIntInc(1, 10)
-      },
-      'reservationFor': {
-        'type': 'FoodEstablishment',
-        'value': reservedRestaurant
-      },
-      'address': {
-        'type': 'PostalAddress',
-        'value': restaurantsData[index].address
-      },
-      'startTime': {
-        'type': 'DateTime',
-        'value': utils.getRandomDate().toISOString()
-      },
-      'partySize': {
-        'value': utils.randomIntInc(1, 20)
-      }
-    };
-
-    q.push({
-      'attributes': attr
-    }, returnPost);
-  });
-};
-
-// Load restaurant data from Orion
-var loadRestaurantData = function() {
-
-  // Once we have all data for restaurants generate reviews for them
-
-  var processRestaurants = function(data) {
-    restaurantsData = JSON.parse(JSON.stringify(data.body));
-    feedOrionReservations();
-  };
-  utils.getListByType('Restaurant',null,fiwareHeaders)
-  .then(processRestaurants)
+/**
+ * Function to load reservations into Orion
+ *
+ * @param {String} restaurant - Restaurant of the reservation
+*/
+function sendReservation(restaurant) {
+  utils.sendRequest('POST', restaurant, null, fiwareHeaders)
+  .then(logProgress)
   .catch(function(err) {
-    console.error(err);
+    console.error(err.error);
   });
-};
+}
 
-console.log('Generating random reservations for restaurants ...');
+/**
+ * Function that generates reservations based in the CLI parameters
+*/
+function feedOrionReservations() {
+  console.log('Feeding reservations info in orion.');
+  if (restaurantSelected) {
+    var counter = numberOfReservations;
+    while (counter--) {
+      createReservations(restaurantsData[0]);
+    }
+  } else {
+    restaurantsData.forEach(function(element) {
+      createReservations(element);
+    });
+  }
+}
 
-loadRestaurantData();
+parseArgs();
+getRestaurantInformation();
