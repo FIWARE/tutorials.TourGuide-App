@@ -1,0 +1,133 @@
+#!/bin/bash
+#
+#  load_reservations
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  load reservations subcommand for TourGuide CLI.
+#
+
+load_reservations_wait=0
+restaurant_name=""
+limit=0
+feeder_params=""
+from_date=""
+to_date=""
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} load reservations [-h | --help] [-w | --wait] [-r <name> | --restaurant <name>]
+                                    [-l <n> | --limit <n>] [-f <date> | --from <date>]
+                                    [-t <date> | --to <date>]
+
+Create reservations for the loaded restaurants.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the tourguide container to be ready.
+                             Default is to exit if tourguide container is not ready.
+  -r  --restaurant <name>    Create a reservation for a single restaurant using its <name>.
+                             Default is to create reservations for all available restaurants.
+  -l  --limit <n>            Limit the number of reservations to load per restaurant to <n>.
+                             Default is 1 reservation per restaurant.
+  -f  --from <date>          Create reservations from <date> on.
+                             Use ISO8601 date format.
+  -t  --to <date>            Create reservations up to <date>.
+                             Use ISO8601 date format.
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hwr:l:f:t: -l help,wait,restaurant:,limit:,from:,to: -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-w" | "--wait")
+                shift
+                load_reservations_wait=1
+                ;;
+            "-r" | "--restaurant")
+                shift
+                restaurant_name=$1
+                ;;
+            "-l" | "--limit")
+                shift
+                limit=$1
+                ;;
+            "-f" | "--from")
+                shift
+                from_date=$1
+                ;;
+            "-t" | "--to")
+                shift
+                to_date=$1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        submodule_help
+    fi
+
+    [ ${limit} -gt 0 ] &&
+        feeder_params="${feeder_params} --numberOfReservations ${limit}"
+    [ ! -z "${restaurant_name}" ] &&
+        feeder_params="${feeder_params} --restaurant '${restaurant_name}'"
+    [ ! -z "${from_date}" ] &&
+        feeder_params="${feeder_params} --fromDate '${from_date}'"
+    [ ! -z "${to_date}" ] &&
+        feeder_params="${feeder_params} --toDate '${to_date}'"
+}
+
+function submodule_cmd () {
+    local _started=0
+    local _tries=0
+    local _container_name="${container_prefix}tourguide"
+
+    submodule_options "$@"
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_container_name} 2>&1 |
+                 grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${load_reservations_wait} -eq 1 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        docker exec -i -t ${_container_name} /bin/bash -c \
+               "cd tutorials.TourGuide-App/server/feeders; \
+                node reservationsgenerator.js ${feeder_params}"
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
+}

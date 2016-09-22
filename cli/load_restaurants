@@ -1,0 +1,113 @@
+#!/bin/bash
+#
+#  load_restaurants
+#  Copyright(c) 2016 Bitergia
+#  Author: Bitergia <fiware-testing@bitergia.com>
+#  MIT Licensed
+#
+#  load restaurants subcommand for TourGuide CLI.
+#
+
+load_restaurants_wait=0
+restaurant_name=""
+limit=0
+feeder_params=""
+
+function submodule_help () {
+    cat <<EOF >&2
+Usage: ${appname} load restaurants [-h | --help] [-w | --wait] [-r <name> | --restaurant <name>]
+                                   [-l <n> | --limit <n>]
+
+Load sample restaurants for use with TourGuide-App.
+
+Command options:
+
+  -h  --help                 Show this help.
+  -w  --wait                 Wait for the tourguide container to be ready.
+                             Default is to exit if tourguide container is not ready.
+  -r  --restaurant <name>    Load a single restaurant using its <name>.
+  -l  --limit <n>            Limit the number of restaurants to load to <n>.
+                             This option is ignored when using --restaurant option.
+
+EOF
+    exit 0
+}
+
+function submodule_options () {
+    TEMP=`getopt -o hwr:l: -l help,wait,restaurant:,limit: -- "$@"`
+
+    if test "$?" -ne 0 ; then
+        submodule_help
+    fi
+
+    eval set -- "$TEMP"
+
+    while true ; do
+        case "$1" in
+            "-h" | "--help" )
+                submodule_help
+                ;;
+            "-w" | "--wait")
+                shift
+                load_restaurants_wait=1
+                ;;
+            "-r" | "--restaurant")
+                shift
+                restaurant_name=$1
+                ;;
+            "-l" | "--limit")
+                shift
+                limit=$1
+                ;;
+            --|*)
+                break;
+                ;;
+        esac
+        shift
+    done
+    shift
+
+    if [ $# -gt 0 ]; then
+        echo "Unknown parameters: $@"
+        submodule_help
+    fi
+
+    [ ${limit} -gt 0 ] &&
+        feeder_params="--numberOfRestaurants ${limit}"
+    [ ! -z "${restaurant_name}" ] &&
+        feeder_params="--restaurant '${restaurant_name}'"
+}
+
+function submodule_cmd () {
+    local _started=0
+    local _tries=0
+    local _container_name="${container_prefix}tourguide"
+
+    submodule_options "$@"
+
+    while [ true ]; do
+        echo -n "Waiting for tourguide to be ready [$(( ${_tries} + 1 ))]... "
+        if ( docker logs ${_container_name} 2>&1 |
+                 grep -qE "service apache2 reload" ) ; then
+            echo "OK."
+            _started=1
+        fi
+
+        if [ ${_started} -eq 0 -a ${load_restaurants_wait} -eq 1 ]; then
+            sleep 1
+            _tries=$(( ${_tries} + 1 ))
+            echo "Retrying."
+        else
+            break
+        fi
+    done
+
+    if [ ${_started} -eq 1 ]; then
+        docker exec -i -t ${_container_name} /bin/bash -c \
+               "cd tutorials.TourGuide-App/server/feeders; \
+               node restaurantfeeder.js ${feeder_params}"
+    else
+        echo "Not ready."
+        echo "Stopping."
+    fi
+}
