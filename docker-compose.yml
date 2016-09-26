@@ -82,7 +82,7 @@ cygnus:
     container_name: cygnus
     links:
         - orion
-        - mysql
+        - mysql:iot-mysql
     expose:
         - "5050"
     environment:
