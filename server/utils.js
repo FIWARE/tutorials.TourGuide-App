@@ -614,10 +614,6 @@ function reviewToOrion(userObject, schemaObject) {
         'type': RESTAURANT_TYPE,
         'value': itemReviewed
       },
-      'publisher': {
-        'type': ORG_TYPE,
-        'value': userObject.organizations[0].name
-      },
       'reviewRating': {
         'type': RATING_TYPE,
         'value': schemaObject.reviewRating.ratingValue
@@ -627,6 +623,13 @@ function reviewToOrion(userObject, schemaObject) {
       },
       'type': REVIEW_TYPE
     };
+    if (userObject.organizations.length > 0) {
+      objectToOrion.publisher = {
+        'type': ORG_TYPE,
+        'value': userObject.organizations[0].name
+      };
+    }
+
     return sortObject(objectToOrion);
   }
 }
