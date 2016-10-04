@@ -1,7 +1,7 @@
 # FIWARE Tour Guide Application
 
 [![License][license-image]][license-url]
-[![Documentation badge](https://readthedocs.org/projects/fiwaretourguide/badge/?version=latest)](http://fiwaretourguide.readthedocs.org/en/latest/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/)
+[![Documentation badge](https://readthedocs.org/projects/fiwaretourguide/badge/?version=latest)](http://fiwaretourguide.readthedocs.io/en/latest/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/introduction/)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/tutorials.tourguide-app.svg)](https://hub.docker.com/r/fiware/tutorials.tourguide-app/)
 [![Support badge]( https://img.shields.io/badge/support-askbot-yellowgreen.svg)](http://ask.fiware.org)
 [![Build Status][travis-image]][travis-url]
