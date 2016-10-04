@@ -75,7 +75,8 @@ exports.readRestaurant = function(req, res) {
   var occupancyLevelsObject;
   var servicePath;
   var fiwareHeaders;
-  var restaurantId = utils.generateId(req.params.id);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(req.params.id));
   var currentDate = new Date().toISOString();
   var filter = [];
   var queryString = {};
@@ -118,7 +119,8 @@ exports.readRestaurantWithDate = function(req, res) {
   var occupancyLevelsObject;
   var servicePath;
   var fiwareHeaders;
-  var restaurantId = utils.generateId(req.params.id);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(req.params.id));
   var filter = [];
   var queryString = {};
   var timeframe = utils.getTimeframe(req.params.date);
@@ -155,7 +157,8 @@ exports.readRestaurantWithDate = function(req, res) {
 */
 exports.updateRestaurant = function(req, res) {
   var queryString = {'options': 'keyValues'};
-  var restaurantId = utils.generateId(req.params.id);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(req.params.id));
   utils.sendRequest('PATCH', req.body, restaurantId, req.headers, queryString)
   .then(function(patchResponse) {
     utils.returnResponse(patchResponse, res);
@@ -172,7 +175,8 @@ exports.updateRestaurant = function(req, res) {
  * @param {Object} res - Response
 */
 exports.deleteRestaurant = function(req, res) {
-  var restaurantId = utils.generateId(req.params.id);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(req.params.id));
   utils.sendRequest('DELETE', null, restaurantId, req.headers)
   .then(function(deleteResponse) {
     utils.returnResponse(deleteResponse, res);
@@ -232,7 +236,8 @@ exports.getOrganizationRestaurants = function(req, res) {
 exports.createReview = function(req, res) {
   var elementToOrion = req.body;
   var restaurantName = elementToOrion.itemReviewed.name;
-  var restaurantId = utils.generateId(restaurantName);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(restaurantName));
   var filter = [];
   var queryString = {};
   var servicePath;
@@ -311,7 +316,8 @@ exports.updateReview = function(req, res) {
   utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
   .then(function(data) {
     restaurantName = data.body.itemReviewed;
-    restaurantId = utils.generateId(restaurantName);
+    restaurantId = utils.generateId(
+      utils.fixedEncodeURIComponent(restaurantName));
     userId = data.body.author;
     return auth.getUserDataPromise(req);
   })
@@ -369,7 +375,8 @@ exports.deleteReview = function(req, res) {
   utils.getListByType(REVIEW_TYPE, reviewId, req.headers)
   .then(function(review) {
     restaurantName = review.body.itemReviewed;
-    restaurantId = utils.generateId(restaurantName);
+    restaurantId = utils.generateId(
+      utils.fixedEncodeURIComponent(restaurantName));
     return utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers);
   })
   .then(function(restaurant) {
@@ -500,7 +507,8 @@ exports.createReservation = function(req, res) {
   var timeframe = utils.getTimeframe(req.body.startTime);
   var filter = [];
   var queryString = {};
-  var restaurantId = utils.generateId(req.body.reservationFor.name);
+  var restaurantId = utils.generateId(
+    utils.fixedEncodeURIComponent(req.body.reservationFor.name));
   var validSchema = tv4.validate(req.body, 'reservation');
   if (validSchema) {
     utils.getListByType(RESTAURANT_TYPE, restaurantId, req.headers)
