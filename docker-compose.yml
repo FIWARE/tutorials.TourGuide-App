@@ -59,7 +59,7 @@ ul20client:
     links:
         - orion
         - idas
-    command: --acpi
+    command: --fake --min 0 --max 100 --variance 5
     environment:
         - UL20_IOTA_HOST=idas
         - UL20_IOTA_PORT=7896
