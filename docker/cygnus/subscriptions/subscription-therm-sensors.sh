@@ -10,7 +10,9 @@
 CYGNUS_HOST=$( getent hosts cygnus | sort -u | awk '{print $1}' )
 CYGNUS_PORT=5050
 CYGNUS_URL=http://${CYGNUS_HOST}:${CYGNUS_PORT}/notify
-ORION_URL=http://${ORION_HOSTNAME}:${ORION_PORT}/v1/subscribeContext
+ORION_HOST=$( getent hosts orion | sort -u | awk '{print $1}' )
+ORION_PORT=1026
+ORION_URL=http://${ORION_HOST}:${ORION_PORT}/v1/subscribeContext
 
 cat <<EOF | curl ${ORION_URL} -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Fiware-Service: tourguide' --header 'Fiware-ServicePath: /#' -d @-
 {
