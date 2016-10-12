@@ -16,8 +16,8 @@
    inkscape:version="0.48.5 r10040"
    sodipodi:docname="composeDiagram.svg"
    inkscape:export-filename="/home/amartin/devel/albertinisg/clean/tutorials.TourGuide-App/doc/img/composeDiagram.png"
-   inkscape:export-xdpi="102.23595"
-   inkscape:export-ydpi="102.23595">
+   inkscape:export-xdpi="103.06042"
+   inkscape:export-ydpi="103.06042">
   <metadata
      id="metadata1396">
     <rdf:RDF>
@@ -43,9 +43,9 @@
      inkscape:window-height="1016"
      id="namedview1394"
      showgrid="false"
-     inkscape:zoom="0.5"
-     inkscape:cx="244.82642"
-     inkscape:cy="337.74666"
+     inkscape:zoom="1"
+     inkscape:cx="447.50952"
+     inkscape:cy="291.39525"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="0"
@@ -104,7 +104,9 @@
        x="27.571394"
        y="20.09421"
        rx="10"
-       ry="10" />
+       ry="10"
+       inkscape:export-xdpi="105.10705"
+       inkscape:export-ydpi="105.10705" />
     <g
        style="display:inline"
        transform="matrix(0.375,0,0,-0.375,645.1252,560.51192)"
@@ -359,14 +361,28 @@
          sodipodi:linespacing="125%"
          id="text6037-5"
          y="750.42456"
-         x="2119.5498"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
+         x="2118.1355"
+         style="font-size:12.5px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold'"
+         xml:space="preserve"
+         inkscape:export-xdpi="98.925705"
+         inkscape:export-ydpi="98.925705"><tspan
            y="750.42456"
-           x="2119.5498"
+           x="2118.1355"
            id="tspan6039-9"
            sodipodi:role="line"
-           style="text-align:center;text-anchor:middle">5000</tspan></text>
+           style="text-align:center;text-anchor:middle">8000:8000</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text6037-5-1"
+         y="733.97968"
+         x="2118.2161"
+         style="font-size:12.5px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold'"
+         xml:space="preserve"><tspan
+           y="733.97968"
+           x="2118.2161"
+           id="tspan6039-9-4"
+           sodipodi:role="line"
+           style="text-align:center;text-anchor:middle">5000:5000</tspan></text>
     </g>
     <g
        transform="translate(-1315.37,-599.71051)"
@@ -569,13 +585,25 @@
          id="text6037-5-5-6"
          y="750.42456"
          x="2119.5498"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         style="font-size:12.5px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold'"
          xml:space="preserve"><tspan
            y="750.42456"
            x="2119.5498"
            id="tspan6039-9-6-14"
            sodipodi:role="line"
-           style="text-align:center;text-anchor:middle">8080,8081</tspan></text>
+           style="text-align:center;text-anchor:middle">4041:4041</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text6037-5-5-6-1"
+         y="733.83917"
+         x="2119.5198"
+         style="font-size:12.5px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold'"
+         xml:space="preserve"><tspan
+           y="733.83917"
+           x="2119.5198"
+           id="tspan6039-9-6-14-5"
+           sodipodi:role="line"
+           style="text-align:center;text-anchor:middle">7896:7896</tspan></text>
     </g>
     <g
        transform="translate(-2005.8461,-232.38245)"
@@ -683,18 +711,18 @@
       <text
          sodipodi:linespacing="125%"
          id="text6037-5-5-2"
-         y="733.41278"
-         x="2119.5498"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         y="722.45264"
+         x="2119.1963"
+         style="font-size:12.5px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Roboto;-inkscape-font-specification:'Roboto, Bold'"
          xml:space="preserve"><tspan
            sodipodi:role="line"
            id="tspan6450"
-           x="2119.5498"
-           y="733.41278">5001,5002</tspan><tspan
+           x="2119.1963"
+           y="722.45264" /><tspan
            sodipodi:role="line"
            id="tspan6452"
-           x="2119.5498"
-           y="749.03778">5050,6001</tspan></text>
+           x="2119.1963"
+           y="738.07764">5050</tspan></text>
     </g>
   </g>
 </svg>
