@@ -4,7 +4,7 @@ var assert = require('chai').assert;
 require('./helpers/data.js');
 chai.should();
 
-var baseURL = 'http://tourguide/api/orion/';
+var baseURL = '/api/orion/';
 
 describe('Testing restaurantsAPI', function () {
   before(function() {
