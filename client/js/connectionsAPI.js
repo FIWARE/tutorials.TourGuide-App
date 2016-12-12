@@ -52,7 +52,7 @@ var connectionsAPI = (function() {
 
     var logoutLink = document.createElement('A');
     logoutLink.id = 'logOutLink';
-    logoutLink.href = 'http://tourguide/logout';
+    logoutLink.href = '/logout';
     logoutLink.textContent = 'Log out';
 
     logoutLink.onclick = function() {
@@ -220,7 +220,7 @@ var connectionsAPI = (function() {
     logInLi.className = 'menuElement';
 
     var logInA = document.createElement('A');
-    logInA.href = 'http://tourguide/auth';
+    logInA.href = '/auth';
     logInA.textContent = 'Log in';
 
     logInLi.appendChild(logInA);
