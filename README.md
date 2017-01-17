@@ -39,7 +39,7 @@ This application is a smart, context-aware application which allows to manage la
 
 ## Architecture
 
-![Architecture diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/develop/doc/img/archDiagram.png?raw=true "Architecture diagram")
+![Architecture diagram](doc/img/archDiagram.png?raw=true "Architecture diagram")
 
 It includes (for the moment) the following components:
 
@@ -56,7 +56,7 @@ This project integrates a set of Generic Enablers using those enablers inside [d
 
 For that purpose, [docker](https://github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/) are required.
 
-![Compose Diagram](https://github.com/Fiware/tutorials.TourGuide-App/blob/develop/doc/img/composeDiagram.png?raw=true "Compose Diagram")
+![Compose Diagram](doc/img/composeDiagram.png?raw=true "Compose Diagram")
 
 ### Installation and Administration Guide
 

@@ -1,0 +1,26 @@
+site_name: FIWARE Tour Guide Application
+site_description: FIWARE Tour Guide documentation
+site_url: http://fiware-tourguide-app.readthedocs.org
+docs_dir: doc/readthedocs/
+extra_css: ["https://fiware.org/style/fiware_readthedocs.css"]
+repo_url: https://github.com/Fiware/tutorials.TourGuide-App.git
+pages:
+  - Home: index.md
+  - 'Architecture': 'architecture/architecture.md'
+  - 'How to build and install':
+      - 'Introduction': 'how-to-build-and-install/how-to-build-and-install.md'
+      - 'Installation and Administration Guide': 'how-to-build-and-install/installation-and-administration-guide.md'
+      - 'Deploying on a Cloud Fiware Lab Instance': 'how-to-build-and-install/deploying-on-a-cloud-fiware-lab-instance.md'
+  - 'User and Programmers Manual':
+      - 'Introduction': 'user-and-programmers-manual/user-and-programmers-manual.md'
+      - 'Miscellaneous configuration':
+          - 'Introduction': 'user-and-programmers-manual/miscellaneous-configuration/miscellaneous-configuration.md'
+          - 'How to configure a Context Provider in Orion': 'user-and-programmers-manual/miscellaneous-configuration/how-to-configure-a-context-provider-in-orion.md'
+          - 'How to use CEP to process and generate events': 'user-and-programmers-manual/miscellaneous-configuration/how-to-use-cep-to-process-and-generate-events.md'
+          - 'How to configure Cygnus in TourGuide': 'user-and-programmers-manual/miscellaneous-configuration/how-to-configure-cygnus-in-tourguide.md'
+          - 'How to generate a new restaurant data image': 'user-and-programmers-manual/miscellaneous-configuration/how-to-generate-a-new-restaurant-data-image.md'
+          - 'How to run Feeders for the data image generation': 'user-and-programmers-manual/miscellaneous-configuration/how-to-run-feeders-for-the-data-image-generation.md'
+          - 'How to retrieve an Oauth Token to use the API': 'user-and-programmers-manual/miscellaneous-configuration/how-to-retrieve-an-oauth-token-to-use-the-api.md'
+  - 'API Overview': 'api-overview/api-overview.md'
+  - 'End to End tests': 'end-to-end-tests/end-to-end-tests.md'
+  - 'Feedback': 'feedback/feedback.md'
