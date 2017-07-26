@@ -20,7 +20,7 @@ var map; // map instance
 var connectionsAPI;
 var AJAXRequest;
 var restaurantsAPI = (function() {
-  var baseURL = 'http://tourguide/api/orion/';
+  var baseURL = '/api/orion/';
 
   // get all restaurants and show them 
   function getAllRestaurants(cb, errCb) {
