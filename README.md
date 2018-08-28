@@ -66,7 +66,7 @@ Detailed information of how to start this environment can be found [here](https:
 
 You can deploy an instance of the Fiware TourGuide App in a cloud instance using [Docker-machine](https://docs.docker.com/machine/). Detailed information of this process can be found in the following documentation:
 
-* [Installing Docker on FIWARE Cloud](http://simple-docker-hosting-on-fiware-cloud.readthedocs.org/en/latest/manuals/install/)
+* [Installing Docker on FIWARE Cloud](http://simple-docker-hosting-on-fiware-cloud.readthedocs.io/)
 
 ## User and Programmers Manual
 
