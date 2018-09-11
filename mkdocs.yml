@@ -1,0 +1,18 @@
+site_name: Tour Guide
+site_description: FIWARE Tour Guide
+docs_dir: doc/
+extra_css: ["https://fiware.org/style/fiware_readthedocs.css"]
+repo_url: https://github.com/Fiware/tutorials.TourGuide-App
+google_analytics: ['UA-80297547-1', 'fiwaretourguideapp.readthedocs.io']
+theme: readthedocs
+pages:
+  - Home: index.md
+
+  - 'FIWARE Tour Guide Application':
+     - 'Installation': 'installation.md'
+     - 'Managing Context Information': 'managing-context-information.md'
+     - 'Managing IoT Data': 'managing-iot-data.md'
+     - 'Configuring Security Aspects': 'configuring-security-aspects.md'
+     - 'Publishing historical data': 'publishing-historical-data.md'
+     - 'Using the front-end application': 'using-the-front-end-application.md'
+
