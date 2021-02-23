@@ -1,9 +1,8 @@
 # FIWARE Tour Guide Application
 
 [![License: MIT](https://img.shields.io/github/license/FIWARE/tutorials.TourGuide-App.svg)](https://opensource.org/licenses/MIT)
-[![Documentation badge](https://readthedocs.org/projects/fiwaretourguide/badge/?version=latest)](http://fiwaretourguide.readthedocs.io/en/latest/fiware-tour-guide-application-a-tutorial-on-how-to-integrate-the-main-fiware-ges/introduction/)
-[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
 ![](https://nexus.lab.fiware.org/static/badges/statuses/deprecated.svg)
+[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
 
 
 > This repository is now archived. Since this application was created, a series of self-contained tutorials on each
