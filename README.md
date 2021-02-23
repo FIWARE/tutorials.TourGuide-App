@@ -53,18 +53,18 @@ provided by the application are:
 
 It includes (for the moment) the following components:
 
--   [Orion Context Broker](https://github.com/telefonicaid/fiware-orion/),
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](./core/README.md) [Orion Context Broker](https://github.com/telefonicaid/fiware-orion/),
     providing the NGSIv2 interfaces.
--   [Backend Device Management - IDAS](https://github.com/FIWARE/catalogue/blob/master/iot-agents/README.md), to connect
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/iot-agents.svg)](./iot-agents/README.md) [Backend Device Management - IDAS](https://github.com/FIWARE/catalogue/blob/master/iot-agents/README.md), to connect
     IoT devices (temperature & humidity).
--   [Cygnus](https://github.com/telefonicaid/fiware-cygnus) for the
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](./core/README.md) [Cygnus](https://github.com/telefonicaid/fiware-cygnus) for the
     [Cosmos ecosystem](https://github.com/ging/fiware-cosmos) to give persistance to the context
     data (using its sinks).
--   [Authorization PDP - AuthZForce](https://github.com/authzforce/server), to get
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/security.svg)](./security/README.md) [Authorization PDP - AuthZForce](https://github.com/authzforce/server), to get
     authorization decisions based on authorization policies.
--   [PEP Proxy - Wilma](https://github.com/ging/fiware-pep-proxy), to add authentication and authorization security to
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/security.svg)](./security/README.md) [PEP Proxy - Wilma](https://github.com/ging/fiware-pep-proxy), to add authentication and authorization security to
     the application.
--   [IDM KeyRock](https://github.com/ging/fiware-idm), covering the user profile management, authorization and
+-   [![](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/security.svg)](./security/README.md) [IDM KeyRock](https://github.com/ging/fiware-idm), covering the user profile management, authorization and
     authentication among others.
 
 ## How to build and install
